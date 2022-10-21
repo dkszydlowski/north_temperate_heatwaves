@@ -1,5 +1,6 @@
 #Initial Data Download and Cleaning for Heat Waves Project
 library("tidyverse")
+library("lubridate")
 ##### Cascade Sonde Data 2008-2011 #####
 
 # Package ID: knb-lter-ntl.360.1 Cataloging System:https://pasta.edirepository.org.
@@ -108,6 +109,26 @@ detach(dt1)
 
 #####Cleaning Cascade Sonde 2008-2011#####
 sonde08_11 = dt1
+sonde08_11=sonde08_11 %>%
+  mutate(doyCat=yday(datetime))
 
+sonde08_11mean=sonde08_11 %>%
+  group_by(lake, year, doyCat) %>%
+  summarize(mean_temp=mean(stemp),
+            mean_chl=mean(chl),
+            mean_pH=mean(pH),
+            mean_doSat=mean(doSat),
+            mean_zmix=mean(zmix),
+            mean_par=mean(par),
+            mean_wind=mean(wind))
 
+sonde08_11mean=sonde08_11mean %>%
+  mutate(date=as.Date(doyCat, origin=paste(year-1, "-12-31", sep="")))
+ 
+sonde08_11_mean_L = sonde08_11mean %>%
+  filter(lake == "Paul", year == "2011")
+
+ggplot(data=sonde08_11_mean_L, aes(x=date, y=mean_temp)) + 
+  geom_point() +
+  geom_line()
 
