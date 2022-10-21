@@ -1,6 +1,9 @@
 #Initial Data Download and Cleaning for Heat Waves Project
 library("tidyverse")
+library("ggridges")
 library("lubridate")
+library("zoo")
+library(heatwaveR)
 ##### Cascade Sonde Data 2008-2011 #####
 
 # Package ID: knb-lter-ntl.360.1 Cataloging System:https://pasta.edirepository.org.
@@ -114,8 +117,8 @@ sonde08_11=sonde08_11 %>%
 
 sonde08_11mean=sonde08_11 %>%
   group_by(lake, year, doyCat) %>%
-  summarize(mean_temp=mean(stemp),
-            mean_chl=mean(chl),
+  summarize(mean_temp=mean(stemp, na.remove = TRUE),
+            mean_chl=mean(chl, na.remove = TRUE),
             mean_pH=mean(pH),
             mean_doSat=mean(doSat),
             mean_zmix=mean(zmix),
@@ -126,9 +129,35 @@ sonde08_11mean=sonde08_11mean %>%
   mutate(date=as.Date(doyCat, origin=paste(year-1, "-12-31", sep="")))
  
 sonde08_11_mean_L = sonde08_11mean %>%
-  filter(lake == "Paul", year == "2011")
+  filter(lake == "Paul", year == "2010")
+
+sonde08_11_mean_L$normChl = sonde08_11_mean_L$mean_chl/sonde08_11_mean_L$mean_chl[1]*100
+sonde08_11_mean_L$normTemp = sonde08_11_mean_L$mean_temp/sonde08_11_mean_L$mean_temp[1]*100
+
+sonde08_11_mean_L$normChl = na.approx(sonde08_11_mean_L$normChl)
 
 ggplot(data=sonde08_11_mean_L, aes(x=date, y=mean_temp)) + 
   geom_point() +
-  geom_line()
+  geom_line() +
+geom_density_line(stat = "identity", size = 0.5, fill = "blue", alpha = 0.8)+
+  theme_classic()
+  
+
+ggplot(data=sonde08_11_mean_L, aes(x=date, y=normChl)) + 
+  geom_point() +
+  geom_line() +
+ # geom_density(aes(x = date, y = normTemp), stat = "density")+
+  geom_line(aes(x = date, y = normTemp))+
+  geom_density_line(stat = "identity", size = 0.5, fill = "forestgreen", alpha = 0.8)+
+  theme_classic()
+
+
+#scale_y_continuous(name = "Mean temperature", sec.axis = sec_axis(~.*1/2, name = "mean chl"))
+#  geom_line(aes(x = date, y = mean_chl))
+ # geom_rect(xmin = "2009-06-15", xmax = "2009-06-30", ymin = 16, ymax = 16)
+
+
+### Testing calculating heatwaves ###
+
+
 
