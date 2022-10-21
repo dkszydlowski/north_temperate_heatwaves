@@ -145,10 +145,10 @@ geom_density_line(stat = "identity", size = 0.5, fill = "blue", alpha = 0.8)+
 
 ggplot(data=sonde08_11_mean_L, aes(x=date, y=normChl)) + 
   geom_point() +
-  geom_line() +
- # geom_density(aes(x = date, y = normTemp), stat = "density")+
-  geom_line(aes(x = date, y = normTemp))+
-  geom_density_line(stat = "identity", size = 0.5, fill = "forestgreen", alpha = 0.8)+
+    geom_line(aes(x = date, y = normTemp), size = 1.5)+
+  geom_density_line(aes(x = date, y = normTemp), stat = "identity", size = 0.5, fill = "steelblue3", alpha = 0.3)+
+  geom_line(size = 1.5) +
+   geom_density_line(stat = "identity", size = 1.5, fill = "forestgreen", alpha = 0.3)+
   theme_classic()
 
 
@@ -156,8 +156,16 @@ ggplot(data=sonde08_11_mean_L, aes(x=date, y=normChl)) +
 #  geom_line(aes(x = date, y = mean_chl))
  # geom_rect(xmin = "2009-06-15", xmax = "2009-06-30", ymin = 16, ymax = 16)
 
+sonde08_11mean = sonde08_11mean %>% ungroup()
 
 ### Testing calculating heatwaves ###
+hwTest <- sonde08_11mean %>% rename(t = date, temp = mean_temp) %>% filter(lake == "Paul") %>% select(t, temp)
 
+start = "2008-06-01"
+end = "2011-08-15"
 
+climOutput = ts2clm(hwTest, climatologyPeriod = c(start, "2011-08-15"))
 
+heatwaves = detect_event(climOutput)
+
+event_line(heatwaves, metric = "intensity_max", start_date = start, end_date = end)
