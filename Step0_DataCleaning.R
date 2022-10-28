@@ -136,20 +136,28 @@ sonde08_11_mean_L$normTemp = sonde08_11_mean_L$mean_temp/sonde08_11_mean_L$mean_
 
 sonde08_11_mean_L$normChl = na.approx(sonde08_11_mean_L$normChl)
 
-ggplot(data=sonde08_11_mean_L, aes(x=date, y=mean_temp)) + 
-  geom_point() +
-  geom_line() +
-geom_density_line(stat = "identity", size = 0.5, fill = "blue", alpha = 0.8)+
-  theme_classic()
   
-
+# make a plot for 2010
 ggplot(data=sonde08_11_mean_L, aes(x=date, y=normChl)) + 
   geom_point() +
     geom_line(aes(x = date, y = normTemp), size = 1.5)+
   geom_density_line(aes(x = date, y = normTemp), stat = "identity", size = 0.5, fill = "steelblue3", alpha = 0.3)+
   geom_line(size = 1.5) +
    geom_density_line(stat = "identity", size = 1.5, fill = "forestgreen", alpha = 0.3)+
-  theme_classic()
+  theme_classic()+
+  labs(title = paste(sonde08_11_mean_L$lake[1], "Lake", sonde08_11_mean_L$year[1]), y = "% of initial value")+
+  theme(title = element_text(size = 20))+
+  annotate("rect", xmin = as.Date("2010-05-24"), xmax = as.Date("2010-06-03"), ymin = 0, ymax = Inf,
+           fill = "red", alpha = 0.3)+
+  annotate("rect", xmin = as.Date("2010-08-09"), xmax = as.Date("2010-08-15"), ymin = 0, ymax = Inf,
+           fill = "red", alpha = 0.3)+
+  theme(text = element_text(size = 20))
+  
+
+
+
+
+
 
 
 #scale_y_continuous(name = "Mean temperature", sec.axis = sec_axis(~.*1/2, name = "mean chl"))
@@ -158,14 +166,14 @@ ggplot(data=sonde08_11_mean_L, aes(x=date, y=normChl)) +
 
 sonde08_11mean = sonde08_11mean %>% ungroup()
 
-### Testing calculating heatwaves ###
+##### Testing calculating heatwaves #####
 hwTest <- sonde08_11mean %>% rename(t = date, temp = mean_temp) %>% filter(lake == "Paul") %>% select(t, temp)
 
 start = "2008-06-01"
 end = "2011-08-15"
 
-climOutput = ts2clm(hwTest, climatologyPeriod = c(start, "2011-08-15"))
-
+climOutput = ts2clm(hwTest, climatologyPeriod = c(start, end))
 heatwaves = detect_event(climOutput)
 
-event_line(heatwaves, metric = "intensity_max", start_date = start, end_date = end)
+event_line(heatwaves, metric = "intensity_max", start_date = start, end_date = end)+
+  geom_point()
