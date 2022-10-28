@@ -166,6 +166,156 @@ ggplot(data=sonde08_11_mean_L, aes(x=date, y=normChl)) +
 
 sonde08_11mean = sonde08_11mean %>% ungroup()
 
+
+##### Cascade Sonde Data 2013-2015#####
+
+# Package ID: knb-lter-ntl.371.2 Cataloging System:https://pasta.edirepository.org.
+# Data set title: Cascade project at North Temperate Lakes LTER - High Frequency Data for Whole Lake Nutrient Additions 2013-2015.
+# Data set creator:  Mike Pace - University of Virginia 
+# Data set creator:  Jon Cole - Cary Institute of Ecosystem Studies 
+# Data set creator:  Stephen Carpenter - University of Wisconsin 
+# Contact:  Mike Pace -  University of Virginia  - pacem@virginia.edu
+# Contact:  NTL Information Manager -  University of Wisconsin  - ntl.infomgr@gmail.com
+# Stylesheet v2.11 for metadata conversion into program: John H. Porter, Univ. Virginia, jporter@virginia.edu 
+
+inUrl1  <- "https://pasta.lternet.edu/package/data/eml/knb-lter-ntl/371/2/db9752988bbf4eb7d5a5491c0b642b94" 
+infile1 <- tempfile()
+try(download.file(inUrl1,infile1,method="curl"))
+if (is.na(file.size(infile1))) download.file(inUrl1,infile1,method="auto")
+
+
+dt1 <-read.csv(infile1,header=F 
+               ,skip=1
+               ,sep=","  
+               ,quot='"' 
+               , col.names=c(
+                 "Year",     
+                 "Lake",     
+                 "DoY",     
+                 "BGA_YSI",     
+                 "BGA_HYLB",     
+                 "BGA_logged_YSI",     
+                 "BGA_logged_HYLB",     
+                 "DO_YSI",     
+                 "DO_HYLB",     
+                 "DOsat_calc_YSI",     
+                 "DOsat_calc_HYLB",     
+                 "PH_YSI",     
+                 "PH_HYLB",     
+                 "Chl_YSI",     
+                 "Chl_HYLB",     
+                 "Temp_YSI",     
+                 "Temp_HYLB"    ), check.names=TRUE)
+
+unlink(infile1)
+
+# Fix any interval or ratio columns mistakenly read in as nominal and nominal columns read as numeric or dates read as strings
+
+if (class(dt1$Year)=="factor") dt1$Year <-as.numeric(levels(dt1$Year))[as.integer(dt1$Year) ]               
+if (class(dt1$Year)=="character") dt1$Year <-as.numeric(dt1$Year)
+if (class(dt1$Lake)!="factor") dt1$Lake<- as.factor(dt1$Lake)
+if (class(dt1$DoY)=="factor") dt1$DoY <-as.numeric(levels(dt1$DoY))[as.integer(dt1$DoY) ]               
+if (class(dt1$DoY)=="character") dt1$DoY <-as.numeric(dt1$DoY)
+if (class(dt1$BGA_YSI)=="factor") dt1$BGA_YSI <-as.numeric(levels(dt1$BGA_YSI))[as.integer(dt1$BGA_YSI) ]               
+if (class(dt1$BGA_YSI)=="character") dt1$BGA_YSI <-as.numeric(dt1$BGA_YSI)
+if (class(dt1$BGA_HYLB)=="factor") dt1$BGA_HYLB <-as.numeric(levels(dt1$BGA_HYLB))[as.integer(dt1$BGA_HYLB) ]               
+if (class(dt1$BGA_HYLB)=="character") dt1$BGA_HYLB <-as.numeric(dt1$BGA_HYLB)
+if (class(dt1$BGA_logged_YSI)=="factor") dt1$BGA_logged_YSI <-as.numeric(levels(dt1$BGA_logged_YSI))[as.integer(dt1$BGA_logged_YSI) ]               
+if (class(dt1$BGA_logged_YSI)=="character") dt1$BGA_logged_YSI <-as.numeric(dt1$BGA_logged_YSI)
+if (class(dt1$BGA_logged_HYLB)=="factor") dt1$BGA_logged_HYLB <-as.numeric(levels(dt1$BGA_logged_HYLB))[as.integer(dt1$BGA_logged_HYLB) ]               
+if (class(dt1$BGA_logged_HYLB)=="character") dt1$BGA_logged_HYLB <-as.numeric(dt1$BGA_logged_HYLB)
+if (class(dt1$DO_YSI)=="factor") dt1$DO_YSI <-as.numeric(levels(dt1$DO_YSI))[as.integer(dt1$DO_YSI) ]               
+if (class(dt1$DO_YSI)=="character") dt1$DO_YSI <-as.numeric(dt1$DO_YSI)
+if (class(dt1$DO_HYLB)=="factor") dt1$DO_HYLB <-as.numeric(levels(dt1$DO_HYLB))[as.integer(dt1$DO_HYLB) ]               
+if (class(dt1$DO_HYLB)=="character") dt1$DO_HYLB <-as.numeric(dt1$DO_HYLB)
+if (class(dt1$DOsat_calc_YSI)=="factor") dt1$DOsat_calc_YSI <-as.numeric(levels(dt1$DOsat_calc_YSI))[as.integer(dt1$DOsat_calc_YSI) ]               
+if (class(dt1$DOsat_calc_YSI)=="character") dt1$DOsat_calc_YSI <-as.numeric(dt1$DOsat_calc_YSI)
+if (class(dt1$DOsat_calc_HYLB)=="factor") dt1$DOsat_calc_HYLB <-as.numeric(levels(dt1$DOsat_calc_HYLB))[as.integer(dt1$DOsat_calc_HYLB) ]               
+if (class(dt1$DOsat_calc_HYLB)=="character") dt1$DOsat_calc_HYLB <-as.numeric(dt1$DOsat_calc_HYLB)
+if (class(dt1$PH_YSI)=="factor") dt1$PH_YSI <-as.numeric(levels(dt1$PH_YSI))[as.integer(dt1$PH_YSI) ]               
+if (class(dt1$PH_YSI)=="character") dt1$PH_YSI <-as.numeric(dt1$PH_YSI)
+if (class(dt1$PH_HYLB)=="factor") dt1$PH_HYLB <-as.numeric(levels(dt1$PH_HYLB))[as.integer(dt1$PH_HYLB) ]               
+if (class(dt1$PH_HYLB)=="character") dt1$PH_HYLB <-as.numeric(dt1$PH_HYLB)
+if (class(dt1$Chl_YSI)=="factor") dt1$Chl_YSI <-as.numeric(levels(dt1$Chl_YSI))[as.integer(dt1$Chl_YSI) ]               
+if (class(dt1$Chl_YSI)=="character") dt1$Chl_YSI <-as.numeric(dt1$Chl_YSI)
+if (class(dt1$Chl_HYLB)=="factor") dt1$Chl_HYLB <-as.numeric(levels(dt1$Chl_HYLB))[as.integer(dt1$Chl_HYLB) ]               
+if (class(dt1$Chl_HYLB)=="character") dt1$Chl_HYLB <-as.numeric(dt1$Chl_HYLB)
+if (class(dt1$Temp_YSI)=="factor") dt1$Temp_YSI <-as.numeric(levels(dt1$Temp_YSI))[as.integer(dt1$Temp_YSI) ]               
+if (class(dt1$Temp_YSI)=="character") dt1$Temp_YSI <-as.numeric(dt1$Temp_YSI)
+if (class(dt1$Temp_HYLB)=="factor") dt1$Temp_HYLB <-as.numeric(levels(dt1$Temp_HYLB))[as.integer(dt1$Temp_HYLB) ]               
+if (class(dt1$Temp_HYLB)=="character") dt1$Temp_HYLB <-as.numeric(dt1$Temp_HYLB)
+
+# Convert Missing Values to NA for non-dates
+
+dt1$Year <- ifelse((trimws(as.character(dt1$Year))==trimws("NA")),NA,dt1$Year)               
+suppressWarnings(dt1$Year <- ifelse(!is.na(as.numeric("NA")) & (trimws(as.character(dt1$Year))==as.character(as.numeric("NA"))),NA,dt1$Year))
+dt1$DoY <- ifelse((trimws(as.character(dt1$DoY))==trimws("NA")),NA,dt1$DoY)               
+suppressWarnings(dt1$DoY <- ifelse(!is.na(as.numeric("NA")) & (trimws(as.character(dt1$DoY))==as.character(as.numeric("NA"))),NA,dt1$DoY))
+dt1$BGA_YSI <- ifelse((trimws(as.character(dt1$BGA_YSI))==trimws("NA")),NA,dt1$BGA_YSI)               
+suppressWarnings(dt1$BGA_YSI <- ifelse(!is.na(as.numeric("NA")) & (trimws(as.character(dt1$BGA_YSI))==as.character(as.numeric("NA"))),NA,dt1$BGA_YSI))
+dt1$BGA_HYLB <- ifelse((trimws(as.character(dt1$BGA_HYLB))==trimws("NA")),NA,dt1$BGA_HYLB)               
+suppressWarnings(dt1$BGA_HYLB <- ifelse(!is.na(as.numeric("NA")) & (trimws(as.character(dt1$BGA_HYLB))==as.character(as.numeric("NA"))),NA,dt1$BGA_HYLB))
+dt1$BGA_logged_YSI <- ifelse((trimws(as.character(dt1$BGA_logged_YSI))==trimws("NA")),NA,dt1$BGA_logged_YSI)               
+suppressWarnings(dt1$BGA_logged_YSI <- ifelse(!is.na(as.numeric("NA")) & (trimws(as.character(dt1$BGA_logged_YSI))==as.character(as.numeric("NA"))),NA,dt1$BGA_logged_YSI))
+dt1$BGA_logged_HYLB <- ifelse((trimws(as.character(dt1$BGA_logged_HYLB))==trimws("NA")),NA,dt1$BGA_logged_HYLB)               
+suppressWarnings(dt1$BGA_logged_HYLB <- ifelse(!is.na(as.numeric("NA")) & (trimws(as.character(dt1$BGA_logged_HYLB))==as.character(as.numeric("NA"))),NA,dt1$BGA_logged_HYLB))
+dt1$DO_YSI <- ifelse((trimws(as.character(dt1$DO_YSI))==trimws("NA")),NA,dt1$DO_YSI)               
+suppressWarnings(dt1$DO_YSI <- ifelse(!is.na(as.numeric("NA")) & (trimws(as.character(dt1$DO_YSI))==as.character(as.numeric("NA"))),NA,dt1$DO_YSI))
+dt1$DO_HYLB <- ifelse((trimws(as.character(dt1$DO_HYLB))==trimws("NA")),NA,dt1$DO_HYLB)               
+suppressWarnings(dt1$DO_HYLB <- ifelse(!is.na(as.numeric("NA")) & (trimws(as.character(dt1$DO_HYLB))==as.character(as.numeric("NA"))),NA,dt1$DO_HYLB))
+dt1$DOsat_calc_YSI <- ifelse((trimws(as.character(dt1$DOsat_calc_YSI))==trimws("NA")),NA,dt1$DOsat_calc_YSI)               
+suppressWarnings(dt1$DOsat_calc_YSI <- ifelse(!is.na(as.numeric("NA")) & (trimws(as.character(dt1$DOsat_calc_YSI))==as.character(as.numeric("NA"))),NA,dt1$DOsat_calc_YSI))
+dt1$DOsat_calc_HYLB <- ifelse((trimws(as.character(dt1$DOsat_calc_HYLB))==trimws("NA")),NA,dt1$DOsat_calc_HYLB)               
+suppressWarnings(dt1$DOsat_calc_HYLB <- ifelse(!is.na(as.numeric("NA")) & (trimws(as.character(dt1$DOsat_calc_HYLB))==as.character(as.numeric("NA"))),NA,dt1$DOsat_calc_HYLB))
+dt1$PH_YSI <- ifelse((trimws(as.character(dt1$PH_YSI))==trimws("NA")),NA,dt1$PH_YSI)               
+suppressWarnings(dt1$PH_YSI <- ifelse(!is.na(as.numeric("NA")) & (trimws(as.character(dt1$PH_YSI))==as.character(as.numeric("NA"))),NA,dt1$PH_YSI))
+dt1$PH_HYLB <- ifelse((trimws(as.character(dt1$PH_HYLB))==trimws("NA")),NA,dt1$PH_HYLB)               
+suppressWarnings(dt1$PH_HYLB <- ifelse(!is.na(as.numeric("NA")) & (trimws(as.character(dt1$PH_HYLB))==as.character(as.numeric("NA"))),NA,dt1$PH_HYLB))
+dt1$Chl_YSI <- ifelse((trimws(as.character(dt1$Chl_YSI))==trimws("NA")),NA,dt1$Chl_YSI)               
+suppressWarnings(dt1$Chl_YSI <- ifelse(!is.na(as.numeric("NA")) & (trimws(as.character(dt1$Chl_YSI))==as.character(as.numeric("NA"))),NA,dt1$Chl_YSI))
+dt1$Chl_HYLB <- ifelse((trimws(as.character(dt1$Chl_HYLB))==trimws("NA")),NA,dt1$Chl_HYLB)               
+suppressWarnings(dt1$Chl_HYLB <- ifelse(!is.na(as.numeric("NA")) & (trimws(as.character(dt1$Chl_HYLB))==as.character(as.numeric("NA"))),NA,dt1$Chl_HYLB))
+dt1$Temp_YSI <- ifelse((trimws(as.character(dt1$Temp_YSI))==trimws("NA")),NA,dt1$Temp_YSI)               
+suppressWarnings(dt1$Temp_YSI <- ifelse(!is.na(as.numeric("NA")) & (trimws(as.character(dt1$Temp_YSI))==as.character(as.numeric("NA"))),NA,dt1$Temp_YSI))
+dt1$Temp_HYLB <- ifelse((trimws(as.character(dt1$Temp_HYLB))==trimws("NA")),NA,dt1$Temp_HYLB)               
+suppressWarnings(dt1$Temp_HYLB <- ifelse(!is.na(as.numeric("NA")) & (trimws(as.character(dt1$Temp_HYLB))==as.character(as.numeric("NA"))),NA,dt1$Temp_HYLB))
+
+
+# Here is the structure of the input data frame:
+str(dt1)                            
+attach(dt1)                            
+# The analyses below are basic descriptions of the variables. After testing, they should be replaced.                 
+
+summary(Year)
+summary(Lake)
+summary(DoY)
+summary(BGA_YSI)
+summary(BGA_HYLB)
+summary(BGA_logged_YSI)
+summary(BGA_logged_HYLB)
+summary(DO_YSI)
+summary(DO_HYLB)
+summary(DOsat_calc_YSI)
+summary(DOsat_calc_HYLB)
+summary(PH_YSI)
+summary(PH_HYLB)
+summary(Chl_YSI)
+summary(Chl_HYLB)
+summary(Temp_YSI)
+summary(Temp_HYLB) 
+# Get more details on character variables
+
+summary(as.factor(dt1$Lake))
+detach(dt1)               
+
+
+
+sonde13_15 = dt1
+
+
+
+
+
 ##### Testing calculating heatwaves #####
 hwTest <- sonde08_11mean %>% rename(t = date, temp = mean_temp) %>% filter(lake == "Paul") %>% select(t, temp)
 
@@ -177,3 +327,5 @@ heatwaves = detect_event(climOutput)
 
 event_line(heatwaves, metric = "intensity_max", start_date = start, end_date = end)+
   geom_point()
+
+
