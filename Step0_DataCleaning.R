@@ -1,6 +1,9 @@
 #Initial Data Download and Cleaning for Heat Waves Project
 library("tidyverse")
+library("ggridges")
 library("lubridate")
+library("zoo")
+library(heatwaveR)
 ##### Cascade Sonde Data 2008-2011 #####
 
 # Package ID: knb-lter-ntl.360.1 Cataloging System:https://pasta.edirepository.org.
@@ -114,8 +117,8 @@ sonde08_11=sonde08_11 %>%
 
 sonde08_11mean=sonde08_11 %>%
   group_by(lake, year, doyCat) %>%
-  summarize(mean_temp=mean(stemp),
-            mean_chl=mean(chl),
+  summarize(mean_temp=mean(stemp, na.remove = TRUE),
+            mean_chl=mean(chl, na.remove = TRUE),
             mean_pH=mean(pH),
             mean_doSat=mean(doSat),
             mean_zmix=mean(zmix),
@@ -124,11 +127,53 @@ sonde08_11mean=sonde08_11 %>%
 
 sonde08_11mean=sonde08_11mean %>%
   mutate(date=as.Date(doyCat, origin=paste(year-1, "-12-31", sep="")))
- 
+
 sonde08_11_mean_L = sonde08_11mean %>%
-  filter(lake == "Paul", year == "2011")
+  filter(lake == "Paul", year == "2010")
 
-ggplot(data=sonde08_11_mean_L, aes(x=date, y=mean_temp)) + 
+sonde08_11_mean_L$normChl = sonde08_11_mean_L$mean_chl/sonde08_11_mean_L$mean_chl[1]*100
+sonde08_11_mean_L$normTemp = sonde08_11_mean_L$mean_temp/sonde08_11_mean_L$mean_temp[1]*100
+
+sonde08_11_mean_L$normChl = na.approx(sonde08_11_mean_L$normChl)
+
+
+# make a plot for 2010
+ggplot(data=sonde08_11_mean_L, aes(x=date, y=normChl)) + 
   geom_point() +
-  geom_line()
+  geom_line(aes(x = date, y = normTemp), size = 1.5)+
+  geom_density_line(aes(x = date, y = normTemp), stat = "identity", size = 0.5, fill = "steelblue3", alpha = 0.3)+
+  geom_line(size = 1.5) +
+  geom_density_line(stat = "identity", size = 1.5, fill = "forestgreen", alpha = 0.3)+
+  theme_classic()+
+  labs(title = paste(sonde08_11_mean_L$lake[1], "Lake", sonde08_11_mean_L$year[1]), y = "% of initial value")+
+  theme(title = element_text(size = 20))+
+  annotate("rect", xmin = as.Date("2010-05-24"), xmax = as.Date("2010-06-03"), ymin = 0, ymax = Inf,
+           fill = "red", alpha = 0.3)+
+  annotate("rect", xmin = as.Date("2010-08-09"), xmax = as.Date("2010-08-15"), ymin = 0, ymax = Inf,
+           fill = "red", alpha = 0.3)+
+  theme(text = element_text(size = 20))
 
+
+
+
+
+
+
+
+#scale_y_continuous(name = "Mean temperature", sec.axis = sec_axis(~.*1/2, name = "mean chl"))
+#  geom_line(aes(x = date, y = mean_chl))
+# geom_rect(xmin = "2009-06-15", xmax = "2009-06-30", ymin = 16, ymax = 16)
+
+sonde08_11mean = sonde08_11mean %>% ungroup()
+
+##### Testing calculating heatwaves #####
+hwTest <- sonde08_11mean %>% rename(t = date, temp = mean_temp) %>% filter(lake == "Paul") %>% select(t, temp)
+
+start = "2008-06-01"
+end = "2011-08-15"
+
+climOutput = ts2clm(hwTest, climatologyPeriod = c(start, end))
+heatwaves = detect_event(climOutput)
+
+event_line(heatwaves, metric = "intensity_max", start_date = start, end_date = end)+
+  geom_point()
