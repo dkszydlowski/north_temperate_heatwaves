@@ -367,6 +367,10 @@ sonde08_11mean = sonde08_11mean %>%
   mutate(lake = replace(lake, lake == "Peter", "R")) %>%
   mutate(lake = replace(lake, lake == "Paul", "L"))
 
+allSonde = rbind(sonde08_11mean, sonde13_15mean, sonde18_19mean)
+
+write.csv(allSonde, "CombinedData.csv")
+
 
 ##### 2008-2011 calculating heatwaves #####
 hwTest1 <- sonde08_11mean %>% rename(t = date, temp = mean_temp) %>% filter(lake == "Paul") %>% select(t, temp)
