@@ -340,6 +340,34 @@ sonde13_15_mean_L$normChl = na.approx(sonde13_15_mean_L$normChl)
 
 
 
+#####Cleaning Cascade Sonde Data 2018-2019#####
+sonde18_19 = read.csv("experimentalLakes_combinedData_daily_allDates_v2.csv")
+sonde18_19 = sonde18_19 %>%
+  filter(Year == 2018 | Year == 2019)
+
+sonde18_19 = sonde18_19 %>%
+  rename(lake = Lake, year = Year, doyCat = doy, mean_chl = Chl_Manual, mean_temp = Temp_Sonde, mean_pH = pH, mean_doSat = DOsat, mean_do = DOconc, date = Date)
+
+sonde18_19 = sonde18_19 %>%
+  select(lake, year, doyCat, mean_temp, mean_chl, mean_pH, mean_doSat, mean_do, date) %>%
+  mutate(date = as.Date(date, format = "%m/%d/%Y"))
+
+sonde18_19mean = sonde18_19 
+
+
+#####Combining Data#####
+sonde08_11mean$mean_do = NA
+
+sonde08_11mean = sonde08_11mean %>%
+  select(lake, year, doyCat, mean_temp, mean_chl, mean_pH, mean_doSat, mean_do, date)
+
+sonde08_11mean$lake = as.character(sonde08_11mean$lake)
+
+sonde08_11mean = sonde08_11mean %>%
+  mutate(lake = replace(lake, lake == "Peter", "R")) %>%
+  mutate(lake = replace(lake, lake == "Paul", "L"))
+
+
 ##### 2008-2011 calculating heatwaves #####
 hwTest1 <- sonde08_11mean %>% rename(t = date, temp = mean_temp) %>% filter(lake == "Paul") %>% select(t, temp)
 
@@ -366,4 +394,6 @@ heatwaves = detect_event(climOutput)
 
 event_line(heatwaves, metric = "intensity_max", start_date = "2013-06-01", end_date = "2013-09-15")+
   geom_point()
+
+
 
