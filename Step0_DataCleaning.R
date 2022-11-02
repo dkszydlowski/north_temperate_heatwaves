@@ -369,7 +369,7 @@ sonde08_11mean = sonde08_11mean %>%
 
 allSonde = rbind(sonde08_11mean, sonde13_15mean, sonde18_19mean)
 
-write.csv(allSonde, "CombinedData.csv")
+write.csv(allSonde, "CombinedData.csv", row.names = FALSE)
 
 
 ##### 2008-2011 calculating heatwaves #####
