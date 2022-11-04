@@ -341,16 +341,15 @@ sonde13_15_mean_L$normChl = na.approx(sonde13_15_mean_L$normChl)
 
 
 #####Cleaning Cascade Sonde Data 2018-2019#####
-sonde18_19 = read.csv("experimentalLakes_combinedData_daily_allDates_v2.csv")
+sonde18_19 = read.csv("Cascade_LR_2018_2019_RaftData_MARSSfilledData_manualChl_dailyData_v2 (2).csv")
 sonde18_19 = sonde18_19 %>%
   filter(Year == 2018 | Year == 2019)
 
 sonde18_19 = sonde18_19 %>%
-  rename(lake = Lake, year = Year, doyCat = doy, mean_chl = Chl_Manual, mean_temp = Temp_Sonde, mean_pH = pH, mean_doSat = DOsat, mean_do = DOconc, date = Date)
+  rename(lake = Lake, year = Year, doyCat = DOYtrunc, mean_chl = Chl_HYLB, mean_temp = Temp_HYLB, mean_pH = pH_HYLB, mean_doSat = DOlocalSat_HYLB, mean_do = DO_HYLB, date = Date)
 
 sonde18_19 = sonde18_19 %>%
-  select(lake, year, doyCat, mean_temp, mean_chl, mean_pH, mean_doSat, mean_do, date) %>%
-  mutate(date = as.Date(date, format = "%m/%d/%Y"))
+  select(lake, year, doyCat, mean_temp, mean_chl, mean_pH, mean_doSat, mean_do, date) 
 
 sonde18_19mean = sonde18_19 
 
