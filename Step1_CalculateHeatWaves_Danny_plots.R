@@ -44,7 +44,7 @@ event_line(peterHW, metric = "intensity_max", start_date = "2019-06-01", end_dat
 climOutputT = ts2clm(tuesdayHWinput, climatologyPeriod = c(min(tuesdayHWinput$t), max(tuesdayHWinput$t)))
 tuesdayHW = detect_event(climOutputT)
 
-event_line(tuesdayHW, metric = "intensity_max", start_date = "2019-06-01", end_date = "2019-09-15")+
+event_line(peterHW, metric = "intensity_max", start_date = "2015-06-01", end_date = "2015-08-15")+
   geom_point()
 
 
@@ -109,8 +109,8 @@ plot_heatwaves = function(targLake, targYear, sonde, hw){
   
   print(str)
   
- 
-  p = ggplot(data=temp, aes(x=date, y=normChl)) + 
+ plotText = deparse(quote(
+  ggplot(data=temp, aes(x=date, y=normChl)) + 
     geom_point() +
     geom_line(aes(x = date, y = normTemp), size = 1.5)+
     geom_density_line(aes(x = date, y = normTemp), stat = "identity", size = 0.5, fill = "steelblue3", alpha = 0.3)+
@@ -119,19 +119,19 @@ plot_heatwaves = function(targLake, targYear, sonde, hw){
     theme_classic()+
     labs(title = paste(temp$lake[1], "Lake", temp$year[1]), y = "% of initial value")+
     theme(title = element_text(size = 20))+
-    theme(text = element_text(size = 20))
- print(p +
-  for(k in 1:length(strings)){
-  eval(parse(text = strings[k]))
-    print(strings[k])
-  }
- )
+    theme(text = element_text(size = 20))))
+  
+
+
+  eval(parse(text = str))
+    
+ 
   
 }
 
 # run the code for a specific lake-year
 
-plot_heatwaves("R", "2013", allSondeInterp, heatwaves)
+plot_heatwaves("L", "2008", allSondeInterp, heatwaves)
 
 
 
@@ -152,3 +152,24 @@ for(i in 1:nrow(hwTemp)){
   }
   
 }
+
+
+
+
+### Test out the code ###
+
+
+plotText = deparse(quote(
+  ggplot(data=temp, aes(x=date, y=normChl)) + 
+    geom_point() +
+    geom_line(aes(x = date, y = normTemp), size = 1.5)+
+    geom_density_line(aes(x = date, y = normTemp), stat = "identity", size = 0.5, fill = "steelblue3", alpha = 0.3)+
+    geom_line(size = 1.5) +
+    geom_density_line(stat = "identity", size = 1.5, fill = "forestgreen", alpha = 0.3)+
+    theme_classic()+
+    labs(title = paste(temp$lake[1], "Lake", temp$year[1]), y = "% of initial value")+
+    theme(title = element_text(size = 20))+
+    theme(text = element_text(size = 20))))
+
+
+eval(parse(text = str))
