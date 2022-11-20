@@ -7,7 +7,6 @@ library("zoo")
 library(heatwaveR)
 
 
-
 allSonde = read.csv("CombinedData.csv")
 allSonde$date = as.Date(allSonde$date)
 
@@ -40,19 +39,29 @@ event_line(paulHW, metric = "intensity_max", start_date = "2019-06-01", end_date
 climOutputR = ts2clm(peterHWinput, climatologyPeriod = c(min(peterHWinput$t), max(peterHWinput$t)))
 peterHW = detect_event(climOutputR)
 
-event_line(peterHW, metric = "intensity_max", start_date = "2019-06-01", end_date = "2019-09-15")+
-  geom_point()
+event_line(peterHW, metric = "intensity_max", start_date = "2018-06-01", end_date = "2018-09-15")+
+  geom_point()+
+  xlim(as.Date("2018-05-01"), as.Date("2018-09-01"))
+
+# the Tuesday data throws an error because technically there aren't three years of data
+# can we just add a dummy day to bypass that error? We have three summers of data
+
+tuesdayHWinput[nrow(tuesdayHWinput)+1, ] = NA
+tuesdayHWinput[nrow(tuesdayHWinput), 1] = as.Date("2016-06-01")
+
 
 climOutputT = ts2clm(tuesdayHWinput, climatologyPeriod = c(min(tuesdayHWinput$t), max(tuesdayHWinput$t)))
 tuesdayHW = detect_event(climOutputT)
 
-event_line(tuesdayHW, metric = "intensity_max", start_date = "2019-06-01", end_date = "2019-09-15")+
-  geom_point()
+event_line(tuesdayHW, metric = "intensity_max", start_date = "2013-06-01", end_date = "2013-09-15")+
+  geom_point()+
+  xlim(as.Date("2013-05-01"), as.Date("2013-09-01"))
 
 
 peterHW$event$lake = "R" 
 paulHW$event$lake = "L"
-heatwaves = rbind(peterHW$event, paulHW$event)
+tuesdayHW$event$lake = "T"
+heatwaves = rbind(peterHW$event, paulHW$event, tuesdayHW$event)
 
 #####Test Plots#####
 ggplot(data = allSonde, aes(x = date, y = mean_temp, color = lake)) + 
@@ -315,4 +324,4 @@ ggplot(data=Paul2019, aes(x=date, y=normChl)) +
   theme(text = element_text(size = 20))
 
 
-write.csv(heatwaves, "heatwavesdata.csv")
+write.csv(heatwaves, "heatwavesdata.csv", row.names = FALSE)
