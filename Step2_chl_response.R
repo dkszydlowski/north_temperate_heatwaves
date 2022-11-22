@@ -3,6 +3,7 @@
 if (!require(slider)) install.packages('slider')
 library(slider)
 
+
 # read in the heatwaves data calculated in the previous step
 heatwaves = read.csv("Heatwavesdata.csv")
 
@@ -34,4 +35,7 @@ hwResponse = function(data, variable, start, end, lake){
 #          roll3_tcline = slide_dbl(thermocline, .f=mean, na.rm = TRUE, .before = 2, .complete = TRUE), #3 day rolling window
 #          roll4_tcline = slide_dbl(thermocline, .f=mean, na.rm = TRUE, .before = 3, .complete = TRUE)) #4 day rolling window
 
+
+
+# maybe a function that calculates the slope following a heatwave
 
