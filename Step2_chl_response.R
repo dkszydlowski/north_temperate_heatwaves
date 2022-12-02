@@ -3,9 +3,11 @@
 if (!require(slider)) install.packages('slider')
 library(slider)
 
+if (!require(tidyr)) install.packages('tidyr')
 library(tidyr)
-library(dplyr)
 
+if (!require(dplyr)) install.packages('dplyr')
+library(dplyr)
 
 # read in the heatwaves data calculated in the previous step
 heatwaves = read.csv("Heatwavesdata.csv")
@@ -48,7 +50,6 @@ models <- slide(
   .complete = TRUE
 )
 
-
 testing <- allSonde %>% 
   group_by(year, lake) %>% 
   slide(
@@ -58,13 +59,9 @@ testing <- allSonde %>%
   )
 
 
-
 peter15$slope = NA
 peter15$se = NA
 peter15$p_value = NA
-
-i =1
-
 
 ## extract the slope, se, and p-value
 # and add to the dataframe
@@ -90,7 +87,7 @@ models <- slide(
   .complete = TRUE
 )
 
-temp$slope = NA
+temp$chl_slope = NA
 temp$se = NA
 temp$p_value = NA
 temp$r_squared = NA
@@ -103,8 +100,9 @@ for(j in 1:nrow(temp)){
   
   if(!(is.null(coef))){
     Slope <- coef["doyCat"]
-    temp$slope[j] = Slope
-    temp$r_squared[j] = summary(model)$r.squared
+    temp$chl_slope[j] = Slope # pull out the flope from the model
+    temp$p_value[j] = summary(model)$coefficients[2,4] 
+    temp$r_squared[j] = summary(model)$r.squared # pull out r_squared from model
   }
   
 
@@ -117,21 +115,23 @@ if(i >1){slopes = rbind(slopes, temp)} # else, appends to slopes
 remove(models)
 }
 
-
-### Right now, this code does a 
-
-
-### Make a function which extracts the slopes for a given heatwave
+# Need to fix the p-value extraction!!!!!!
 
 
-# #Example of rolling windows calculating the mean of thermocline depth in 2, 3, and 4 day windows
-# thermo_roll = thermo1 %>%
-#   mutate(roll2_tcline = slide_dbl(thermocline, .f=mean, na.rm = TRUE, .before = 1, .complete = TRUE), #2 day rolling window
-#          roll3_tcline = slide_dbl(thermocline, .f=mean, na.rm = TRUE, .before = 2, .complete = TRUE), #3 day rolling window
-#          roll4_tcline = slide_dbl(thermocline, .f=mean, na.rm = TRUE, .before = 3, .complete = TRUE)) #4 day rolling window
+######### Make a function to extract the slopes following each heatwave event ##########
+# heatwave is the date of a heatwave, lake is the lake, data is the data to look for it in
+
+hwSlopes <- function(heatwave, targLake, data){
+  startDate = as.Date(heatwave)+7
+  endDate = as.Date(heatwave)+13
+  
+  temp = data %>% filter(lake == targLake, date >= startDate, date <= endDate)
+  return(temp)
+  
+}
+
+test = hwSlopes("2010-05-24", "R", slopes)
+
+mean(test$chl_slope, na.rm = TRUE)
 
 
-
-# maybe a function that calculates the slope following a heatwave
-
-testCoef = coefficients(testModel)[2]
