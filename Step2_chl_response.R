@@ -124,6 +124,7 @@ remove(models)
 ### Make a function which extracts the slopes for a given heatwave
 
 
+
 # #Example of rolling windows calculating the mean of thermocline depth in 2, 3, and 4 day windows
 # thermo_roll = thermo1 %>%
 #   mutate(roll2_tcline = slide_dbl(thermocline, .f=mean, na.rm = TRUE, .before = 1, .complete = TRUE), #2 day rolling window
@@ -134,4 +135,3 @@ remove(models)
 
 # maybe a function that calculates the slope following a heatwave
 
-testCoef = coefficients(testModel)[2]
