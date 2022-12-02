@@ -3,11 +3,14 @@
 if (!require(slider)) install.packages('slider')
 library(slider)
 
+
 if (!require(tidyr)) install.packages('tidyr')
 library(tidyr)
 
 if (!require(dplyr)) install.packages('dplyr')
 library(dplyr)
+
+
 
 # read in the heatwaves data calculated in the previous step
 heatwaves = read.csv("Heatwavesdata.csv")
@@ -17,21 +20,27 @@ allSonde = read.csv("CombinedData.csv")
 allSonde$date = as.Date(allSonde$date)
 
 peter15 = allSonde %>% filter(lake == "R" & year == 2015)
-# maybe make a function that calculates the slope following a heatwave
-
+# maybe make a function that calculates the slope following a heatwav
 #peter15 = as.list(peter15)
+
 # data is the data from the sondes
 # variable is the response variable of interest
 # start is the start date we want to analyze
 # end is how many days to add to that (e.g., 7, 14, etc. for our window)
 
+
 data_test = slide_dbl(peter15$mean_chl, .f = ., .after = 14, .complete = TRUE)
+
+dataTest = peter15 %>% 
+  mutate(roll2_chl = slide_dbl(mean_chl, .f=mean, na.rm = TRUE, .after = 14, .complete = TRUE))
+
 
 
 hwResponse = function(data, variable, start, end, lake){
   
 
 }
+
 
 testModel = lm(peter15$mean_chl~peter15$doyCat)$coefficients
 testModel$coefficients[2]
@@ -133,5 +142,6 @@ hwSlopes <- function(heatwave, targLake, data){
 test = hwSlopes("2010-05-24", "R", slopes)
 
 mean(test$chl_slope, na.rm = TRUE)
+
 
 
