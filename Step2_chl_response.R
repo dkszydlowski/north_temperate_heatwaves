@@ -11,11 +11,12 @@ library(dplyr)
 
 # read in the heatwaves data calculated in the previous step
 heatwaves = read.csv("Heatwavesdata.csv")
-
+ 
 # read in the sonde data from step 1
 allSonde = read.csv("CombinedData.csv")
 allSonde$date = as.Date(allSonde$date)
 
+######## Testing code ##########
 peter15 = allSonde %>% filter(lake == "R" & year == 2015)
 # maybe make a function that calculates the slope following a heatwave
 
@@ -63,6 +64,12 @@ peter15$slope = NA
 peter15$se = NA
 peter15$p_value = NA
 
+
+
+
+
+####### Start of actual code #########
+
 ## extract the slope, se, and p-value
 # and add to the dataframe
 
@@ -73,8 +80,14 @@ allSonde = allSonde %>%
 # make a vector of unique lake years
 lake_years = unique(allSonde$lake_year)
 
+
+
 # cycle through each lake year, calculate models for each, then store model results
 # in the dataframe. Need to initially store the model results in a list
+
+i = 1
+
+
 for(i in 1:length(lake_years)){
   
 print(lake_years[i])
@@ -117,7 +130,6 @@ remove(models)
 
 # Need to fix the p-value extraction!!!!!!
 
-
 ######### Make a function to extract the slopes following each heatwave event ##########
 # heatwave is the date of a heatwave, lake is the lake, data is the data to look for it in
 
@@ -130,8 +142,15 @@ hwSlopes <- function(heatwave, targLake, data){
   
 }
 
-test = hwSlopes("2010-05-24", "R", slopes)
+heatwaves$averageSlope = NA
 
-mean(test$chl_slope, na.rm = TRUE)
+# copy and paste this
+test = hwSlopes("2009-06-27", "R", slopes)
+heatwaves$averageSlope[1] = mean(test$chl_slope, na.rm = TRUE)
+
+
+test = hwSlopes("2010-06-03", "R", slopes)
+heatwaves$averageSlope[2] = mean(test$chl_slope, na.rm = TRUE)
+
 
 
