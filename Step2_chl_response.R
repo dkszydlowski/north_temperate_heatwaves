@@ -144,6 +144,7 @@ hwSlopes <- function(heatwave, targLake, data){
 
 heatwaves$averageSlope = NA
 
+
 # copy and paste this
 test = hwSlopes("2009-06-27", "R", slopes)
 heatwaves$averageSlope[1] = mean(test$chl_slope, na.rm = TRUE)
