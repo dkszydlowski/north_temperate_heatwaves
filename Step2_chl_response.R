@@ -19,6 +19,7 @@ heatwaves = read.csv("Heatwavesdata.csv")
 allSonde = read.csv("CombinedData.csv")
 allSonde$date = as.Date(allSonde$date)
 
+######## Testing code ##########
 peter15 = allSonde %>% filter(lake == "R" & year == 2015)
 # maybe make a function that calculates the slope following a heatwav
 #peter15 = as.list(peter15)
@@ -38,7 +39,7 @@ dataTest = peter15 %>%
 
 hwResponse = function(data, variable, start, end, lake){
   
-
+  
 }
 
 
@@ -72,6 +73,12 @@ peter15$slope = NA
 peter15$se = NA
 peter15$p_value = NA
 
+
+
+
+
+####### Start of actual code #########
+
 ## extract the slope, se, and p-value
 # and add to the dataframe
 
@@ -82,50 +89,55 @@ allSonde = allSonde %>%
 # make a vector of unique lake years
 lake_years = unique(allSonde$lake_year)
 
+
+
 # cycle through each lake year, calculate models for each, then store model results
 # in the dataframe. Need to initially store the model results in a list
+
+i = 1
+
+
 for(i in 1:length(lake_years)){
   
-print(lake_years[i])
-temp = allSonde %>% filter(lake_year == lake_years[i]) # temp dataframe for this lake_year
-
-models <- slide(
-  temp, 
-  ~lm(mean_chl ~ doyCat, data = .x), 
-  .before = 7, 
-  .complete = TRUE
-)
-
-temp$chl_slope = NA
-temp$se = NA
-temp$p_value = NA
-temp$r_squared = NA
-
-for(j in 1:nrow(temp)){
+  print(lake_years[i])
+  temp = allSonde %>% filter(lake_year == lake_years[i]) # temp dataframe for this lake_year
   
-  model = models[[j]]
-  coef <- coefficients(model) 
-  # extracting the coefficients from the current model
+  models <- slide(
+    temp, 
+    ~lm(mean_chl ~ doyCat, data = .x), 
+    .before = 7, 
+    .complete = TRUE
+  )
   
-  if(!(is.null(coef))){
-    Slope <- coef["doyCat"]
-    temp$chl_slope[j] = Slope # pull out the flope from the model
-    temp$p_value[j] = summary(model)$coefficients[2,4] 
-    temp$r_squared[j] = summary(model)$r.squared # pull out r_squared from model
+  temp$chl_slope = NA
+  temp$se = NA
+  temp$p_value = NA
+  temp$r_squared = NA
+  
+  for(j in 1:nrow(temp)){
+    
+    model = models[[j]]
+    coef <- coefficients(model) 
+    # extracting the coefficients from the current model
+    
+    if(!(is.null(coef))){
+      Slope <- coef["doyCat"]
+      temp$chl_slope[j] = Slope # pull out the flope from the model
+      temp$p_value[j] = summary(model)$coefficients[2,4] 
+      temp$r_squared[j] = summary(model)$r.squared # pull out r_squared from model
+    }
+    
+    
   }
   
-
-}
-
-if(i ==1){ slopes = temp} # if first iteration, creates slopes, the final dataframe
-
-if(i >1){slopes = rbind(slopes, temp)} # else, appends to slopes 
-
-remove(models)
+  if(i ==1){ slopes = temp} # if first iteration, creates slopes, the final dataframe
+  
+  if(i >1){slopes = rbind(slopes, temp)} # else, appends to slopes 
+  
+  remove(models)
 }
 
 # Need to fix the p-value extraction!!!!!!
-
 
 ######### Make a function to extract the slopes following each heatwave event ##########
 # heatwave is the date of a heatwave, lake is the lake, data is the data to look for it in
@@ -139,9 +151,23 @@ hwSlopes <- function(heatwave, targLake, data){
   
 }
 
-test = hwSlopes("2010-05-24", "R", slopes)
-
-mean(test$chl_slope, na.rm = TRUE)
+heatwaves$averageSlope = NA
 
 
+# copy and paste this
+test = hwSlopes("2009-06-27", "R", slopes)
+heatwaves$averageSlope[1] = mean(test$chl_slope, na.rm = TRUE)
+
+
+
+
+
+#For loop attempt
+
+lengthHW = nrow(heatwaves)
+
+for(i in 1:lengthHW){
+  test = hwSlopes(heatwaves$date_end[i], heatwaves$lake[i], slopes)
+  heatwaves$averageSlope[i] = mean(test$chl_slope, na.rm = TRUE)
+}
 
