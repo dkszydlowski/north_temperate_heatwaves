@@ -171,3 +171,4 @@ for(i in 1:lengthHW){
   heatwaves$averageSlope[i] = mean(test$chl_slope, na.rm = TRUE)
 }
 
+write.csv(heatwaves, "./results/heatwaves_with_slopes.csv", row.names = FALSE)
