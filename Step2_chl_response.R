@@ -9,6 +9,7 @@ library(tidyr)
 
 if (!require(dplyr)) install.packages('dplyr')
 library(dplyr)
+library(tidyverse)
 
 
 
@@ -162,8 +163,7 @@ heatwaves$averageSlope[1] = mean(test$chl_slope, na.rm = TRUE)
 
 
 
-#For loop attempt
-
+#Using a For Loop
 lengthHW = nrow(heatwaves)
 
 for(i in 1:lengthHW){
@@ -172,3 +172,35 @@ for(i in 1:lengthHW){
 }
 
 write.csv(heatwaves, "./results/heatwaves_with_slopes.csv", row.names = FALSE)
+
+
+#making plots
+results = read.csv("./results/heatwaves_with_slopes.csv")
+hist(results)
+
+#break up by lake by filtering data
+resultsT = results %>% filter(lake == "T")
+resultsL = results %>% filter(lake == "L")
+resultsR = results %>% filter(lake == "R")
+
+#make preliminary plots - plot slope 
+plot(resultsT$averageSlope ~ resultsT$duration)
+plot(resultsR$averageSlope ~ resultsR$duration)
+
+#work on plotting slopes vs different variables, see if any interesting relationships 
+
+#use ggplot to make three plots, one for each lake with date of heatwave on x-axis
+#and average slope on the y
+
+#png(filename = "./figures/preliminary figures/R_slopes_2023_02_09", height = 8, width = 11, units = "in", res = 300)
+
+ggplot(data = resultsR, aes(x = date_end, y = averageSlope))+
+  geom_bar(stat='identity', fill = "forestgreen")+
+  theme_classic()+
+  ylab("average chlorophyll slope (ug/L/day)")+
+  xlab("end date of heatwave")+
+  ggtitle("Peter")
+  
+
+
+
