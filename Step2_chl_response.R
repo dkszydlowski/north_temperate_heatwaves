@@ -10,7 +10,8 @@ if (!require(dplyr)) install.packages('dplyr')
 library(dplyr)
 library(tidyverse)
 
-
+if (!require(zoo)) install.packages('zoo')
+library(zoo)
 
 # read in the heatwaves data calculated in the previous step
 heatwaves = read.csv("Heatwavesdata.csv")
@@ -18,6 +19,13 @@ heatwaves = read.csv("Heatwavesdata.csv")
 # read in the sonde data from step 1
 allSonde = read.csv("CombinedData.csv")
 allSonde$date = as.Date(allSonde$date)
+
+# interpolate the data by lake_year
+allSonde = allSonde %>% group_by("lake_year") %>% 
+  mutate(mean_chl = na.approx(mean_chl),
+         mean_doSat = na.approx(mean_doSat),
+         mean_pH = na.approx(mean_pH)) %>% 
+  ungroup()
 
 ######## Testing code ##########
 peter15 = allSonde %>% filter(lake == "R" & year == 2015)
@@ -295,8 +303,8 @@ ggplot(heatwaves, aes(x=percentChange)) +
   geom_density(alpha=.7, fill = "steelblue2")
 
 
-randomDays = randomDays %>% mutate(date_start = as.Date(start_date),
-                                   date_end = as.Date(end_date))
+randomDays = randomDays %>% rename(date_start = start_date,
+                                   date_end = end_date)
 
 heatwaves = heatwaves %>% mutate(date_start = as.Date(date_start),
                                    date_end = as.Date(date_end))
@@ -307,7 +315,8 @@ heatwaves$variable = "heatwave"
 randomDays = randomDays %>% filter(lake_year %in% c("L_2008", "R_2008", "L_2014", "L_2015"))
 
 allPercent = randomDays %>% 
-  full_join(heatwaves, by = c("date_start", "date_end", "variable", "percentChange", "lake", "lake_year"))
+  full_join(heatwaves, by = c("date_start", "date_end", "year", "variable", "averageSlope", "percentChange", 
+                              "lake", "lake_year"))
 
 
 
@@ -332,3 +341,10 @@ ggplot(allPercent, aes(x=percentChange, fill = variable)) +
 allPercent %>%  filter((lake_year %in% nutrients)) %>% 
 ggplot(aes(x=percentChange, fill = variable)) +
   geom_density(alpha=.5)
+
+
+# save the allPercent data to a dataframe
+# save interpolated allSonde data to a dataframe
+
+write.csv(allSonde, "./formatted data/allSonde_interpolated.csv", row.names = FALSE)
+write.csv(allPercent, "./formatted data/results_random_and_heatwaves.csv")

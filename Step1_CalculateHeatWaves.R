@@ -310,6 +310,9 @@ ggplot(data=Paul2018, aes(x=date, y=normChl)) +
 Paul2019 = allSondeInterp %>%
   filter(lake == "L", year == "2019")
 
+text = "annotate('rect', xmin = as.Date('2019-07-15'), xmax = as.Date('2019-07-19'), ymin = 0, ymax = Inf,
+         fill = 'red', alpha = 0.3)"
+
 ggplot(data=Paul2019, aes(x=date, y=normChl)) + 
   geom_point() +
   geom_line(aes(x = date, y = normTemp), size = 1.5)+
@@ -319,10 +322,9 @@ ggplot(data=Paul2019, aes(x=date, y=normChl)) +
   theme_classic()+
   labs(title = paste(Paul2019$lake[1], "Lake", Paul2019$year[1]), y = "% of initial value")+
   theme(title = element_text(size = 20))+
-  annotate("rect", xmin = as.Date("2019-07-15"), xmax = as.Date("2019-07-19"), ymin = 0, ymax = Inf,
-           fill = "red", alpha = 0.3)+
-  annotate("rect", xmin = as.Date("2019-06-15"), xmax = as.Date("2019-06-23"), ymin = 0, ymax = Inf,
-           fill = "blue", alpha = 0.3)+
+ #eval(parse(text = text))+
+  annotate('rect', xmin = as.Date('2019-06-15'), xmax = as.Date('2019-06-23'), ymin = 0, ymax = Inf,
+           fill = 'blue', alpha = 0.3)+
   theme(text = element_text(size = 20))
  
 
