@@ -321,7 +321,10 @@ ggplot(data=Paul2019, aes(x=date, y=normChl)) +
   theme(title = element_text(size = 20))+
   annotate("rect", xmin = as.Date("2019-07-15"), xmax = as.Date("2019-07-19"), ymin = 0, ymax = Inf,
            fill = "red", alpha = 0.3)+
+  annotate("rect", xmin = as.Date("2019-06-15"), xmax = as.Date("2019-06-23"), ymin = 0, ymax = Inf,
+           fill = "blue", alpha = 0.3)+
   theme(text = element_text(size = 20))
+ 
 
 
 write.csv(heatwaves, "heatwavesdata.csv", row.names = FALSE)

@@ -3,7 +3,6 @@
 if (!require(slider)) install.packages('slider')
 library(slider)
 
-
 if (!require(tidyr)) install.packages('tidyr')
 library(tidyr)
 
@@ -143,23 +142,42 @@ for(i in 1:length(lake_years)){
 ######### Make a function to extract the slopes following each heatwave event ##########
 # heatwave is the date of a heatwave, lake is the lake, data is the data to look for it in
 
-hwSlopes <- function(heatwave, targLake, data){
-  startDate = as.Date(heatwave)+7
-  endDate = as.Date(heatwave)+13
+hwSlopes <- function(heatwaveStart, heatwaveEnd,  targLake, data){
+  startDate = as.Date(heatwaveEnd)+7
+  endDate = as.Date(heatwaveEnd)+13
+  
+  beforeDate = as.Date(heatwaveStart) -1
+  
+  startChl = data %>% filter(date == beforeDate) %>% 
+    select(mean_chl)
   
   temp = data %>% filter(lake == targLake, date >= startDate, date <= endDate)
+  
+  temp = temp %>% mutate(chl_before = startChl$mean_chl[1])
   return(temp)
   
 }
 
 heatwaves$averageSlope = NA
+heatwaves$percentChange = NA
+
 
 
 # copy and paste this
-test = hwSlopes("2009-06-27", "R", slopes)
+test = hwSlopes("2009-06-20", "2009-06-27", "R", slopes)
 heatwaves$averageSlope[1] = mean(test$chl_slope, na.rm = TRUE)
+heatwaves$percentChange[1] = 100*(mean(test$chl_slope, na.rm = TRUE)*7)/test$chl_before[1]
 
 
+# 
+# hwSlopesBefore <- function(heatwave, targLake, data){
+#   startDate = as.Date(heatwave)-14
+#   endDate = as.Date(heatwave)+7
+#   
+#   temp = data %>% filter(lake == targLake, date >= startDate, date <= endDate)
+#   return(temp)
+#   
+# }
 
 
 
@@ -167,8 +185,10 @@ heatwaves$averageSlope[1] = mean(test$chl_slope, na.rm = TRUE)
 lengthHW = nrow(heatwaves)
 
 for(i in 1:lengthHW){
-  test = hwSlopes(heatwaves$date_end[i], heatwaves$lake[i], slopes)
+  test = hwSlopes(heatwaves$date_start[i], heatwaves$date_end[i], heatwaves$lake[i], slopes)
   heatwaves$averageSlope[i] = mean(test$chl_slope, na.rm = TRUE)
+  heatwaves$percentChange[i] = 100*(mean(test$chl_slope, na.rm = TRUE)*7)/test$chl_before[1]
+  
 }
 
 write.csv(heatwaves, "./results/heatwaves_with_slopes.csv", row.names = FALSE)
@@ -203,4 +223,60 @@ ggplot(data = resultsR, aes(x = date_end, y = averageSlope))+
   
 
 
+rand()
+
+
+set.seed(21)
+sample(seq((as.Date('2008-05-13')), as.Date('2008-08-27'), by = 1), 12)
+
+
+
+
+###### RANDOM DATE COMPARISON ########
+# create a new dataframe similar to heatwaves, but with random dates
+# heatwave duration is 8 days, on average
+# create random start dates and end dates separated by 8 days
+# only years and days with dataavailable
+
+lake_years = unique(allSonde$lake_year)
+
+i =1
+
+#randomDays = data.frame(lake_year = , lake, year, start_date, end_date)
+
+for(i in 1: length(lake_years)){
+  
+  target = allSonde %>% filter(lake_year == lake_years[i])
+  minDate = min(target$date)
+  maxDate = max(target$date)
+  
+  set.seed(21)
+  startDates = sort(sample(seq((as.Date(minDate)), as.Date(maxDate), by = 1), 4))
+  endDates = startDates + 8
+  
+  current_randomDays = data.frame(lake_year = lake_years[i], lake = unique(target$lake)[1],
+                                  year = unique(target$year)[1],
+                                  start_date = startDates, end_date = endDates)
+  
+  if(i == 1){
+    randomDays = current_randomDays
+  }
+  if(i > 1){
+    randomDays = rbind(randomDays, current_randomDays)
+  }
+  
+}
+
+
+# calculate slopes using random days
+lengthRandom = nrow(randomDays)
+randomDays$percentChange = NA
+randomDays$averageSlope = NA
+
+for(i in 1:lengthRandom){
+  test = hwSlopes(randomDays$date_start[i], randomDays$date_end[i], randomDays$lake[i], slopes)
+  randomDays$averageSlope[i] = mean(test$chl_slope, na.rm = TRUE)
+  randomDays$percentChange[i] = 100*(mean(test$chl_slope, na.rm = TRUE)*7)/test$chl_before[1]
+  
+}
 
