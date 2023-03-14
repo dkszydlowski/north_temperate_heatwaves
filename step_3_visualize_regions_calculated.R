@@ -7,7 +7,10 @@ allSonde = read.csv("./formatted data/allSonde_interpolated.csv")
 allSlopes = read.csv("./formatted data/results_random_and_heatwaves.csv")
 
 # make normalized temperature and chlorophyll columns in allSonde
+allSonde = allSonde %>%  
+  mutate(normTemp = 100 * mean_temp/mean_temp[1], normChl = 100 * mean_chl/mean_chl[1])
 
+allSonde$date = as.Date(allSonde$date)
 
 # in a for loop, plot raw data, the heatwave, slope, and random days for
 # each lake_year combination
@@ -24,7 +27,8 @@ lyAllSonde = allSonde %>% filter(lake_year == lake_years[i])
 
 
 
-text = "annotate('rect', xmin = as.Date('2019-07-15'), xmax = as.Date('2019-07-19'), ymin = 0, ymax = Inf,
+text = "annotate('rect', xmin = as.Date('2008-07-15'), xmax = as.Date('2008-07-19'), ymin = 0, ymax = Inf,
+         fill = 'red', alpha = 0.3)+ annotate('rect', xmin = as.Date('2008-06-15'), xmax = as.Date('2008-07-19'), ymin = 0, ymax = Inf,
          fill = 'red', alpha = 0.3)"
 
 ggplot(data=lyAllSonde, aes(x=date, y=normChl)) + 
@@ -34,10 +38,10 @@ ggplot(data=lyAllSonde, aes(x=date, y=normChl)) +
   geom_line(size = 1.5) +
   geom_density_line(stat = "identity", size = 1.5, fill = "forestgreen", alpha = 0.3)+
   theme_classic()+
-  labs(title = paste(Paul2019$lake[1], "Lake", Paul2019$year[1]), y = "% of initial value")+
+  labs(title = paste(lyAllSonde$lake[1], "Lake", lyAllSonde$year[1]), y = "% of initial value")+
   theme(title = element_text(size = 20))+
   #eval(parse(text = text))+
-  annotate('rect', xmin = as.Date('2019-06-15'), xmax = as.Date('2019-06-23'), ymin = 0, ymax = Inf,
-           fill = 'blue', alpha = 0.3)+
+ # annotate('rect', xmin = as.Date('2019-06-15'), xmax = as.Date('2019-06-23'), ymin = 0, ymax = Inf,
+ #          fill = 'blue', alpha = 0.3)+
   theme(text = element_text(size = 20))
 

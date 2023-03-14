@@ -13,6 +13,12 @@ library(tidyverse)
 if (!require(zoo)) install.packages('zoo')
 library(zoo)
 
+if (!require(gganimate)) install.packages('gganimate')
+library(gganimate)
+
+if (!require(transformr)) install.packages('transformr')
+library(transformr)
+
 # read in the heatwaves data calculated in the previous step
 heatwaves = read.csv("Heatwavesdata.csv")
 
@@ -343,8 +349,111 @@ ggplot(aes(x=percentChange, fill = variable)) +
   geom_density(alpha=.5)
 
 
+
+###### COMPARE DISTRIBUTIONS OVER TIME ##########
+
+## in the slopes dataframe, add a column percent change that is a percent change in chlorophyll from seven days before that slope
+# this normalizes across lakes
+# then, save as a dataframe
+
+slopes = slopes %>% group_by(lake_year) %>% 
+  mutate(percent_change = 100*chl_slope*7/lag(mean_chl, 7, default = NA)) %>% 
+  ungroup()
+
+slopes = slopes %>% mutate(period = "all other days")
+slopes$shift = NA
+
+# shift is the number of days after the heatwave we want to investigate
+shift = 1
+
+# windowSize is the size of the window we want to look at
+windowSize = 1
+
+for(shift in -7:40){
+
+  # add a column to slopes which indicates whether or not there is a heatwave
+for(i in 1:nrow(heatwaves)){
+  start = heatwaves$date_start[i]
+  end = heatwaves$date_end[i]
+  
+  dates = seq(start, end, 1)
+  datesAnalyzed = seq(end+shift, end + shift+windowSize, 1)
+  
+  slopes = slopes %>% mutate(period = replace(period, date %in% dates, "during heatwave"))
+  slopes = slopes %>% mutate(period = replace(period, date %in% datesAnalyzed, "after heatwave"))
+  
+  slopes$shift = shift
+}
+
+if(shift == -7){
+  allSlopes = slopes
+}
+if(shift > -7){
+  allSlopes = rbind(allSlopes, slopes)
+}
+
+}
+
+
 # save the allPercent data to a dataframe
 # save interpolated allSonde data to a dataframe
 
-write.csv(allSonde, "./formatted data/allSonde_interpolated.csv", row.names = FALSE)
-write.csv(allPercent, "./formatted data/results_random_and_heatwaves.csv")
+# write.csv(allSonde, "./formatted data/allSonde_interpolated.csv", row.names = FALSE)
+# write.csv(allPercent, "./formatted data/results_random_and_heatwaves.csv")
+
+
+# check out the density distribution of all slopes
+# look at only significant slopes
+sig = slopes %>% filter(p_value < 0.05) 
+plot(density(sig$percent_change, na.rm = TRUE))
+
+
+allSlopes %>% filter(percent_change < 500) %>% 
+ggplot( aes(x=percent_change, fill = period)) +
+  geom_density(alpha=.5)+
+  theme_classic()+
+ gganimate::transition_time(shift)+
+  labs(title = "Days after heatwave for all lakes: {frame_time}")
+
+
+gganimate::anim_save(filename = "./figures/animations/all_lakes_window_1.gif")
+
+
+
+
+allSlopes %>% filter(percent_change < 500, lake == "T") %>% 
+  ggplot( aes(x=percent_change, fill = period)) +
+  geom_density(alpha=.5)+
+  theme_classic()+
+  gganimate::transition_time(shift)+
+  labs(title = "Days after heatwave for Tuesday Lake: {frame_time}")
+
+
+gganimate::anim_save(filename = "./figures/animations/tuesday_window_1.gif")
+
+
+
+allSlopes %>% filter(percent_change < 500, lake == "R") %>% 
+  ggplot( aes(x=percent_change, fill = period)) +
+  geom_density(alpha=.5)+
+  theme_classic()+
+  gganimate::transition_time(shift)+
+  labs(title = "Days after heatwave for Peter Lake: {frame_time}")
+
+
+gganimate::anim_save(filename = "./figures/animations/peter_window_1.gif")
+
+
+
+
+
+allSlopes %>% filter(percent_change < 500, lake == "L") %>% 
+  ggplot( aes(x=percent_change, fill = period)) +
+  geom_density(alpha=.5)+
+  theme_classic()+
+  gganimate::transition_time(shift)+
+  labs(title = "Days after heatwave for Paul Lake: {frame_time}")
+
+
+gganimate::anim_save(filename = "./figures/animations/paul_window_1.gif")
+
