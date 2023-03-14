@@ -251,7 +251,7 @@ for(i in 1: length(lake_years)){
   maxDate = max(target$date)
   
   set.seed(21)
-  startDates = sort(sample(seq((as.Date(minDate)), as.Date(maxDate), by = 1), 4))
+  startDates = sort(sample(seq((as.Date(minDate)), as.Date(maxDate), by = 1), 5))
   endDates = startDates + 8
   
   current_randomDays = data.frame(lake_year = lake_years[i], lake = unique(target$lake)[1],
@@ -273,10 +273,62 @@ lengthRandom = nrow(randomDays)
 randomDays$percentChange = NA
 randomDays$averageSlope = NA
 
+i =1
 for(i in 1:lengthRandom){
-  test = hwSlopes(randomDays$date_start[i], randomDays$date_end[i], randomDays$lake[i], slopes)
+  test = hwSlopes(randomDays$start_date[i], randomDays$end_date[i], randomDays$lake[i], slopes)
   randomDays$averageSlope[i] = mean(test$chl_slope, na.rm = TRUE)
   randomDays$percentChange[i] = 100*(mean(test$chl_slope, na.rm = TRUE)*7)/test$chl_before[1]
   
 }
 
+
+plot(density(randomDays$percentChange, na.rm = TRUE))
+
+plot(density(heatwaves$percentChange, na.rm = TRUE))
+
+
+
+ggplot(randomDays, aes(x=percentChange)) +
+  geom_density(alpha=.7, fill = "forestgreen")
+
+ggplot(heatwaves, aes(x=percentChange)) +
+  geom_density(alpha=.7, fill = "steelblue2")
+
+
+randomDays = randomDays %>% mutate(date_start = as.Date(start_date),
+                                   date_end = as.Date(end_date))
+
+heatwaves = heatwaves %>% mutate(date_start = as.Date(date_start),
+                                   date_end = as.Date(date_end))
+
+randomDays$variable = "random"
+heatwaves$variable = "heatwave"
+
+randomDays = randomDays %>% filter(lake_year %in% c("L_2008", "R_2008", "L_2014", "L_2015"))
+
+allPercent = randomDays %>% 
+  full_join(heatwaves, by = c("date_start", "date_end", "variable", "percentChange", "lake", "lake_year"))
+
+
+
+ggplot(allPercent, aes(x=percentChange, fill = variable)) +
+  geom_density(alpha=.5)
+
+nutrients = c("R_2013",
+              "R_2014",
+              "R_2015",
+              "R_2019",
+              "T_2013",
+              "T_2014",
+              "T_2015")
+
+
+
+ggplot(allPercent, aes(x=percentChange, fill = variable)) +
+  geom_density(alpha=.5)
+
+# test what happens if we remove heatwaves in nutrient addition years
+
+allPercent %>%  filter((lake_year %in% nutrients)) %>% 
+ggplot(aes(x=percentChange, fill = variable)) +
+  geom_density(alpha=.5)
