@@ -3,6 +3,9 @@
 if (!require(slider)) install.packages('slider')
 library(slider)
 
+if (!require(plyr)) install.packages('plyr')
+library(plyr)
+
 if (!require(tidyr)) install.packages('tidyr')
 library(tidyr)
 
@@ -18,6 +21,11 @@ library(gganimate)
 
 if (!require(transformr)) install.packages('transformr')
 library(transformr)
+
+if (!require(ggridges)) install.packages('ggridges')
+library(ggridges)
+
+
 
 # read in the heatwaves data calculated in the previous step
 heatwaves = read.csv("Heatwavesdata.csv")
@@ -350,6 +358,15 @@ ggplot(aes(x=percentChange, fill = variable)) +
 
 
 
+
+
+
+
+
+
+
+
+
 ###### COMPARE DISTRIBUTIONS OVER TIME ##########
 
 ## in the slopes dataframe, add a column percent change that is a percent change in chlorophyll from seven days before that slope
@@ -357,7 +374,7 @@ ggplot(aes(x=percentChange, fill = variable)) +
 # then, save as a dataframe
 
 slopes = slopes %>% group_by(lake_year) %>% 
-  mutate(percent_change = 100*chl_slope*7/lag(mean_chl, 7, default = NA)) %>% 
+  mutate(percent_change = 100*chl_slope*7/lag(mean_chl, 8, default = NA)) %>% 
   ungroup()
 
 slopes = slopes %>% mutate(period = "all other days")
@@ -367,6 +384,7 @@ slopes$shift = NA
 shift = 1
 
 # windowSize is the size of the window we want to look at
+#minimum is 1
 windowSize = 1
 
 for(shift in -7:40){
@@ -378,9 +396,12 @@ for(i in 1:nrow(heatwaves)){
   
   dates = seq(start, end, 1)
   datesAnalyzed = seq(end+shift, end + shift+windowSize, 1)
+  datesExcluded = seq(end -7, end + 40, 1) # excludes dates that are part of rolling window but not currently considered in after heatwave
   
+  slopes = slopes %>% mutate(period = replace(period, date %in% datesExcluded, "exclude after heatwave"))
   slopes = slopes %>% mutate(period = replace(period, date %in% dates, "during heatwave"))
   slopes = slopes %>% mutate(period = replace(period, date %in% datesAnalyzed, "after heatwave"))
+  
   
   slopes$shift = shift
 }
@@ -401,24 +422,43 @@ if(shift > -7){
 # write.csv(allSonde, "./formatted data/allSonde_interpolated.csv", row.names = FALSE)
 # write.csv(allPercent, "./formatted data/results_random_and_heatwaves.csv")
 
+# calculate mean values by period and shift
+mean_df <- allSlopes %>% 
+  filter(percent_change < 175, period != "exclude after heatwave", !is.na(percent_change)) %>% 
+  group_by(period, shift) %>% 
+  dplyr::summarise(mean_percent_change = mean(percent_change)) 
 
-# check out the density distribution of all slopes
-# look at only significant slopes
-sig = slopes %>% filter(p_value < 0.05) 
-plot(density(sig$percent_change, na.rm = TRUE))
+# round mean values to one decimal place
+mean_df$mean_percent_change <- round(mean_df$mean_percent_change, 1)
 
-
-allSlopes %>% filter(percent_change < 500) %>% 
-ggplot( aes(x=percent_change, fill = period)) +
-  geom_density(alpha=.5)+
-  theme_classic()+
- gganimate::transition_time(shift)+
+# plot the density ridges with mean values
+allSlopes %>% 
+  filter(percent_change < 175, period != "exclude after heatwave") %>% 
+  ggplot(aes(x = percent_change,
+             y = period,
+             fill = period)) +
+  geom_density_ridges(alpha = .5,
+                      quantile_lines = TRUE,
+                      quantile_fun = function(x, ...) mean(x), 
+                      scale = 3) +
+  geom_text(data = mean_df,
+            aes(x = mean_percent_change,
+                y = period,
+                label = as.character(round(mean_percent_change, digits = 0))),
+            color = "black",
+            size = 4,
+            vjust = 2) +
+  theme_classic() +
+  gganimate::transition_time(shift) +
   labs(title = "Days after heatwave for all lakes: {frame_time}")
 
+  gganimate::animate(plot = last_plot(), fps = 5) # slows down the animation
 
-gganimate::anim_save(filename = "./figures/animations/all_lakes_window_1.gif")
+ #gganimate::anim_save(filename = "./figures/animations/all_lakes_window_7.gif")
 
 
+  
+  
 
 
 allSlopes %>% filter(percent_change < 500, lake == "T") %>% 
@@ -456,4 +496,34 @@ allSlopes %>% filter(percent_change < 500, lake == "L") %>%
 
 
 gganimate::anim_save(filename = "./figures/animations/paul_window_1.gif")
+
+
+
+
+
+shift40HW = allSlopes %>% filter(shift == 40, period == "after heatwave")
+shift40other = allSlopes %>% filter(shift == 40, period == "all other days")
+
+t.test(shift40HW$percent_change, shift40other$percent_change)
+
+
+
+
+##### Plot the mean percent change in chlorophyll over time   #####
+
+mean_df <- allSlopes %>% 
+  filter(percent_change < 175, period != "exclude after heatwave", !is.na(percent_change)) %>% 
+  group_by(period, shift) %>% 
+  dplyr::summarise(mean_percent_change = mean(percent_change), sd_percent_change = sd(percent_change)) 
+
+
+ggplot(mean_df, aes( x= shift, y = mean_percent_change, color = period))+
+  geom_line(size = 1)+
+  labs(x = "days after heatwave")+
+  theme_classic()
+
+
+
+
+
 
