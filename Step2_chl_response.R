@@ -385,7 +385,7 @@ shift = 1
 
 # windowSize is the size of the window we want to look at
 #minimum is 1
-windowSize = 1
+windowSize = 4
 
 for(shift in -7:40){
 
@@ -514,7 +514,9 @@ t.test(shift40HW$percent_change, shift40other$percent_change)
 mean_df <- allSlopes %>% 
   filter(percent_change < 175, period != "exclude after heatwave", !is.na(percent_change)) %>% 
   group_by(period, shift) %>% 
-  dplyr::summarise(mean_percent_change = mean(percent_change), sd_percent_change = sd(percent_change)) 
+  dplyr::summarise(mean_percent_change = mean(percent_change), 
+                   sd_percent_change = sd(percent_change), 
+                   number_percent_change = n()) 
 
 
 ggplot(mean_df, aes( x= shift, y = mean_percent_change, color = period))+
@@ -524,6 +526,39 @@ ggplot(mean_df, aes( x= shift, y = mean_percent_change, color = period))+
 
 
 
+
+
+
+
+##### Plots of just a couple of interesting days, frozen
+
+allSlopes %>%
+  filter(percent_change < 175, period != "exclude after heatwave", shift == 4) %>% 
+  ggplot(aes(x = percent_change,
+             y = period,
+             fill = period)) +
+  geom_density_ridges(alpha = .7,
+                      quantile_lines = TRUE,
+                      quantile_fun = function(x, ...) mean(x), 
+                      scale = 3) +
+  geom_text(data = mean_df %>% filter(shift == 5),
+            aes(x = mean_percent_change,
+                y = period,
+                label = as.character(round(mean_percent_change, digits = 0))),
+            color = "black",
+            size = 4,
+            vjust = 2) +
+  
+  geom_text(data = mean_df %>% filter(shift == 5),
+            aes(x = -200,
+                y = period,
+                label = paste("n = ", number_percent_change, sep = "")),
+            color = "black",
+            size = 4,
+            vjust = 2) +
+  theme_classic()
+
+gganimate::animate(plot = last_plot(), fps = 5) # slows down the animation
 
 
 
