@@ -33,6 +33,7 @@ tuesdayHWinput = tuesday %>% select(t, temp)
 climOutputL = ts2clm(paulHWinput, climatologyPeriod = c(min(paulHWinput$t), max(paulHWinput$t)))
 paulHW = detect_event(climOutputL)
 
+# check the output from the heatwave code
 event_line(paulHW, metric = "intensity_max", start_date = "2019-06-01", end_date = "2019-09-15")+
   geom_point()
 
@@ -44,7 +45,7 @@ event_line(peterHW, metric = "intensity_max", start_date = "2018-06-01", end_dat
   xlim(as.Date("2018-05-01"), as.Date("2018-09-01"))
 
 # the Tuesday data throws an error because technically there aren't three years of data
-# can we just add a dummy day to bypass that error? We have three summers of data
+# just add a dummy day to bypass that error-- We have three summers of data
 
 tuesdayHWinput[nrow(tuesdayHWinput)+1, ] = NA
 tuesdayHWinput[nrow(tuesdayHWinput), 1] = as.Date("2016-06-01")
@@ -64,17 +65,9 @@ tuesdayHW$event$lake = "T"
 heatwaves = rbind(peterHW$event, paulHW$event, tuesdayHW$event)
 
 #####Test Plots#####
-ggplot(data = allSonde, aes(x = date, y = mean_temp, color = lake)) + 
-  geom_point()+
-  geom_line()
 
-year2010 = allSonde %>%
-  filter(year == "2010") 
-ggplot(data = year2010, aes(x = date, y = mean_temp, color = lake)) + 
-  geom_point()+
-  geom_line()
-
-
+## update the sonde data so that
+# we have normalized temp and chlorophyll to plot on the same plot
 allSondeInterp = allSonde %>%
   group_by(lake, year) %>%
   mutate(mean_temp = na.approx(mean_temp, na.rm = FALSE), mean_chl = na.approx(mean_chl, na.rm = FALSE)) %>%
