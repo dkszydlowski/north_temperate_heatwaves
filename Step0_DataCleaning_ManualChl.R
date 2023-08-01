@@ -83,6 +83,8 @@ LR_08_09 = dt1
 
 # rename columns
 LR_08_09 = LR_08_09 %>% rename(doyCat = DOY, mean_chl = Chla)
+
+LR_08_09 = LR_08_09 %>% select(year, lake, doyCat, mean_chl)
 #===============================================================================#
 ##### 2013-2015 LRT #####
 # 
@@ -255,3 +257,16 @@ LRT_11_19 = LRT_11_19 %>% rename(year = Year, lake = Lake, doyCat = DOY, mean_ch
 
 # just the columns we need
 LRT_11_19 = LRT_11_19 %>% select(year, lake, doyCat, mean_chl)
+
+
+
+##### Finalize dataframe #####
+manual_chl = rbind(LR_08_09, LRT_11_19)
+
+# remove 2016 data because it is empty
+manual_chl = manual_chl %>% filter(year != 2016)
+
+# save the manual chlorophyll data
+write.csv(manual_chl, "./formatted data/CombinedData_manual_chl.csv", row.names = FALSE)
+
+
