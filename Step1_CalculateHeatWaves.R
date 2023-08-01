@@ -30,6 +30,7 @@ peterHWinput = peter %>% select(t, temp)
 tuesdayHWinput = tuesday %>% select(t, temp)
 
 
+##### Calculate heatwave events #####
 climOutputL = ts2clm(paulHWinput, climatologyPeriod = c(min(paulHWinput$t), max(paulHWinput$t)))
 paulHW = detect_event(climOutputL)
 
@@ -59,12 +60,12 @@ event_line(tuesdayHW, metric = "intensity_max", start_date = "2013-06-01", end_d
   xlim(as.Date("2013-05-01"), as.Date("2013-09-01"))
 
 
+##### Clean up the output #####
 peterHW$event$lake = "R" 
 paulHW$event$lake = "L"
 tuesdayHW$event$lake = "T"
 heatwaves = rbind(peterHW$event, paulHW$event, tuesdayHW$event)
 
-#####Test Plots#####
 
 ## update the sonde data so that
 # we have normalized temp and chlorophyll to plot on the same plot
@@ -73,9 +74,11 @@ allSondeInterp = allSonde %>%
   mutate(mean_temp = na.approx(mean_temp, na.rm = FALSE), mean_chl = na.approx(mean_chl, na.rm = FALSE)) %>%
   mutate(normTemp = 100 * mean_temp/mean_temp[1], normChl = 100 * mean_chl/mean_chl[1])
 
+# create a year column
 heatwaves = heatwaves %>%
   mutate(year = year(date_peak)) 
 
+# create a lake_year column
 heatwaves = heatwaves %>%
   mutate(lake_year = paste(lake, year, sep = "_")) 
 
@@ -96,7 +99,7 @@ ggplot(data=Peter2009, aes(x=date, y=normChl)) +
            fill = "red", alpha = 0.3)+
   theme(text = element_text(size = 20))
 
-#####Plot Heatwaves - Peter 2010#####
+##### Plot Heatwaves - Peter 2010 #####
 Peter2010 = allSondeInterp %>%
   filter(lake == "R", year == "2010")
 
@@ -472,6 +475,8 @@ ggplot(data=Paul2015, aes(x=date, y=normChl)) +
 
 
 
+
+##### Save the final heatwave data #####
 
 write.csv(heatwaves, "heatwavesdata.csv", row.names = FALSE)
 
