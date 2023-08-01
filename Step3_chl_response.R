@@ -1,4 +1,4 @@
-# step 2, calculate the response of chl to the heatwaves
+# step 3, calculate the response of chl to the heatwaves
 #install and load slider library for rolling window analysis
 if (!require(slider)) install.packages('slider')
 library(slider)
@@ -26,12 +26,11 @@ if (!require(ggridges)) install.packages('ggridges')
 library(ggridges)
 
 
-
 # read in the heatwaves data calculated in the previous step
-heatwaves = read.csv("Heatwavesdata.csv")
+heatwaves = read.csv("./formatted data/heatwavesdata.csv")
 
 # read in the sonde data from step 1
-allSonde = read.csv("CombinedData.csv")
+allSonde = read.csv("./formatted data/CombinedData.csv")
 allSonde$date = as.Date(allSonde$date)
 
 # interpolate the data by lake_year
@@ -40,61 +39,6 @@ allSonde = allSonde %>% group_by("lake_year") %>%
          mean_doSat = na.approx(mean_doSat),
          mean_pH = na.approx(mean_pH)) %>% 
   ungroup()
-
-######## Testing code ##########
-peter15 = allSonde %>% filter(lake == "R" & year == 2015)
-# maybe make a function that calculates the slope following a heatwav
-#peter15 = as.list(peter15)
-
-# data is the data from the sondes
-# variable is the response variable of interest
-# start is the start date we want to analyze
-# end is how many days to add to that (e.g., 7, 14, etc. for our window)
-
-
-data_test = slide_dbl(peter15$mean_chl, .f = ., .after = 14, .complete = TRUE)
-
-dataTest = peter15 %>% 
-  mutate(roll2_chl = slide_dbl(mean_chl, .f=mean, na.rm = TRUE, .after = 14, .complete = TRUE))
-
-
-
-hwResponse = function(data, variable, start, end, lake){
-  
-  
-}
-
-
-testModel = lm(peter15$mean_chl~peter15$doyCat)$coefficients
-testModel$coefficients[2]
-
-#peter15 = as.list(peter15)
-#peter15 = data.frame(peter15)
-
-models = as.list(peter15)
-
-# make a list of models
-# extract the slope, se, and p-value of each one
-models <- slide(
-  peter15, 
-  ~lm(mean_chl ~ doyCat, data = .x), 
-  .before = 7, 
-  .complete = TRUE
-)
-
-testing <- allSonde %>% 
-  group_by(year, lake) %>% 
-  slide(
-    ~lm(mean_chl ~doyCat, data = .x), 
-    .before = 7, 
-    .complete = TRUE
-  )
-
-
-peter15$slope = NA
-peter15$se = NA
-peter15$p_value = NA
-
 
 
 

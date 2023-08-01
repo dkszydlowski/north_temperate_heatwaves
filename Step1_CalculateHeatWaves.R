@@ -7,7 +7,7 @@ library("zoo")
 library(heatwaveR)
 
 
-allSonde = read.csv("CombinedData.csv")
+allSonde = read.csv("./formatted data/CombinedData.csv")
 allSonde$date = as.Date(allSonde$date)
 
 paul = allSonde %>%

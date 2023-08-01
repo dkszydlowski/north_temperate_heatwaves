@@ -1,7 +1,7 @@
 # script to plot the chlorophyll, temperature, and heatwave time series
 
 # read in the data
-allSonde = read.csv("CombinedData.csv")
+allSonde = read.csv("./formatted data/CombinedData.csv")
 allSonde$date = as.Date(allSonde$date)
 
 ## update the sonde data so that
@@ -13,7 +13,10 @@ allSondeInterp = allSonde %>%
 
 
 
-#####Plot Heatwaves - Peter 2009#####
+#==============================================================================#
+###### SONDE CHLOROPHYLL ######
+
+####Plot Heatwaves - Peter 2009####
 Peter2009 = allSondeInterp %>%
   filter(lake == "R", year == "2009")
 
@@ -30,7 +33,7 @@ ggplot(data=Peter2009, aes(x=date, y=normChl)) +
            fill = "red", alpha = 0.3)+
   theme(text = element_text(size = 20))
 
-##### Plot Heatwaves - Peter 2010 #####
+#### Plot Heatwaves - Peter 2010 ####
 Peter2010 = allSondeInterp %>%
   filter(lake == "R", year == "2010")
 
@@ -49,7 +52,7 @@ ggplot(data=Peter2010, aes(x=date, y=normChl)) +
            fill = "red", alpha = 0.3)+
   theme(text = element_text(size = 20))
 
-#####Plot Heatwaves - Peter 2011#####
+####Plot Heatwaves - Peter 2011####
 Peter2011 = allSondeInterp %>%
   filter(lake == "R", year == "2011")
 
@@ -66,7 +69,7 @@ ggplot(data=Peter2011, aes(x=date, y=normChl)) +
            fill = "red", alpha = 0.3)+
   theme(text = element_text(size = 20))
 
-#####Plot Heatwaves - Peter 2013#####
+####Plot Heatwaves - Peter 2013####
 Peter2013 = allSondeInterp %>%
   filter(lake == "R", year == "2013")
 
@@ -83,7 +86,7 @@ ggplot(data=Peter2013, aes(x=date, y=normChl)) +
            fill = "red", alpha = 0.3)+
   theme(text = element_text(size = 20))
 
-#####Plot Heatwaves - Peter 2014####
+####Plot Heatwaves - Peter 2014####
 Peter2014 = allSondeInterp %>%
   filter(lake == "R", year == "2014")
 
@@ -100,7 +103,7 @@ ggplot(data=Peter2014, aes(x=date, y=normChl)) +
            fill = "red", alpha = 0.3)+
   theme(text = element_text(size = 20))
 
-#####Plot Heatwaves - Peter 2018#####
+####Plot Heatwaves - Peter 2018####
 Peter2018 = allSondeInterp %>%
   filter(lake == "R", year == "2018")
 
@@ -123,7 +126,7 @@ ggplot(data=Peter2018, aes(x=date, y=normChl)) +
            fill = "red", alpha = 0.3)+
   theme(text = element_text(size = 20))
 
-#####Plot Heatwaves - Peter 2019#####
+####Plot Heatwaves - Peter 2019####
 Peter2019 = allSondeInterp %>%
   filter(lake == "R", year == "2019")
 
@@ -140,7 +143,7 @@ ggplot(data=Peter2019, aes(x=date, y=normChl)) +
            fill = "red", alpha = 0.3)+
   theme(text = element_text(size = 20))
 
-#####Plot Heatwaves - Paul 2009#####
+####Plot Heatwaves - Paul 2009####
 Paul2009 = allSondeInterp %>%
   filter(lake == "L", year == "2009")
 
@@ -157,7 +160,7 @@ ggplot(data=Paul2009, aes(x=date, y=normChl)) +
            fill = "red", alpha = 0.3)+
   theme(text = element_text(size = 20))
 
-#####Plot Heatwaves - Paul 2010#####
+####Plot Heatwaves - Paul 2010####
 Paul2010 = allSondeInterp %>%
   filter(lake == "L", year == "2010")
 
@@ -176,7 +179,7 @@ ggplot(data=Paul2010, aes(x=date, y=normChl)) +
            fill = "red", alpha = 0.3)+
   theme(text = element_text(size = 20))
 
-#####Plot Heatwaves - Paul 2011#####
+####Plot Heatwaves - Paul 2011####
 Paul2011 = allSondeInterp %>%
   filter(lake == "L", year == "2011")
 
@@ -193,7 +196,7 @@ ggplot(data=Paul2011, aes(x=date, y=normChl)) +
            fill = "red", alpha = 0.3)+
   theme(text = element_text(size = 20))
 
-#####Plot Heatwaves - Paul 2013#####
+####Plot Heatwaves - Paul 2013####
 Paul2013 = allSondeInterp %>%
   filter(lake == "L", year == "2013")
 
@@ -210,7 +213,7 @@ ggplot(data=Paul2013, aes(x=date, y=normChl)) +
            fill = "red", alpha = 0.3)+
   theme(text = element_text(size = 20))
 
-#####Plot Heatwaves - Paul 2018#####
+####Plot Heatwaves - Paul 2018####
 Paul2018 = allSondeInterp %>%
   filter(lake == "L", year == "2018")
 
@@ -233,7 +236,7 @@ ggplot(data=Paul2018, aes(x=date, y=normChl)) +
            fill = "red", alpha = 0.3)+
   theme(text = element_text(size = 20))
 
-#####Plot Heatwaves - Paul 2019#####
+####Plot Heatwaves - Paul 2019####
 Paul2019 = allSondeInterp %>%
   filter(lake == "L", year == "2019")
 
@@ -255,7 +258,7 @@ ggplot(data=Paul2019, aes(x=date, y=normChl)) +
   theme(text = element_text(size = 20))
 
 
-#####Plot Heatwaves - Tuesday 2013 #####
+####Plot Heatwaves - Tuesday 2013 ####
 Tuesday2013 = allSondeInterp %>%
   filter(lake == "T", year == "2013")
 
@@ -278,7 +281,7 @@ ggplot(data=Tuesday2013, aes(x=date, y=normChl)) +
 
 
 
-#####Plot Heatwaves - Tuesday 2014 #####
+####Plot Heatwaves - Tuesday 2014 ####
 Tuesday2014 = allSondeInterp %>%
   filter(lake == "T", year == "2014")
 
@@ -296,7 +299,7 @@ ggplot(data=Tuesday2014, aes(x=date, y=normChl)) +
   theme(text = element_text(size = 20))
 
 
-#####Plot Heatwaves - Tuesday 2015 #####
+#### Plot Heatwaves - Tuesday 2015 ####
 Tuesday2015 = allSondeInterp %>%
   filter(lake == "T", year == "2015")
 
@@ -400,5 +403,7 @@ ggplot(data=Paul2015, aes(x=date, y=normChl)) +
 
 
 
+#==============================================================================#
+##### MANUAL CHLOROPHYLL #####
 
 

@@ -269,4 +269,3 @@ manual_chl = manual_chl %>% filter(year != 2016)
 # save the manual chlorophyll data
 write.csv(manual_chl, "./formatted data/CombinedData_manual_chl.csv", row.names = FALSE)
 
-

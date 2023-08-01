@@ -371,35 +371,5 @@ sonde08_11mean = sonde08_11mean %>%
 
 allSonde = rbind(sonde08_11mean, sonde13_15mean, sonde18_19mean)
 
-write.csv(allSonde, "CombinedData.csv", row.names = FALSE)
-
-
-##### 2008-2011 calculating heatwaves #####
-hwTest1 <- sonde08_11mean %>% rename(t = date, temp = mean_temp) %>% filter(lake == "Paul") %>% select(t, temp)
-
-start = "2008-06-01"
-end = "2011-08-15"
-
-climOutput = ts2clm(hwTest, climatologyPeriod = c(start, end))
-heatwaves = detect_event(climOutput)
-
-event_line(heatwaves, metric = "intensity_max", start_date = start, end_date = end)+
-  geom_point()
-
-
-##### 2013-2015 Calculating heatwaves #####
-hwTest2 <- sonde13_15mean %>% rename(t = date, temp = mean_temp) %>% filter(lake == "L") %>% select(t, temp)
-
-
-hwtest3 <- rbind(hwTest1, hwTest2)
-start = "2008-06-01"
-end = "2015-09-04"
-
-climOutput = ts2clm(hwtest3, climatologyPeriod = c(start, end))
-heatwaves = detect_event(climOutput)
-
-event_line(heatwaves, metric = "intensity_max", start_date = "2013-06-01", end_date = "2013-09-15")+
-  geom_point()
-
-
+write.csv(allSonde, "./formatted data/CombinedData.csv", row.names = FALSE)
 
