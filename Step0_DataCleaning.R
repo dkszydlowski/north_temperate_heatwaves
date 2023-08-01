@@ -1,4 +1,7 @@
-#Initial Data Download and Cleaning for Heat Waves Project
+# Initial Data Download and Cleaning for Heat Waves Project
+# This script downloads and cleans the SONDE chlorophyll and temperature data
+
+
 library("tidyverse")
 library("ggridges")
 library("lubridate")
