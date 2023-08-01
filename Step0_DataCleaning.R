@@ -3,7 +3,7 @@ library("tidyverse")
 library("ggridges")
 library("lubridate")
 library("zoo")
-library(heatwaveR)
+library("heatwaveR")
 ##### Cascade Sonde Data 2008-2011 #####
 
 # Package ID: knb-lter-ntl.360.1 Cataloging System:https://pasta.edirepository.org.
