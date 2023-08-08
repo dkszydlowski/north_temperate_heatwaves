@@ -16,6 +16,25 @@ allSondeInterp = allSonde %>%
 #==============================================================================#
 ###### SONDE CHLOROPHYLL ######
 
+allSondeInterp$lake_year = paste(allSondeInterp$lake, allSondeInterp$year, sep = "_")
+
+#make raw data plots of sonde chlorophyll for all lake_years
+lake_years = unique(allSondeInterp$lake_year)
+
+for(i in 1:length(lake_years)){
+  
+  temp = allSondeInterp %>% filter(lake_year == lake_years[i]) 
+  
+  print(
+    ggplot(data = temp, aes(x = doyCat, y = mean_chl))+
+      geom_point()+
+      geom_line()+
+      labs(title = lake_years[i])
+  )
+  
+}
+
+
 ####Plot Heatwaves - Peter 2009####
 Peter2009 = allSondeInterp %>%
   filter(lake == "R", year == "2009")
@@ -405,5 +424,6 @@ ggplot(data=Paul2015, aes(x=date, y=normChl)) +
 
 #==============================================================================#
 ##### MANUAL CHLOROPHYLL #####
+
 
 

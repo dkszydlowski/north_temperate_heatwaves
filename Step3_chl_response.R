@@ -30,16 +30,15 @@ library(ggridges)
 heatwaves = read.csv("./formatted data/heatwavesdata.csv")
 
 # read in the sonde data from step 1
-allSonde = read.csv("./formatted data/CombinedData.csv")
-allSonde$date = as.Date(allSonde$date)
+allData = read.csv("./formatted data/CombinedData.csv")
+allData$date = as.Date(allData$date)
 
 # interpolate the data by lake_year
-allSonde = allSonde %>% group_by("lake_year") %>% 
+allData = allData %>% group_by("lake_year") %>% 
   mutate(mean_chl = na.approx(mean_chl),
          mean_doSat = na.approx(mean_doSat),
          mean_pH = na.approx(mean_pH)) %>% 
   ungroup()
-
 
 
 
@@ -48,25 +47,22 @@ allSonde = allSonde %>% group_by("lake_year") %>%
 ## extract the slope, se, and p-value
 # and add to the dataframe
 
-# make a lake_year column in allSonde
-allSonde = allSonde %>% 
+# make a lake_year column in allData
+allData = allData %>% 
   mutate(lake_year = paste(lake, year, sep = "_"))
 
 # make a vector of unique lake years
-lake_years = unique(allSonde$lake_year)
-
-
+lake_years = unique(allData$lake_year)
 
 # cycle through each lake year, calculate models for each, then store model results
 # in the dataframe. Need to initially store the model results in a list
 
-i = 1
-
+# Model results are the slopes, calculated based on the preceding 7 days
 
 for(i in 1:length(lake_years)){
   
   print(lake_years[i])
-  temp = allSonde %>% filter(lake_year == lake_years[i]) # temp dataframe for this lake_year
+  temp = allData %>% filter(lake_year == lake_years[i]) # temp dataframe for this lake_year
   
   models <- slide(
     temp, 
@@ -88,7 +84,7 @@ for(i in 1:length(lake_years)){
     
     if(!(is.null(coef))){
       Slope <- coef["doyCat"]
-      temp$chl_slope[j] = Slope # pull out the flope from the model
+      temp$chl_slope[j] = Slope # pull out the slope from the model
       temp$p_value[j] = summary(model)$coefficients[2,4] 
       temp$r_squared[j] = summary(model)$r.squared # pull out r_squared from model
     }
@@ -103,21 +99,37 @@ for(i in 1:length(lake_years)){
   remove(models)
 }
 
-# Need to fix the p-value extraction!!!!!!
 
-######### Make a function to extract the slopes following each heatwave event ##########
+
+######### Make a function to extract the target slopes following each heatwave event ##########
+# currently, the slopes dataframe has daily slopes for all of the lake_year combinations
+# Need to extract the slopes just following a heatwave
 # heatwave is the date of a heatwave, lake is the lake, data is the data to look for it in
 
 hwSlopes <- function(heatwaveStart, heatwaveEnd,  targLake, data){
-  startDate = as.Date(heatwaveEnd)+7
+  
+  # slopes from 7-14 after a heatwave
+  # because our slopes are calculated over a 7-day rolling window, the first slope considered will
+  # encompass the first week after the heatwave
+  
+  startDate = as.Date(heatwaveEnd)+7 
   endDate = as.Date(heatwaveEnd)+13
   
+  # this is the date before the heatwave, which we will use to calculate the percent
+  # change in chlorophyll
+  
   beforeDate = as.Date(heatwaveStart) -1
+  
+  # get the starting chlorophyll concentration before the heatwave
   
   startChl = data %>% filter(date == beforeDate) %>% 
     select(mean_chl)
   
+  # filter out the slopes we are interested in
+  
   temp = data %>% filter(lake == targLake, date >= startDate, date <= endDate)
+  
+  # put the starting chlorophyll value in the dataframe so we can return it with the function
   
   temp = temp %>% mutate(chl_before = startChl$mean_chl[1])
   return(temp)
@@ -130,25 +142,16 @@ heatwaves$percentChange = NA
 
 
 # copy and paste this
-test = hwSlopes("2009-06-20", "2009-06-27", "R", slopes)
-heatwaves$averageSlope[1] = mean(test$chl_slope, na.rm = TRUE)
-heatwaves$percentChange[1] = 100*(mean(test$chl_slope, na.rm = TRUE)*7)/test$chl_before[1]
+# test = hwSlopes("2009-06-20", "2009-06-27", "R", slopes)
+# heatwaves$averageSlope[1] = mean(test$chl_slope, na.rm = TRUE)
+# heatwaves$percentChange[1] = 100*(mean(test$chl_slope, na.rm = TRUE)*7)/test$chl_before[1]
 
-
-# 
-# hwSlopesBefore <- function(heatwave, targLake, data){
-#   startDate = as.Date(heatwave)-14
-#   endDate = as.Date(heatwave)+7
-#   
-#   temp = data %>% filter(lake == targLake, date >= startDate, date <= endDate)
-#   return(temp)
-#   
-# }
-
-
+# OR
 
 #Using a For Loop
 lengthHW = nrow(heatwaves)
+
+# take the average slope 
 
 for(i in 1:lengthHW){
   test = hwSlopes(heatwaves$date_start[i], heatwaves$date_end[i], heatwaves$lake[i], slopes)
@@ -157,22 +160,19 @@ for(i in 1:lengthHW){
   
 }
 
-write.csv(heatwaves, "./results/heatwaves_with_slopes.csv", row.names = FALSE)
+write.csv(heatwaves, "./results/heatwaves_with_average_slopes.csv", row.names = FALSE)
 
 
 #making plots
-results = read.csv("./results/heatwaves_with_slopes.csv")
-hist(results)
+results = read.csv("./results/heatwaves_with_average_slopes.csv")
 
 #break up by lake by filtering data
 resultsT = results %>% filter(lake == "T")
 resultsL = results %>% filter(lake == "L")
 resultsR = results %>% filter(lake == "R")
 
-#make preliminary plots - plot slope 
-plot(resultsT$averageSlope ~ resultsT$duration)
-plot(resultsR$averageSlope ~ resultsR$duration)
 
+### PLOT SLOPES BAR GRAPHS ###
 #work on plotting slopes vs different variables, see if any interesting relationships 
 
 #use ggplot to make three plots, one for each lake with date of heatwave on x-axis
@@ -188,14 +188,12 @@ ggplot(data = resultsR, aes(x = date_end, y = percentChange))+
   ggtitle("Peter")
   
 
-
 ggplot(data = resultsL, aes(x = date_end, y = percentChange))+
   geom_bar(stat='identity', fill = "forestgreen")+
   theme_classic()+
   ylab("percent change in chl")+
   xlab("end date of heatwave")+
   ggtitle("Paul")
-
 
 ggplot(data = resultsT, aes(x = date_end, y = percentChange))+
   geom_bar(stat='identity', fill = "forestgreen")+
@@ -204,129 +202,15 @@ ggplot(data = resultsT, aes(x = date_end, y = percentChange))+
   xlab("end date of heatwave")+
   ggtitle("Tuesday")
 
-rand()
-
-
-set.seed(21)
-sample(seq((as.Date('2008-05-13')), as.Date('2008-08-27'), by = 1), 12)
-
-
-
-
-###### RANDOM DATE COMPARISON ########
-# create a new dataframe similar to heatwaves, but with random dates
-# heatwave duration is 8 days, on average
-# create random start dates and end dates separated by 8 days
-# only years and days with dataavailable
-
-lake_years = unique(allSonde$lake_year)
-
-i =1
-
-#randomDays = data.frame(lake_year = , lake, year, start_date, end_date)
-
-for(i in 1: length(lake_years)){
-  
-  target = allSonde %>% filter(lake_year == lake_years[i])
-  minDate = min(target$date)
-  maxDate = max(target$date)
-  
-  set.seed(21)
-  startDates = sort(sample(seq((as.Date(minDate)), as.Date(maxDate), by = 1), 5))
-  endDates = startDates + 8
-  
-  current_randomDays = data.frame(lake_year = lake_years[i], lake = unique(target$lake)[1],
-                                  year = unique(target$year)[1],
-                                  start_date = startDates, end_date = endDates)
-  
-  if(i == 1){
-    randomDays = current_randomDays
-  }
-  if(i > 1){
-    randomDays = rbind(randomDays, current_randomDays)
-  }
-  
-}
-
-
-# calculate slopes using random days
-lengthRandom = nrow(randomDays)
-randomDays$percentChange = NA
-randomDays$averageSlope = NA
-
-i =1
-for(i in 1:lengthRandom){
-  test = hwSlopes(randomDays$start_date[i], randomDays$end_date[i], randomDays$lake[i], slopes)
-  randomDays$averageSlope[i] = mean(test$chl_slope, na.rm = TRUE)
-  randomDays$percentChange[i] = 100*(mean(test$chl_slope, na.rm = TRUE)*7)/test$chl_before[1]
-  
-}
-
-
-plot(density(randomDays$percentChange, na.rm = TRUE))
-
-plot(density(heatwaves$percentChange, na.rm = TRUE))
-
-
-
-ggplot(randomDays, aes(x=percentChange)) +
-  geom_density(alpha=.7, fill = "forestgreen")
-
-ggplot(heatwaves, aes(x=percentChange)) +
-  geom_density(alpha=.7, fill = "steelblue2")
-
-
-randomDays = randomDays %>% rename(date_start = start_date,
-                                   date_end = end_date)
-
-heatwaves = heatwaves %>% mutate(date_start = as.Date(date_start),
-                                   date_end = as.Date(date_end))
-
-randomDays$variable = "random"
-heatwaves$variable = "heatwave"
-
-randomDays = randomDays %>% filter(lake_year %in% c("L_2008", "R_2008", "L_2014", "L_2015"))
-
-allPercent = randomDays %>% 
-  full_join(heatwaves, by = c("date_start", "date_end", "year", "variable", "averageSlope", "percentChange", 
-                              "lake", "lake_year"))
-
-
-
-ggplot(allPercent, aes(x=percentChange, fill = variable)) +
-  geom_density(alpha=.5)
-
-nutrients = c("R_2013",
-              "R_2014",
-              "R_2015",
-              "R_2019",
-              "T_2013",
-              "T_2014",
-              "T_2015")
-
-
-
-ggplot(allPercent, aes(x=percentChange, fill = variable)) +
-  geom_density(alpha=.5)
-
-# test what happens if we remove heatwaves in nutrient addition years
-
-allPercent %>%  filter((lake_year %in% nutrients)) %>% 
-ggplot(aes(x=percentChange, fill = variable)) +
-  geom_density(alpha=.5)
-
-
-
-
-
-
-
 
 
 
 
 
 ###### COMPARE DISTRIBUTIONS OVER TIME ##########
+
+# We might also consider the distributions of chlorophyll slopes following a heatwave,
+# rather than just taking the average
 
 ## in the slopes dataframe, add a column percent change that is a percent change in chlorophyll from seven days before that slope
 # this normalizes across lakes
@@ -339,24 +223,53 @@ slopes = slopes %>% group_by(lake_year) %>%
 slopes = slopes %>% mutate(period = "all other days")
 slopes$shift = NA
 
+# make sure heatwaves date_start and date_end are formatted as dates
+heatwaves$date_end = as.Date(heatwaves$date_end)
+heatwaves$date_start = as.Date(heatwaves$date_start)
+
 # shift is the number of days after the heatwave we want to investigate
+# how much is the rolling window shifted
 shift = 1
 
 # windowSize is the size of the window we want to look at
 #minimum is 1
 windowSize = 4
 
+# will investigate slopes from 1-40 days after a heatwave
+# and will do this for each heatwave event
+
+### This creates a dataframe, all slopes, that has the slopes categorized
+# by their time period (during or after a heatwave, or all other days)
+# and includes the number of days after the heatwave event (shift) that is considered
+# one column, "exlude after heatwaves," are slopes within 40 days after a heatwave
+# that are not in the current rolling window
+
 for(shift in 0:40){
 
   # add a column to slopes which indicates whether or not there is a heatwave
 for(i in 1:nrow(heatwaves)){
-  start = heatwaves$date_start[i]
-  end = heatwaves$date_end[i]
+  start = heatwaves$date_start[i] # start date of the current heatwave
+  end = heatwaves$date_end[i] # end date of the current heatwave
   
+  # sequence of dates during the heatwave
   dates = seq(start, end, 1)
-  datesAnalyzed = seq(end+shift, end + shift+windowSize, 1)
-  datesExcluded = seq(end -7, end + 40, 1) # excludes dates that are part of rolling window but not currently considered in after heatwave
   
+  
+  # excludes dates that are part of rolling window but not currently considered in after heatwave
+  # dates that are within 40 days after a heatwave but not in our window for analysis as
+  # after heatwave because of our current shift selection.
+  # This gets overwrritten in part by "after heatwave" for those dates that are included
+  # in analysis
+  datesExcluded = seq(end -7, end + 40, 1) 
+  
+  # dates to be analyzed after the heatwaves
+  # this creates a sequence of numbers, from the end of the heatwave plus whatever
+  # shift is set to, to that same value plus the windowSize. So it sets a window shifted
+  # X number of days after the heatwave
+  
+  datesAnalyzed = seq(end+shift, end + shift+windowSize, 1)
+
+  # fill the dataframe "period" column with the correct categorization
   slopes = slopes %>% mutate(period = replace(period, date %in% datesExcluded, "exclude after heatwave"))
   slopes = slopes %>% mutate(period = replace(period, date %in% dates, "during heatwave"))
   slopes = slopes %>% mutate(period = replace(period, date %in% datesAnalyzed, "after heatwave"))
@@ -365,6 +278,7 @@ for(i in 1:nrow(heatwaves)){
   slopes$shift = shift
 }
 
+  # combine to the main dataframe
 if(shift == 0){
   allSlopes = slopes
 }
@@ -375,15 +289,22 @@ if(shift > 0){
 }
 
 
-# save the allPercent data to a dataframe
-# save interpolated allSonde data to a dataframe
 
-# write.csv(allSonde, "./formatted data/allSonde_interpolated.csv", row.names = FALSE)
+
+# save the allPercent data to a dataframe
+# save interpolated allData data to a dataframe
+
+# write.csv(allData, "./formatted data/allData_interpolated.csv", row.names = FALSE)
 # write.csv(allPercent, "./formatted data/results_random_and_heatwaves.csv")
 
 # calculate mean values by period and shift
+# across all lakes, this will give the mean slope following all heatwave events
+# by time period
+
+# right now, excluding outliters > 175% change because they are a small portion of
+# the dataset
 mean_df <- allSlopes %>% 
-  filter(percent_change < 175, period != "exclude after heatwave", !is.na(percent_change)) %>% 
+  filter(period != "exclude after heatwave", percent_change< 175, !is.na(percent_change)) %>% 
   group_by(period, shift) %>% 
   dplyr::summarise(mean_percent_change = mean(percent_change)) 
 
@@ -413,11 +334,10 @@ allSlopes %>%
 
   #gganimate::animate(plot = last_plot(), fps = 5) # slows down the animation
 
- gganimate::anim_save(filename = "./figures/animations/all_lakes_window_4.gif")
+ #gganimate::anim_save(filename = "./figures/animations/all_lakes_window_4.gif")
 
 
   
-
 allSlopes %>% filter(percent_change < 500, lake == "T") %>% 
   ggplot( aes(x=percent_change, fill = period)) +
   geom_density(alpha=.5)+
@@ -426,7 +346,7 @@ allSlopes %>% filter(percent_change < 500, lake == "T") %>%
   labs(title = "Days after heatwave for Tuesday Lake: {frame_time}")
 
 
-gganimate::anim_save(filename = "./figures/animations/tuesday_window_1.gif")
+#gganimate::anim_save(filename = "./figures/animations/tuesday_window_1.gif")
 
 
 
@@ -438,9 +358,7 @@ allSlopes %>% filter(percent_change < 500, lake == "R") %>%
   labs(title = "Days after heatwave for Peter Lake: {frame_time}")
 
 
-gganimate::anim_save(filename = "./figures/animations/peter_window_1.gif")
-
-
+#gganimate::anim_save(filename = "./figures/animations/peter_window_1.gif")
 
 
 
@@ -453,7 +371,6 @@ allSlopes %>% filter(percent_change < 500, lake == "L") %>%
 
 
 gganimate::anim_save(filename = "./figures/animations/paul_window_1.gif")
-
 
 
 
@@ -515,7 +432,7 @@ mean_dfT <- allSlopes %>% filter(lake == "T") %>%
 
 ##### Plots of just a couple of interesting days, frozen
 
-# all days
+# all days, with a shift of 4 days after the heatwave
 allSlopes %>% 
   filter(percent_change < 175, period != "exclude after heatwave", shift == 4) %>% 
   ggplot(aes(x = percent_change,
@@ -646,23 +563,6 @@ allSlopes %>% filter(lake == "T") %>%
   theme_classic()
 
 
-history = read.csv("manipulation_history.csv")
+history = read.csv("./formatted data/manipulation_history.csv")
 
 
-
-
-#make raw data plots of sonde chlorophyll for all lake_years
-lake_years = unique(allSonde$lake_year)
-
-for(i in 1:length(lake_years)){
-  
-  temp = allSonde %>% filter(lake_year == lake_years[i]) 
-  
-  print(
-  ggplot(data = temp, aes(x = doyCat, y = mean_chl))+
-    geom_point()+
-    geom_line()+
-  labs(title = lake_years[i])
-  )
-
-}

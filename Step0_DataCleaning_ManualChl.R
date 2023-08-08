@@ -266,6 +266,20 @@ manual_chl = rbind(LR_08_09, LRT_11_19)
 # remove 2016 data because it is empty
 manual_chl = manual_chl %>% filter(year != 2016)
 
-# save the manual chlorophyll data
-write.csv(manual_chl, "./formatted data/CombinedData_manual_chl.csv", row.names = FALSE)
+# replace the lake names with their letter codes
+manual_chl = manual_chl %>%
+  mutate(lake = replace(lake, lake == "Peter", "R")) %>%
+  mutate(lake = replace(lake, lake == "Paul", "L")) %>% 
+  mutate(lake = replace(lake, lake == "Tuesday", "T"))
 
+# save the manual chlorophyll data
+write.csv(manual_chl, "./formatted data/manual_chlorophyll.csv", row.names = FALSE)
+
+## Finally, combine the manual chlorophyll with the temperature data to make a combined dataframe
+
+all = read.csv("./formatted data/CombinedData.csv")
+
+manual_chl = manual_chl %>% rename(manual_chl = mean_chl)
+full_dataset = full_join(manual_chl, all, by = c("lake", "year", "doyCat"))
+
+write.csv(full_dataset, "./formatted data/full raw data manual and sonde chlorophyll.csv", row.names = FALSE)
