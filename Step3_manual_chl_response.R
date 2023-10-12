@@ -671,14 +671,14 @@ allSlopes %>%
                       quantile_lines = TRUE,
                       quantile_fun = function(x, ...) mean(x), 
                       scale = 2, size = 0.7) +
+  # geom_text(data = mean_dfT %>% filter(shift == 4),
+  #           aes(x = mean_percent_change,
+  #               y = factor(period, levels = desired_order),  # Use factor with desired order
+  #               label = as.character(round(mean_percent_change, digits = 0))),
+  #           color = "black",
+  #           size = 4,
+  #           vjust = 2) +
   geom_text(data = mean_dfT %>% filter(shift == 4),
-            aes(x = mean_percent_change,
-                y = factor(period, levels = desired_order),  # Use factor with desired order
-                label = as.character(round(mean_percent_change, digits = 0))),
-            color = "black",
-            size = 4,
-            vjust = 2) +
-  geom_text(data = mean_dfT %>% filter(shift == 1),
             aes(x = -200,
                 y = factor(period, levels = desired_order),  # Use factor with desired order
                 label = paste("n = ", number_percent_change, sep = "")),
@@ -693,11 +693,14 @@ allSlopes %>%
   theme(axis.text=element_text(size=14),
          axis.title=element_text(size=18,face="bold"))
 
-
-
 dev.off()
 
 desired_order <- c("after heatwave", "during heatwave", "all other days")
+
+
+
+png("./figures/science in the northwoods figures/Peter Lake heatwave results 4 days after.png", height = 7, width = 13, units = "in", res = 600)
+
 
 allSlopes %>%
   filter(lake == "R") %>%
@@ -709,14 +712,14 @@ allSlopes %>%
                       quantile_lines = TRUE,
                       quantile_fun = function(x, ...) mean(x), 
                       scale = 2, size = 0.7) +
+  # geom_text(data = mean_dfR %>% filter(shift == 4),
+  #           aes(x = mean_percent_change,
+  #               y = factor(period, levels = desired_order),  # Use factor with desired order
+  #               label = as.character(round(mean_percent_change, digits = 0))),
+  #           color = "black",
+  #           size = 4,
+  #           vjust = 2) +
   geom_text(data = mean_dfR %>% filter(shift == 4),
-            aes(x = mean_percent_change,
-                y = factor(period, levels = desired_order),  # Use factor with desired order
-                label = as.character(round(mean_percent_change, digits = 0))),
-            color = "black",
-            size = 4,
-            vjust = 2) +
-  geom_text(data = mean_dfR %>% filter(shift == 1),
             aes(x = -200,
                 y = factor(period, levels = desired_order),  # Use factor with desired order
                 label = paste("n = ", number_percent_change, sep = "")),
@@ -727,8 +730,13 @@ allSlopes %>%
   xlab("% change in surface chlorophyll-a")+
   labs(title = "Peter") +
   scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE")) +  # Specify fill colors for groups
-  theme_classic()
+  theme_classic()+
+  theme(axis.text=element_text(size=14),
+        axis.title=element_text(size=18,face="bold"))
 
+dev.off()
+
+png("./figures/science in the northwoods figures/Paul Lake heatwave results 4 days after.png", height = 7, width = 13, units = "in", res = 600)
 
 
 allSlopes %>%
@@ -748,7 +756,7 @@ allSlopes %>%
   #           color = "black",
   #           size = 4,
   #           vjust = 2) +
-  geom_text(data = mean_dfL %>% filter(shift == 1),
+  geom_text(data = mean_dfL %>% filter(shift == 4),
             aes(x = -200,
                 y = factor(period, levels = desired_order),  # Use factor with desired order
                 label = paste("n = ", number_percent_change, sep = "")),
@@ -759,4 +767,8 @@ allSlopes %>%
   xlab("% change in surface chlorophyll-a")+
   labs(title = "Paul") +
   scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE")) +  # Specify fill colors for groups
-  theme_classic()
+  theme_classic()+
+  theme(axis.text=element_text(size=14),
+        axis.title=element_text(size=18,face="bold"))
+
+dev.off()
