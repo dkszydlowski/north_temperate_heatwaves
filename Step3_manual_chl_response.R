@@ -98,7 +98,8 @@ lake_years = unique(allData$lake_year)
 # cycle through each lake year, calculate models for each, then store model results
 # in the dataframe. Need to initially store the model results in a list
 
-# Model results are the slopes, calculated based on the preceding 7 days
+# Model results are the slopes, originally calculated based on the preceding 7 days
+daysBefore = 
 
 for(i in 1:length(lake_years)){
   

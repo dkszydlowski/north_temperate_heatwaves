@@ -25,6 +25,8 @@ library(transformr)
 if (!require(ggridges)) install.packages('ggridges')
 library(ggridges)
 
+# clear the environment
+rm(list = ls(all.names = TRUE))
 
 # read in the heatwaves data calculated in the previous step
 heatwaves = read.csv("./formatted data/heatwavesdata.csv")
@@ -41,9 +43,7 @@ allData = allData %>% group_by("lake_year") %>%
   ungroup()
 
 
-
 ####### Start of actual code #########
-
 ## extract the slope, se, and p-value
 # and add to the dataframe
 
@@ -57,7 +57,8 @@ lake_years = unique(allData$lake_year)
 # cycle through each lake year, calculate models for each, then store model results
 # in the dataframe. Need to initially store the model results in a list
 
-# Model results are the slopes, calculated based on the preceding 7 days
+# Model results are the slopes, calculated based on the preceding 7 days originally
+daysBefore = 7 # variable for how long the slope will be calculated for
 
 for(i in 1:length(lake_years)){
   
@@ -67,7 +68,7 @@ for(i in 1:length(lake_years)){
   models <- slide(
     temp, 
     ~lm(mean_chl ~ doyCat, data = .x), 
-    .before = 7, 
+    .before = daysBefore, 
     .complete = TRUE
   )
   
@@ -140,7 +141,6 @@ heatwaves$averageSlope = NA
 heatwaves$percentChange = NA
 
 
-
 # copy and paste this
 # test = hwSlopes("2009-06-20", "2009-06-27", "R", slopes)
 # heatwaves$averageSlope[1] = mean(test$chl_slope, na.rm = TRUE)
@@ -156,7 +156,7 @@ lengthHW = nrow(heatwaves)
 for(i in 1:lengthHW){
   test = hwSlopes(heatwaves$date_start[i], heatwaves$date_end[i], heatwaves$lake[i], slopes)
   heatwaves$averageSlope[i] = mean(test$chl_slope, na.rm = TRUE)
-  heatwaves$percentChange[i] = 100*(mean(test$chl_slope, na.rm = TRUE)*7)/test$chl_before[1]
+  heatwaves$percentChange[i] = 100*(mean(test$chl_slope, na.rm = TRUE)*daysBefore)/test$chl_before[1]
   
 }
 
