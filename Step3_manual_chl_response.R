@@ -82,9 +82,6 @@ allData = allData %>% group_by("lake_year") %>%
   ungroup()
 
 
-
-####### Start of actual code #########
-
 ## extract the slope, se, and p-value
 # and add to the dataframe
 
@@ -99,7 +96,7 @@ lake_years = unique(allData$lake_year)
 # in the dataframe. Need to initially store the model results in a list
 
 # Model results are the slopes, originally calculated based on the preceding 7 days
-daysBefore = 
+daysBefore = 7
 
 for(i in 1:length(lake_years)){
   
@@ -109,7 +106,7 @@ for(i in 1:length(lake_years)){
   models <- slide(
     temp, 
     ~lm(mean_chl ~ doyCat, data = .x), 
-    .before = 7, 
+    .before = daysBefore, 
     .complete = TRUE
   )
   
@@ -194,7 +191,6 @@ heatwaves$percentChange = NA
 lengthHW = nrow(heatwaves)
 
 # take the average slope 
-
 for(i in 1:lengthHW){
   test = hwSlopes(heatwaves$date_start[i], heatwaves$date_end[i], heatwaves$lake[i], slopes)
   heatwaves$averageSlope[i] = mean(test$chl_slope, na.rm = TRUE)
@@ -214,6 +210,7 @@ resultsL = results %>% filter(lake == "L")
 resultsR = results %>% filter(lake == "R")
 
 
+
 ### PLOT SLOPES BAR GRAPHS ###
 #work on plotting slopes vs different variables, see if any interesting relationships 
 
@@ -228,7 +225,6 @@ ggplot(data = resultsR, aes(x = date_end, y = percentChange))+
   ylab("percent change in chl")+
   xlab("end date of heatwave")+
   ggtitle("Peter")
-
 
 ggplot(data = resultsL, aes(x = date_end, y = percentChange))+
   geom_bar(stat='identity', fill = "forestgreen")+
@@ -258,8 +254,10 @@ ggplot(data = resultsT, aes(x = date_end, y = percentChange))+
 # this normalizes across lakes
 # then, save as a dataframe
 
+baselineChl = 8 # the number of days before the calculated slope to turn it into a percent
+
 slopes = slopes %>% group_by(lake_year) %>% 
-  mutate(percent_change = 100*chl_slope*7/lag(mean_chl, 8, default = NA)) %>% 
+  mutate(percent_change = 100*chl_slope*daysBefore/lag(mean_chl, baselineChl, default = NA)) %>% 
   ungroup()
 
 slopes = slopes %>% mutate(period = "all other days")
@@ -286,7 +284,7 @@ windowSize = 4
 ### This creates a dataframe, all slopes, that has the slopes categorized
 # by their time period (during or after a heatwave, or all other days)
 # and includes the number of days after the heatwave event (shift) that is considered
-# one column, "exlude after heatwaves," are slopes within 40 days after a heatwave
+# one column, "exclude after heatwaves," are slopes within 40 days after a heatwave
 # that are not in the current rolling window
 
 for(shift in 0:40){
@@ -298,7 +296,6 @@ for(shift in 0:40){
     
     # sequence of dates during the heatwave
     dates = seq(start, end, 1)
-    
     
     # excludes dates that are part of rolling window but not currently considered in after heatwave
     # dates that are within 40 days after a heatwave but not in our window for analysis as
