@@ -1,5 +1,8 @@
 # script to plot the chlorophyll, temperature, and heatwave time series
 
+lubrary(tidyverse)
+library(lubridate)
+
 # read in the data
 allSonde = read.csv("./formatted data/CombinedData.csv")
 allSonde$date = as.Date(allSonde$date)
@@ -427,3 +430,33 @@ ggplot(data=Paul2015, aes(x=date, y=normChl)) +
 
 
 
+
+
+
+##### HEATWAVE SEASONALITY ######
+#### Make a plot of the timing of the heatwaves based on year ####
+
+LallSondeInterp = allSondeInterp %>% filter(lake == "L")
+
+# group by Cascade era
+# era 1 is food webs, era 2 is squeal, era 3 is spatial squeal
+LallSondeInterp = LallSondeInterp %>% mutate(era = NA)
+LallSondeInterp = LallSondeInterp %>% mutate(era = replace(era, year == "2008" | year == "2009" | year == "2010" | year == "2011", "food web"))
+LallSondeInterp = LallSondeInterp %>% mutate(era = replace(era, year == "2013" | year == "2014" | year == "2015", "squeal"))
+LallSondeInterp = LallSondeInterp %>% mutate(era = replace(era, year == "2018" | year == "2019", "spatial squeal"))
+
+ggplot(data = LallSondeInterp, aes(x = doyCat, y = mean_temp, color = as.factor(year))) +
+  geom_line(size = 1) +
+  theme_classic() +
+  facet_wrap(~era)
+
+heatwaves = read.csv("./formatted data/heatwavesdata.csv")
+
+heatwaves = heatwaves %>% 
+  mutate(doy.start = yday(date_start), doy.end = yday(date_end), doy.peak = yday(date_peak))
+
+
+
+ggplot(data = heatwaves, aes(x = doy.peak, y = intensity_mean, color = lake))+
+  geom_point(size = 2)+
+  theme_classic()
