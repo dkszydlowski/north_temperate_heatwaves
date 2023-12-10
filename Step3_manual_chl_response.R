@@ -1,6 +1,6 @@
 # Re-run step 3 but with the manual chlorophyll data
  
-# manual chlorophyll better represent phytoplankton
+# manual chlorophyll better represents phytoplankton
 
 # step 3, calculate the response of chl to the heatwaves
 #install and load slider library for rolling window analysis
