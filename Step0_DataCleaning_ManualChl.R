@@ -1,4 +1,4 @@
-# data cleaning for the manual chlorophyll data instead of the sonde data
+# data cleaning for the MANUAL chlorophyll data instead of the sonde data
 
 ##### 2008-2009 LR #####
 

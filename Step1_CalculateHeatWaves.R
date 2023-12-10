@@ -75,7 +75,7 @@ heatwaves = heatwaves %>%
   mutate(lake_year = paste(lake, year, sep = "_")) 
 
 ##### Save the final heatwave data #####
-write.csv(heatwaves, "./formatted data/heatwavesdata.csv", row.names = FALSE)
+#write.csv(heatwaves, "./formatted data/heatwavesdata.csv", row.names = FALSE)
 
 
 

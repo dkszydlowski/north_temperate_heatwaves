@@ -412,6 +412,8 @@ mean_dfT <- allSlopes %>% filter(lake == "T") %>%
 
 desired_order <- c("after heatwave", "during heatwave", "all other days")
 
+png("./figures/dissolved oxygen response/Tuesday Lake heatwave results 4 days after DO.png", height = 7, width = 13, units = "in", res = 600)
+
 allSlopes %>%
   filter(lake == "T") %>%
   filter(period != "exclude after heatwave", shift == 4) %>%
@@ -442,8 +444,11 @@ allSlopes %>%
   scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE")) +  # Specify fill colors for groups
   theme_classic()
 
+dev.off()
 
 
+
+png("./figures/dissolved oxygen response/Peter Lake heatwave results 4 days after DO.png", height = 7, width = 13, units = "in", res = 600)
 
 allSlopes %>%
   filter(lake == "R") %>%
@@ -477,8 +482,9 @@ allSlopes %>%
   theme(axis.text=element_text(size=14),
         axis.title=element_text(size=18,face="bold"))
 
+dev.off()
 
-
+png("./figures/dissolved oxygen response/Paul Lake heatwave results 4 days after DO.png", height = 7, width = 13, units = "in", res = 600)
 
 
 allSlopes %>%
@@ -512,4 +518,4 @@ allSlopes %>%
   theme_classic()+
   theme(axis.text=element_text(size=14),
         axis.title=element_text(size=18,face="bold"))
-
+dev.off()
