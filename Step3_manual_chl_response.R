@@ -760,7 +760,7 @@ allSlopes %>%
                 label = paste("n = ", number_percent_change, sep = "")),
             color = "black",
             size = 4,
-            vjust = 2) +
+            vjust = 2) + 
   ylab("") +
   xlab("% change in surface chlorophyll-a")+
   labs(title = "Paul") +
