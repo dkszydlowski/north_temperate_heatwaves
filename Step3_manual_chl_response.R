@@ -139,7 +139,6 @@ for(i in 1:length(lake_years)){
 }
 
 
-
 ######### Make a function to extract the target slopes following each heatwave event ##########
 # currently, the slopes dataframe has daily slopes for all of the lake_year combinations
 # Need to extract the slopes just following a heatwave
