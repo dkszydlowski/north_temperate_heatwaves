@@ -76,7 +76,3 @@ heatwaves = heatwaves %>%
 
 ##### Save the final heatwave data #####
 #write.csv(heatwaves, "./formatted data/heatwavesdata.csv", row.names = FALSE)
-
-
-
-#### Make a plot of the timing of the heatwaves based on year ####
