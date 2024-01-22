@@ -1,8 +1,11 @@
 # Re-run step 3 but with the manual chlorophyll data
- 
+# updated in January 2024 to be lceaned up and allow for more flexibility
+
 # manual chlorophyll better represents phytoplankton
 
 # step 3, calculate the response of chl to the heatwaves
+
+#### install packages ####
 #install and load slider library for rolling window analysis
 if (!require(slider)) install.packages('slider')
 library(slider) 
@@ -12,7 +15,7 @@ library(plyr)
 
 if (!require(tidyr)) install.packages('tidyr')
 library(tidyr)
- 
+
 if (!require(dplyr)) install.packages('dplyr')
 library(dplyr)
 library(tidyverse)
@@ -28,6 +31,7 @@ library(transformr)
 
 if (!require(ggridges)) install.packages('ggridges')
 library(ggridges)
+
 
 
 # read in the heatwaves data calculated in the previous step
@@ -64,15 +68,15 @@ for(i in 1:length(lake_years)){
     print(j)
     if(is.na(temp$mean_chl[j])){
       temp = temp[-j,]# removes the row
-      }else{break}
+    }else{break}
   }
   
   
   
   if(i == 1){cutData = temp}else{cutData = rbind(cutData, temp)}
-
-  }
   
+}
+
 
 allData = cutData # change allData so it is updated to exclude the leading or ending NA values
 
@@ -84,9 +88,6 @@ allData = allData %>% group_by("lake_year") %>%
   ungroup()
 
 
-## extract the slope, se, and p-value
-# and add to the dataframe
-
 # make a lake_year column in allData
 allData = allData %>% 
   mutate(lake_year = paste(lake, year, sep = "_"))
@@ -97,6 +98,8 @@ lake_years = unique(allData$lake_year)
 # cycle through each lake year, calculate models for each, then store model results
 # in the dataframe. Need to initially store the model results in a list
 
+
+#### calculate slopes between chl values ####
 # Model results are the slopes, originally calculated based on the preceding 7 days
 daysBefore = 7
 
@@ -141,7 +144,7 @@ for(i in 1:length(lake_years)){
 }
 
 
-######### Make a function to extract the target slopes following each heatwave event ##########
+######### function to extract the target slopes ##########
 # currently, the slopes dataframe has daily slopes for all of the lake_year combinations
 # Need to extract the slopes just following a heatwave
 # heatwave is the date of a heatwave, lake is the lake, data is the data to look for it in
@@ -180,13 +183,6 @@ heatwaves$averageSlope = NA
 heatwaves$percentChange = NA
 
 
-
-# copy and paste this
-# test = hwSlopes("2009-06-20", "2009-06-27", "R", slopes)
-# heatwaves$averageSlope[1] = mean(test$chl_slope, na.rm = TRUE)
-# heatwaves$percentChange[1] = 100*(mean(test$chl_slope, na.rm = TRUE)*7)/test$chl_before[1]
-
-# OR
 
 #Using a For Loop
 lengthHW = nrow(heatwaves)
@@ -396,7 +392,7 @@ allSlopes %>% filter(percent_change < 500, lake == "L", shift == 4) %>%
   ggplot( aes(x=percent_change, fill = period)) +
   geom_density(alpha=.5)+
   theme_classic()+
-#  gganimate::transition_time(shift)+
+  #  gganimate::transition_time(shift)+
   labs(title = "Days after heatwave for Peter Lake: {frame_time}")
 
 
@@ -658,7 +654,9 @@ history = read.csv("./formatted data/manipulation_history.csv")
 # Create a factor variable with the desired order for 'period'
 desired_order <- c("after heatwave", "during heatwave", "all other days")
 
-png("./figures/science in the northwoods figures/Tuesday Lake heatwave results 4 days after.png", height = 7, width = 13, units = "in", res = 600)
+#png("./figures/science in the northwoods figures/Tuesday Lake heatwave results 4 days after.png", height = 7, width = 13, units = "in", res = 600)
+
+allSlopes = allSlopes %>% mutate(period = replace(period, period == "exclude after heatwave", "all other days"))
 
 allSlopes %>%
   filter(lake == "T") %>%
@@ -690,15 +688,15 @@ allSlopes %>%
   scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE")) +  # Specify fill colors for groups
   theme_classic()+
   theme(axis.text=element_text(size=14),
-         axis.title=element_text(size=18,face="bold"))
+        axis.title=element_text(size=18,face="bold"))
 
-dev.off()
+#dev.off()
 
 desired_order <- c("after heatwave", "during heatwave", "all other days")
 
 
 
-png("./figures/science in the northwoods figures/Peter Lake heatwave results 4 days after.png", height = 7, width = 13, units = "in", res = 600)
+#png("./figures/science in the northwoods figures/Peter Lake heatwave results 4 days after.png", height = 7, width = 13, units = "in", res = 600)
 
 
 allSlopes %>%
@@ -719,7 +717,7 @@ allSlopes %>%
   #           size = 4,
   #           vjust = 2) +
   geom_text(data = mean_dfR %>% filter(shift == 4),
-            aes(x = -200,
+            aes(x = -700,
                 y = factor(period, levels = desired_order),  # Use factor with desired order
                 label = paste("n = ", number_percent_change, sep = "")),
             color = "black",
@@ -733,9 +731,9 @@ allSlopes %>%
   theme(axis.text=element_text(size=14),
         axis.title=element_text(size=18,face="bold"))
 
-dev.off()
+#dev.off()
 
-png("./figures/science in the northwoods figures/Paul Lake heatwave results 4 days after.png", height = 7, width = 13, units = "in", res = 600)
+#png("./figures/science in the northwoods figures/Paul Lake heatwave results 4 days after.png", height = 7, width = 13, units = "in", res = 600)
 
 
 allSlopes %>%
@@ -770,4 +768,4 @@ allSlopes %>%
   theme(axis.text=element_text(size=14),
         axis.title=element_text(size=18,face="bold"))
 
-dev.off()
+#dev.off()

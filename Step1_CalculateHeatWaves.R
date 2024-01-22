@@ -76,3 +76,9 @@ heatwaves = heatwaves %>%
 
 ##### Save the final heatwave data #####
 #write.csv(heatwaves, "./formatted data/heatwavesdata.csv", row.names = FALSE)
+
+
+# assess which lakes and years we currently have sonde temp data for
+allSonde = allSonde %>% mutate(lake.year = paste(lake, year, sep = "_"))
+
+
