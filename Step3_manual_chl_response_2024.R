@@ -32,76 +32,25 @@ library(transformr)
 if (!require(ggridges)) install.packages('ggridges')
 library(ggridges)
 
-
-
+#==============================================================================#
+#### read in the data ####
 # read in the heatwaves data calculated in the previous step
 heatwaves = read.csv("./formatted data/heatwavesdata.csv")
 
-# read in the sonde data from step 1
-allData = read.csv("./formatted data/full raw data manual and sonde chlorophyll.csv")
-allData$date = as.Date(allData$date)
-
-# in this case, set mean_chl equal to manual_chl
-allData$mean_chl = allData$manual_chl
-
-# loop through and remove NA values at the beginning and end of each lake_year combination
-# so that I can interpolate and run the code
-
-allData$lake_year = paste(allData$lake, allData$year, sep = "_")
-i = 1
-for(i in 1:length(lake_years)){
-  temp = allData %>% filter(lake_year == lake_years[i])
-  temp = temp %>% dplyr::arrange(doyCat)
-  
-  indexChange = 0 # shifts index if a row is deleted
-  
-  # remove consecutive values at the beginning of each lake_year
-  for(j in 1:nrow(temp)){
-    if(is.na(temp$mean_chl[j+indexChange])){
-      temp = temp[-1, ] # removes the row
-      indexChange = indexChange -1 # fixes index because row was removed
-    }else{break}
-  }
-  
-  # remove consecutive values at the end of each lake_year
-  for(j in nrow(temp):1){
-    print(j)
-    if(is.na(temp$mean_chl[j])){
-      temp = temp[-j,]# removes the row
-    }else{break}
-  }
-  
-  
-  
-  if(i == 1){cutData = temp}else{cutData = rbind(cutData, temp)}
-  
-}
-
-
-allData = cutData # change allData so it is updated to exclude the leading or ending NA values
-
-# interpolate the data by lake_year
-allData = allData %>% group_by("lake_year") %>% 
-  mutate(mean_chl = na.approx(mean_chl),
-         mean_doSat = na.approx(mean_doSat),
-         mean_pH = na.approx(mean_pH)) %>% 
-  ungroup()
-
-
-# make a lake_year column in allData
-allData = allData %>% 
-  mutate(lake_year = paste(lake, year, sep = "_"))
+# read in the sonde and manual chl data
+allData = read.csv("./formatted data/interpolated_manual_chl_for_slopes.csv")
 
 # make a vector of unique lake years
 lake_years = unique(allData$lake_year)
 
-# cycle through each lake year, calculate models for each, then store model results
-# in the dataframe. Need to initially store the model results in a list
+#==============================================================================#
+#### CALCULATE SLOPES FOR CHLOROPHYLL ####
 
+# cycle through each lake year, fit linear models for each rolling window, then store model slopes
+# in the 'slopes' dataframe. Need to initially store the model results in a list
 
-#### calculate slopes between chl values ####
 # Model results are the slopes, originally calculated based on the preceding 7 days
-daysBefore = 7
+daysBefore = 7 #lever
 
 for(i in 1:length(lake_years)){
   
@@ -144,14 +93,16 @@ for(i in 1:length(lake_years)){
 }
 
 
-######### function to extract the target slopes ##########
-# currently, the slopes dataframe has daily slopes for all of the lake_year combinations
-# Need to extract the slopes just following a heatwave
+
+#==============================================================================#
+#### SELECT SLOPES IN SPECIFIED WINDOW ####
+# currently, the slopes dataframe has daily rolling window slopes for all of the lake_year combinations
+# Need to select the slopes just following a heatwave
 # heatwave is the date of a heatwave, lake is the lake, data is the data to look for it in
 
 hwSlopes <- function(heatwaveStart, heatwaveEnd,  targLake, data){
   
-  # slopes from 7-14 after a heatwave
+  # slopes from 7-14 days after a heatwave
   # because our slopes are calculated over a 7-day rolling window, the first slope considered will
   # encompass the first week after the heatwave
   
@@ -187,10 +138,13 @@ heatwaves$percentChange = NA
 #Using a For Loop
 lengthHW = nrow(heatwaves)
 
-# take the average slope 
+# take the average slope and calculate the percent change in chlorophyll based on the slope
+
 for(i in 1:lengthHW){
   test = hwSlopes(heatwaves$date_start[i], heatwaves$date_end[i], heatwaves$lake[i], slopes)
   heatwaves$averageSlope[i] = mean(test$chl_slope, na.rm = TRUE)
+  
+  # calculate the percent change in chlorophyll from the slope
   heatwaves$percentChange[i] = 100*(mean(test$chl_slope, na.rm = TRUE)*7)/test$chl_before[1]
   
 }
