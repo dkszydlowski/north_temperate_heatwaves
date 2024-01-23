@@ -32,6 +32,7 @@ library(transformr)
 if (!require(ggridges)) install.packages('ggridges')
 library(ggridges)
 
+
 #### levers we can pull ####
 
 # slope and percent calculations
@@ -42,12 +43,17 @@ baselineDate = 1 # how many days before the start of the heatwave to use as base
 shift
 windowSize
 
+
 #==============================================================================#
 #### read in the data ####
 # read in the heatwaves data calculated in the previous step
 heatwaves = read.csv("./formatted data/heatwavesdata.csv")
 
+
 # read in the manual chl data
+
+# read in the sonde and manual chl data
+
 allData = read.csv("./formatted data/interpolated_manual_chl_for_slopes.csv")
 
 # make a vector of unique lake years
@@ -60,7 +66,11 @@ lake_years = unique(allData$lake_year)
 # in the 'slopes' dataframe. Need to initially store the model results in a list
 
 # Model results are the slopes, originally calculated based on the preceding 7 days
+
 daysBefore = 7 
+
+daysBefore = 7 #lever
+
 
 for(i in 1:length(lake_years)){
   
@@ -160,7 +170,10 @@ for(i in 1:lengthHW){
   # save the mean of the slopes to the heatwaves dataframe
   heatwaves$averageSlope[i] = mean(test$chl_slope, na.rm = TRUE)
   
+
   # calculate the percent change in chlorophyll from the mean slope
+
+  # calculate the percent change in chlorophyll from the slope
   heatwaves$percentChange[i] = 100*(mean(test$chl_slope, na.rm = TRUE)*7)/test$chl_before[1]
   
   # save the standard deviation of the slopes to the heatwaves dataframe
