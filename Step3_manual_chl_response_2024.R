@@ -3,6 +3,9 @@
 
 # manual chlorophyll better represents phytoplankton
 
+# this code is also updated to fix a bug in the slope length,
+# where slope length is inclusive of the current day in the rolling window
+
 # step 3, calculate the response of chl to the heatwaves
 
 #### install packages ####
@@ -32,16 +35,48 @@ library(transformr)
 if (!require(ggridges)) install.packages('ggridges')
 library(ggridges)
 
-
+#==============================================================================#
 #### levers we can pull ####
 
 # slope and percent calculations
-slopeLength = 7 # length of the rolling window slope to be calculated, currently daysBefore
+slopeLength = 7 # length of the rolling window slope to be calculated
 baselineDate = 1 # how many days before the start of the heatwave to use as baseline chl conditions, currently an integer
 
+# build in options here for during the heatwave, or at the beginning of the calculated slope
+
 # slope aggregation choices
-shift
-windowSize
+shift = 4 # time lag of how many days after the heatwave we want to look
+numSlopes = 7 # the number of slopes we want to include in analysis
+
+# timing choices
+# change analysis so that we can look during the heatwave, or after the heatwave? 
+
+
+#==============================================================================#
+#### output of settings ####
+
+cur_date_time = format(Sys.time(), "%Y-%m-%d %H:%M:%S")
+
+plot_metadata <- data.frame(slopeLength = paste("Length of each slope: ", slopeLength, sep = ""),
+                             baselineDate = paste("Baseline chl for calculating percent change: ", baselineDate, sep = ""),
+                             time = paste("Plots generated ", cur_date_time, sep = ""), 
+                            shift = paste("Number of days after heatwave: ", shift, sep = ""),
+                            numSlopes = paste("Number of slopes aggregated per event: ", numSlopes, sep = ""))
+
+
+# Create a blank ggplot with no data points
+ggplot() +
+  theme_void() +  # Removes axes and other elements
+  geom_text(data = plot_metadata, aes(x = 5, y = 5, label = slopeLength),
+            size = 5, hjust = 0.5, vjust = -14)+
+  geom_text(data = plot_metadata, aes(x = 5, y = 5, label = baselineDate),
+            size = 5, hjust = 0.5, vjust = -12)+
+  geom_text(data = plot_metadata, aes(x = 5, y = 5, label = shift),
+            size = 5, hjust = 0.5, vjust = -8)+
+  geom_text(data = plot_metadata, aes(x = 5, y = 5, label = numSlopes),
+            size = 5, hjust = 0.5, vjust = -6)+
+  geom_text(data = plot_metadata, aes(x = 5, y = 5, label = time),
+            size = 5, hjust = 0.5, vjust = 14)
 
 
 #==============================================================================#
@@ -49,11 +84,7 @@ windowSize
 # read in the heatwaves data calculated in the previous step
 heatwaves = read.csv("./formatted data/heatwavesdata.csv")
 
-
 # read in the manual chl data
-
-# read in the sonde and manual chl data
-
 allData = read.csv("./formatted data/interpolated_manual_chl_for_slopes.csv")
 
 # make a vector of unique lake years
@@ -65,22 +96,18 @@ lake_years = unique(allData$lake_year)
 # cycle through each lake year, fit linear models for each rolling window, then store model slopes
 # in the 'slopes' dataframe. Need to initially store the model results in a list
 
+# then, calculate the percent change in chlorophyll relative to the baseline specified above
+
 # Model results are the slopes, originally calculated based on the preceding 7 days
-
-daysBefore = 7 
-
-daysBefore = 7 #lever
-
 
 for(i in 1:length(lake_years)){
   
-  print(lake_years[i])
   temp = allData %>% filter(lake_year == lake_years[i]) # temp dataframe for this lake_year
   
   models <- slide(
     temp, 
     ~lm(mean_chl ~ doyCat, data = .x), 
-    .before = daysBefore, 
+    .after = slopeLength -1, # add the minus one so the slopeLength matches the user input
     .complete = TRUE
   )
   
@@ -99,20 +126,22 @@ for(i in 1:length(lake_years)){
       Slope <- coef["doyCat"]
       temp$chl_slope[j] = Slope # pull out the slope from the model
       temp$p_value[j] = summary(model)$coefficients[2,4] 
+      temp$se[j] = summary(model)$coefficients["doyCat", "Std. Error"] 
       temp$r_squared[j] = summary(model)$r.squared # pull out r_squared from model
     }
     
-    
+    temp$percent_change = 100*temp$chl_slope*slopeLength/lag(temp$mean_chl, slopeLength-1, default = NA)
   }
   
   if(i ==1){ slopes = temp} # if first iteration, creates slopes, the final dataframe
   
   if(i >1){slopes = rbind(slopes, temp)} # else, appends to slopes 
   
-  remove(models)
 }
 
-
+# test case to make sure the slide function works as we think it does
+# test = slopes[1:7, ]
+ summary(lm(test$mean_chl~test$doyCat))
 
 #==============================================================================#
 #### SELECT SLOPES IN SPECIFIED WINDOW ####
@@ -121,8 +150,7 @@ for(i in 1:length(lake_years)){
 # heatwave is the date of a heatwave, lake is the lake, data is the data to look for it in
 
 hwSlopes <- function(heatwaveStart, heatwaveEnd,  targLake, data){
-  
-  # slopes from 7-14 days after a heatwave
+
   # because our slopes are calculated over a 7-day rolling window, the first slope considered will
   # encompass the first week after the heatwave
   
@@ -132,7 +160,7 @@ hwSlopes <- function(heatwaveStart, heatwaveEnd,  targLake, data){
   # this is the date before the heatwave, which we will use to calculate the percent
   # change in chlorophyll
   
-  beforeDate = as.Date(heatwaveStart) -1
+  beforeDate = as.Date(heatwaveStart) - baselineDate
   
   # get the starting chlorophyll concentration before the heatwave
   
@@ -149,7 +177,6 @@ hwSlopes <- function(heatwaveStart, heatwaveEnd,  targLake, data){
   return(temp)
   
 }
-
 
 
 #==============================================================================#
@@ -170,17 +197,14 @@ for(i in 1:lengthHW){
   # save the mean of the slopes to the heatwaves dataframe
   heatwaves$averageSlope[i] = mean(test$chl_slope, na.rm = TRUE)
   
-
-  # calculate the percent change in chlorophyll from the mean slope
-
   # calculate the percent change in chlorophyll from the slope
-  heatwaves$percentChange[i] = 100*(mean(test$chl_slope, na.rm = TRUE)*7)/test$chl_before[1]
+  heatwaves$percentChange[i] = 100*(mean(test$chl_slope, na.rm = TRUE)*slopeLength)/test$chl_before[1]
   
   # save the standard deviation of the slopes to the heatwaves dataframe
   heatwaves$sdSlope[i] = sd(test$chl_slope, na.rm = TRUE)
   
   # convert the standard deviation to a percentage
-  heatwaves$sdSlopePercent[i] = 100*sd(test$chl_slope, na.rm = TRUE)*7/test$chl_before[1]
+  heatwaves$sdSlopePercent[i] = 100*sd(test$chl_slope, na.rm = TRUE)*slopeLength/test$chl_before[1]
   
   
 }
@@ -189,20 +213,17 @@ for(i in 1:lengthHW){
 # write.csv(heatwaves, "./results/heatwaves_with_average_slopes_MANUAL_CHL.csv", row.names = FALSE)
 
 
+
+
+
 #==============================================================================#
 #### PLOT AVG SLOPES ####
 results = read.csv("./results/heatwaves_with_average_slopes_MANUAL_CHL.csv")
-
 
 #break up by lake by filtering data
 resultsT = results %>% filter(lake == "T")
 resultsL = results %>% filter(lake == "L")
 resultsR = results %>% filter(lake == "R")
-
-
-
-### PLOT SLOPES BAR GRAPHS ###
-#work on plotting slopes vs different variables, see if any interesting relationships 
 
 #use ggplot to make three plots, one for each lake with date of heatwave on x-axis
 #and average slope on the y
@@ -238,36 +259,14 @@ ggplot(data = resultsT, aes(x = date_end, y = percentChange))+
 # We might also consider the distributions of chlorophyll slopes following a heatwave,
 # rather than just taking the average for a certain window
 
-## in the slopes dataframe, add a column percent change that is a percent change in chlorophyll from seven days before that slope
-# this normalizes across lakes
-# then, save as a dataframe
-
-baselineChl = 8 # the number of days before the calculated slope to turn it into a percent
-
-slopes = slopes %>% group_by(lake_year) %>% 
-  mutate(percent_change = 100*chl_slope*daysBefore/lag(mean_chl, baselineChl, default = NA)) %>% 
-  ungroup()
-
-slopes = slopes %>% mutate(period = "all other days")
-slopes$shift = NA
-
 # make sure heatwaves date_start and date_end are formatted as dates
 heatwaves$date_end = as.Date(heatwaves$date_end)
 heatwaves$date_start = as.Date(heatwaves$date_start)
+slopes$date = as.Date(slopes$date)
+slopes$period = "all other days"
 
 # write slopes to a file
 #write.csv(slopes, "./formatted data/slopes_3day.csv", row.names = FALSE)
-
-# shift is the number of days after the heatwave we want to investigate
-# how much is the rolling window shifted
-shift = 1
-
-# windowSize is the size of the window we want to look at
-#minimum is 1
-windowSize = 4
-
-# will investigate slopes from 1-40 days after a heatwave
-# and will do this for each heatwave event
 
 ### This creates a dataframe, all slopes, that has the slopes categorized
 # by their time period (during or after a heatwave, or all other days)
@@ -294,16 +293,16 @@ for(shift in 0:40){
     
     # dates to be analyzed after the heatwaves
     # this creates a sequence of numbers, from the end of the heatwave plus whatever
-    # shift is set to, to that same value plus the windowSize. So it sets a window shifted
+    # shift is set to, to that same value plus the numSlopes. So it sets a window shifted
     # X number of days after the heatwave
     
-    datesAnalyzed = seq(end+shift, end + shift+windowSize, 1)
+    datesAnalyzed = seq(end+shift, end + shift+numSlopes, 1)
     
+    # fill the dataframe "period" column with the correct categorization
     # fill the dataframe "period" column with the correct categorization
     slopes = slopes %>% mutate(period = replace(period, date %in% datesExcluded, "exclude after heatwave"))
     slopes = slopes %>% mutate(period = replace(period, date %in% dates, "during heatwave"))
     slopes = slopes %>% mutate(period = replace(period, date %in% datesAnalyzed, "after heatwave"))
-    
     
     slopes$shift = shift
   }
@@ -343,7 +342,7 @@ mean_df$mean_percent_change <- round(mean_df$mean_percent_change, 1)
 
 # plot the density ridges with mean values
 allSlopes %>% 
-  filter(percent_change < 175, period != "exclude after heatwave") %>% 
+  filter(percent_change < 175, period != "exclude after heatwave", shift == 4) %>% 
   ggplot(aes(x = percent_change,
              y = period,
              fill = period)) +
@@ -359,7 +358,7 @@ allSlopes %>%
             size = 4,
             vjust = 2) +
   theme_classic() +
-  gganimate::transition_time(shift) +
+ # gganimate::transition_time(shift) +
   labs(title = "Days after heatwave for all lakes: {frame_time}")
 
 
@@ -408,8 +407,8 @@ t.test(shift4HW$percent_change, shift4other$percent_change)
 t.test(shift4during$percent_change, shift4other$percent_change)
 
 
-
-#### Plot the mean percent change in chlorophyll over time ####
+#==============================================================================#
+#### RESPONSE TIMING LINE PLOTS ####
 
 mean_df <- allSlopes %>% 
   filter( period != "exclude after heatwave", !is.na(percent_change)) %>% 
@@ -481,7 +480,7 @@ mean_dfL %>% filter(shift > 0) %>%
   scale_color_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE"))+
   theme_classic()
 
-mean_dfT %>% filter(shift > 0) %>% 
+mean_dfT %>% filter(shift < 4) %>% 
   ggplot(aes( x= shift, y = mean_percent_change, color = period))+
   geom_line(size = 1)+
   geom_point()+
@@ -522,7 +521,13 @@ mean_dfT %>% filter(shift > 0 & period != "during heatwave") %>%
   labs(x = "days after heatwave")+
   theme_classic()
 
-##### Plots of just a couple of interesting days, frozen
+
+
+
+
+
+#==============================================================================#
+#### PLOTTING DISTRIBUTIONS ####
 
 # all days, with a shift of 4 days after the heatwave
 allSlopes %>% 
@@ -561,7 +566,7 @@ allSlopes %>%
 
 # Peter
 allSlopes %>% filter(lake == "R") %>% 
-  filter( shift == 4) %>% 
+  filter( shift == 0) %>% 
   ggplot(aes(x = percent_change,
              y = period,
              fill = period)) +
@@ -569,7 +574,7 @@ allSlopes %>% filter(lake == "R") %>%
                       quantile_lines = TRUE,
                       quantile_fun = function(x, ...) mean(x), 
                       scale = 3) +
-  geom_text(data = mean_dfR %>% filter(shift == 1),
+  geom_text(data = mean_dfR %>% filter(shift == 0),
             aes(x = mean_percent_change,
                 y = period,
                 label = as.character(round(mean_percent_change, digits = 0))),
@@ -577,7 +582,7 @@ allSlopes %>% filter(lake == "R") %>%
             size = 4,
             vjust = 2) +
   
-  geom_text(data = mean_dfR %>% filter(shift == 4),
+  geom_text(data = mean_dfR %>% filter(shift == 0),
             aes(x = -200,
                 y = period,
                 label = paste("n = ", number_percent_change, sep = "")),
@@ -594,7 +599,7 @@ allSlopes %>% filter(lake == "R") %>%
 #Paul
 
 allSlopes %>% filter(lake == "L") %>% 
-  filter( shift == 4) %>% 
+  filter( shift == 0) %>% 
   ggplot(aes(x = percent_change,
              y = period,
              fill = period)) +
@@ -602,14 +607,14 @@ allSlopes %>% filter(lake == "L") %>%
                       quantile_lines = TRUE,
                       quantile_fun = function(x, ...) mean(x), 
                       scale = 3) +
-  geom_text(data = mean_dfL %>% filter(shift == 4),
+  geom_text(data = mean_dfL %>% filter(shift == 0),
             aes(x = mean_percent_change,
                 y = period,
                 label = as.character(round(mean_percent_change, digits = 0))),
             color = "black",
             size = 4,
             vjust = 2) +
-  geom_text(data = mean_dfL %>% filter(shift == 1),
+  geom_text(data = mean_dfL %>% filter(shift == 0),
             aes(x = -200,
                 y = period,
                 label = paste("n = ", number_percent_change, sep = "")),
@@ -625,7 +630,7 @@ allSlopes %>% filter(lake == "L") %>%
 
 #Tuesday
 allSlopes %>% filter(lake == "T") %>% 
-  filter(shift == 4) %>% 
+  filter(shift == 0) %>% 
   ggplot(aes(x = percent_change,
              y = period,
              fill = period)) +
@@ -633,7 +638,7 @@ allSlopes %>% filter(lake == "T") %>%
                       quantile_lines = TRUE,
                       quantile_fun = function(x, ...) mean(x), 
                       scale = 3) +
-  geom_text(data = mean_dfT %>% filter(shift == 4),
+  geom_text(data = mean_dfT %>% filter(shift == 0),
             aes(x = mean_percent_change,
                 y = period,
                 label = as.character(round(mean_percent_change, digits = 0))),
@@ -641,7 +646,7 @@ allSlopes %>% filter(lake == "T") %>%
             size = 4,
             vjust = 2) +
   
-  geom_text(data = mean_dfT %>% filter(shift == 1),
+  geom_text(data = mean_dfT %>% filter(shift == 0),
             aes(x = -200,
                 y = period,
                 label = paste("n = ", number_percent_change, sep = "")),
@@ -664,7 +669,7 @@ desired_order <- c("after heatwave", "during heatwave", "all other days")
 
 allSlopes %>%
   filter(lake == "T") %>%
-  filter(period != "exclude after heatwave", shift == 4) %>%
+  filter(period != "exclude after heatwave", shift == 0) %>%
   ggplot(aes(x = percent_change,
              y = factor(period, levels = desired_order),  # Use factor with desired order
              fill = period)) +
@@ -672,7 +677,7 @@ allSlopes %>%
                       quantile_lines = TRUE,
                       quantile_fun = function(x, ...) mean(x), 
                       scale = 3, size = 0.7) +
-  geom_text(data = mean_dfT %>% filter(shift == 4),
+  geom_text(data = mean_dfT %>% filter(shift == 0),
             aes(x = mean_percent_change,
                 y = factor(period, levels = desired_order),  # Use factor with desired order
                 label = as.character(round(mean_percent_change, digits = 0))),
@@ -701,7 +706,7 @@ history = read.csv("./formatted data/manipulation_history.csv")
 
 
 
-
+#==============================================================================#
 #### SITN figures 2023 ####
 
 
@@ -714,7 +719,7 @@ allSlopes = allSlopes %>% mutate(period = replace(period, period == "exclude aft
 
 allSlopes %>%
   filter(lake == "T") %>%
-  filter(period != "exclude after heatwave", shift == 4) %>%
+  filter(period != "exclude after heatwave", shift == 0) %>%
   ggplot(aes(x = percent_change,
              y = factor(period, levels = desired_order),  # Use factor with desired order
              fill = period)) +
@@ -722,14 +727,14 @@ allSlopes %>%
                       quantile_lines = TRUE,
                       quantile_fun = function(x, ...) mean(x), 
                       scale = 2, size = 0.7) +
-  # geom_text(data = mean_dfT %>% filter(shift == 4),
+  # geom_text(data = mean_dfT %>% filter(shift == 0),
   #           aes(x = mean_percent_change,
   #               y = factor(period, levels = desired_order),  # Use factor with desired order
   #               label = as.character(round(mean_percent_change, digits = 0))),
   #           color = "black",
   #           size = 4,
   #           vjust = 2) +
-  geom_text(data = mean_dfT %>% filter(shift == 4),
+  geom_text(data = mean_dfT %>% filter(shift == 0),
             aes(x = -200,
                 y = factor(period, levels = desired_order),  # Use factor with desired order
                 label = paste("n = ", number_percent_change, sep = "")),
@@ -755,7 +760,7 @@ desired_order <- c("after heatwave", "during heatwave", "all other days")
 
 allSlopes %>%
   filter(lake == "R") %>%
-  filter(period != "exclude after heatwave", shift == 4) %>%
+  filter(period != "exclude after heatwave", shift == 0) %>%
   ggplot(aes(x = percent_change,
              y = factor(period, levels = desired_order),  # Use factor with desired order
              fill = period)) +
@@ -763,14 +768,14 @@ allSlopes %>%
                       quantile_lines = TRUE,
                       quantile_fun = function(x, ...) mean(x), 
                       scale = 2, size = 0.7) +
-  # geom_text(data = mean_dfR %>% filter(shift == 4),
+  # geom_text(data = mean_dfR %>% filter(shift == 0),
   #           aes(x = mean_percent_change,
   #               y = factor(period, levels = desired_order),  # Use factor with desired order
   #               label = as.character(round(mean_percent_change, digits = 0))),
   #           color = "black",
   #           size = 4,
   #           vjust = 2) +
-  geom_text(data = mean_dfR %>% filter(shift == 4),
+  geom_text(data = mean_dfR %>% filter(shift == 0),
             aes(x = -700,
                 y = factor(period, levels = desired_order),  # Use factor with desired order
                 label = paste("n = ", number_percent_change, sep = "")),
@@ -792,7 +797,7 @@ allSlopes %>%
 
 allSlopes %>%
   filter(lake == "L") %>%
-  filter(period != "exclude after heatwave", shift == 4) %>%
+  filter(period != "exclude after heatwave", shift == 0) %>%
   ggplot(aes(x = percent_change,
              y = factor(period, levels = desired_order),  # Use factor with desired order
              fill = period)) +
@@ -800,14 +805,14 @@ allSlopes %>%
                       quantile_lines = TRUE,
                       quantile_fun = function(x, ...) mean(x), 
                       scale = 1.5, size = 0.7) +
-  # geom_text(data = mean_dfL %>% filter(shift == 4),
+  # geom_text(data = mean_dfL %>% filter(shift == 0),
   #           aes(x = mean_percent_change,
   #               y = factor(period, levels = desired_order),  # Use factor with desired order
   #               label = as.character(round(mean_percent_change, digits = 0))),
   #           color = "black",
   #           size = 4,
   #           vjust = 2) +
-  geom_text(data = mean_dfL %>% filter(shift == 4),
+  geom_text(data = mean_dfL %>% filter(shift == 0),
             aes(x = -200,
                 y = factor(period, levels = desired_order),  # Use factor with desired order
                 label = paste("n = ", number_percent_change, sep = "")),
@@ -823,3 +828,80 @@ allSlopes %>%
         axis.title=element_text(size=18,face="bold"))
 
 #dev.off()
+
+
+
+
+
+
+#==============================================================================#
+#### TEST STANDARD ERROR OF SLOPES ####
+
+# cycle through each lake year, fit linear models for each rolling window, then store model slopes
+# in the 'slopes' dataframe. Need to initially store the model results in a list
+
+ses = data.frame(matrix(nrow = 30, ncol = 2))
+names(ses) = c("slopeLength", "mean.se")
+
+# Model results are the slopes, originally calculated based on the preceding 7 days
+for(slopeLength in 3:30){
+  for(i in 1:length(lake_years)){
+    
+    #print(lake_years[i])
+    temp = allData %>% filter(lake_year == lake_years[i]) # temp dataframe for this lake_year
+    
+    models <- slide(
+      temp, 
+      ~lm(mean_chl ~ doyCat, data = .x), 
+      .before = slopeLength, 
+      .complete = TRUE
+    )
+    
+    temp$chl_slope = NA
+    temp$se = NA
+    temp$p_value = NA
+    temp$r_squared = NA
+    
+    for(j in 1:nrow(temp)){
+      
+      model = models[[j]]
+      coef <- coefficients(model) 
+      # extracting the coefficients from the current model
+      
+      if(!(is.null(coef))){
+        Slope <- coef["doyCat"]
+        temp$chl_slope[j] = Slope # pull out the slope from the model
+        temp$p_value[j] = summary(model)$coefficients[2,4] 
+        temp$se[j] =  summary(model)$coefficients["doyCat", "Std. Error"] 
+        temp$r_squared[j] = summary(model)$r.squared # pull out r_squared from model
+      }
+      
+      
+    }
+    
+    if(i ==1){ slopes = temp} # if first iteration, creates slopes, the final dataframe
+    
+    if(i >1){slopes = rbind(slopes, temp)} # else, appends to slopes 
+    
+    
+  }
+  print(slopeLength)
+  print(mean(slopes$se, na.rm = TRUE))
+  
+  ses$slopeLength[slopeLength] = slopeLength
+  ses$mean.se[slopeLength] = mean(slopes$se, na.rm = TRUE)
+  
+}
+
+ses$sample_size_component = sqrt(1/(ses$slopeLength - 2))
+ses$data_component = ses$mean.se/ses$sample_size_component
+ses$mean_actual_se = ses$mean.se
+
+ses = pivot_longer(ses, cols = c("sample_size_component", "data_component", "mean_actual_se"), names_to = "se.component", values_to = "se")
+
+ggplot(data = ses, aes(x = slopeLength, y = se, color = se.component))+
+  geom_point()+
+  geom_line()+
+  theme_classic()+
+  xlim(min = 3, max = 15)+
+  ylim(min =0 , max = 1)
