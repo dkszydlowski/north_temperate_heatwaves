@@ -84,6 +84,23 @@ metadata_plot <- ggplot() +
             size = 5, hjust = 0.5, vjust = -6)+
   geom_text(data = plot_metadata, aes(x = 5, y = 5, label = exclude.after.heatwaves),
             size = 5, hjust = 0.5, vjust = -4)+
+<<<<<<< HEAD
+=======
+  geom_text(data = plot_metadata, aes(x = 5, y = 5, label = time),
+            size = 5, hjust = 0.5, vjust = 14)
+                  
+
+
+# Create a blank ggplot with no data points
+ggplot() +
+  theme_void() +  # Removes axes and other elements
+  geom_text(data = plot_metadata, aes(x = 5, y = 5, label = slopeLength),
+            size = 5, hjust = 0.5, vjust = 0)+
+  geom_text(data = plot_metadata, aes(x = 5, y = 5, label = baselineDate),
+            size = 5, hjust = 0.5, vjust = 2)+
+  geom_text(data = plot_metadata, aes(x = 5, y = 5, label = shift),
+            size = 5, hjust = 0.5, vjust = 4)+
+>>>>>>> 6913d532bc07f221cb8c27690386c0c39518c25b
   geom_text(data = plot_metadata, aes(x = 5, y = 5, label = time),
             size = 5, hjust = 0.5, vjust = 14)
                   
@@ -439,6 +456,7 @@ mean_dfR %>% filter(daysAfter > 0) %>%
 
 #==============================================================================#
 #### PLOTTING DISTRIBUTIONS ####
+
 
 # Create a factor variable with the desired order for 'period'
 desired_order <- c("after heatwave", "during heatwave", "all other days")
