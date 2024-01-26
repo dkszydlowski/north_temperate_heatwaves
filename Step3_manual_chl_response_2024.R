@@ -1,5 +1,5 @@
 # Re-run step 3 but with the manual chlorophyll data
-# updated in January 2024 to be lceaned up and allow for more flexibility
+# updated in January 2024 to be cleaned up and allow for more flexibility
 
 # manual chlorophyll better represents phytoplankton
 
@@ -52,9 +52,6 @@ numSlopes = 2 # the number of slopes we want to include in analysis
 exclude.after.heatwaves = FALSE # if TRUE, excludes slopes for days within 20 days 
 # of the heatwave that don't fall within our aggregating window
 
-shift = 4 # time lag of how many days after the heatwave we want to look
-windowSize = 7 # the number of slopes we want to include in analysis
-
 # timing choices
 # change analysis so that we can look during the heatwave, or after the heatwave? 
 
@@ -73,7 +70,8 @@ plot_metadata <- data.frame(slopeLength = paste("Length of each slope: ", slopeL
 
 
 
-# Create a blank ggplot with no data points
+# Create a ggplot with the metadata for the data analysis and plot production, 
+# including all of the choices made above
 metadata_plot <- ggplot() +
   theme_void() +  # Removes axes and other elements
   geom_text(data = plot_metadata, aes(x = 5, y = 5, label = slopeLength),
@@ -86,22 +84,10 @@ metadata_plot <- ggplot() +
             size = 5, hjust = 0.5, vjust = -6)+
   geom_text(data = plot_metadata, aes(x = 5, y = 5, label = exclude.after.heatwaves),
             size = 5, hjust = 0.5, vjust = -4)+
-                             baselineDate = paste("Baseline chl for percent calc: ", baselineDate, sep = ""),
-                             time = paste("Plots generated ", cur_date_time, sep = ""), 
-                            shift = paste("Number of days after heatwave: ", shift, sep = ""))
-
-
-# Create a blank ggplot with no data points
-ggplot() +
-  theme_void() +  # Removes axes and other elements
-  geom_text(data = plot_metadata, aes(x = 5, y = 5, label = slopeLength),
-            size = 5, hjust = 0.5, vjust = 0)+
-  geom_text(data = plot_metadata, aes(x = 5, y = 5, label = baselineDate),
-            size = 5, hjust = 0.5, vjust = 2)+
-  geom_text(data = plot_metadata, aes(x = 5, y = 5, label = shift),
-            size = 5, hjust = 0.5, vjust = 4)+
   geom_text(data = plot_metadata, aes(x = 5, y = 5, label = time),
             size = 5, hjust = 0.5, vjust = 14)
+                  
+
 
 
 #==============================================================================#
@@ -213,16 +199,9 @@ for(i in 1:lengthHW){
   
   # save the mean of the slopes to the heatwaves dataframe
   heatwaves$averageSlope[i] = mean(slopes.subset$chl_slope, na.rm = TRUE)
-
-  
-  # calculate the percent change in chlorophyll from the slope
-
   
   # save the standard deviation of the slopes to the heatwaves dataframe
   heatwaves$sdSlope[i] = sd(slopes.subset$chl_slope, na.rm = TRUE)
-  
-  # convert the standard deviation to a percentage
-
   
   # save the mean of the percent change to the heatwaves dataframe
   heatwaves$percentChange[i] = mean(slopes.subset$percent_change, na.rm = TRUE)
@@ -239,7 +218,6 @@ for(i in 1:lengthHW){
 #### PLOT AVG SLOPES ####
 #results = read.csv("./results/heatwaves_with_average_slopes_MANUAL_CHL.csv")
 
-
 #break up by lake by filtering data
 resultsT = results %>% filter(lake == "T")
 resultsL = results %>% filter(lake == "L")
@@ -249,9 +227,6 @@ resultsR = results %>% filter(lake == "R")
 #and average slope on the y
 
 #png(filename = "./figures/preliminary figures/R_slopes_2023_02_09", height = 8, width = 11, units = "in", res = 300)
-
-results$month = month(results$date_start)
-results$month_year = paste(results$month, results$year, sep = "_")
 
 indHWResp <- ggplot(data = results, aes(x = date_start, y = percentChange, fill = lake))+
   geom_bar(stat = "identity", position = "identity", alpha = 0.5, color = "black")+
@@ -264,21 +239,21 @@ indHWResp <- ggplot(data = results, aes(x = date_start, y = percentChange, fill 
 
 
 ggplot(data = resultsR, aes(x = date_end, y = percentChange))+
-  geom_bar(stat='identity', fill = "#4AB5C4")+
+  geom_bar(stat='identity', fill = "#4AB5C4", color = "black")+
   theme_classic()+
   ylab("percent change in chl")+
   xlab("end date of heatwave")+
   ggtitle("Peter")
 
 ggplot(data = resultsL, aes(x = date_end, y = percentChange))+
-  geom_bar(stat='identity', fill = "#ADDAE3")+
+  geom_bar(stat='identity', fill = "#ADDAE3", color = "black")+
   theme_classic()+
   ylab("percent change in chl")+
   xlab("end date of heatwave")+
   ggtitle("Paul")
 
 ggplot(data = resultsT, aes(x = date_end, y = percentChange))+
-  geom_bar(stat='identity', fill = "#BAAD8D")+
+  geom_bar(stat='identity', fill = "#BAAD8D", color = "black")+
   theme_classic()+
   ylab("percent change in chl")+
   xlab("end date of heatwave")+
@@ -291,7 +266,6 @@ ggplot(data = resultsT, aes(x = date_end, y = percentChange))+
 
 # We might also consider the distributions of chlorophyll slopes following a heatwave,
 # rather than just taking the average for a certain window
-
 
 # make sure heatwaves date_start and date_end are formatted as dates
 heatwaves$date_end = as.Date(heatwaves$date_end)
@@ -374,48 +348,6 @@ mean_df <- allSlopes %>%
 mean_df$mean_percent_change <- round(mean_df$mean_percent_change, 1)
 
 
-
-allSlopes %>% filter(lake == "T", shift == 4) %>% 
-  ggplot( aes(x=percent_change, fill = period)) +
-  geom_density(alpha=.5)+
-  theme_classic()+
-  #gganimate::transition_time(shift)+
-  labs(title = "Days after heatwave for Tuesday Lake: {frame_time}")
-
-
-#gganimate::anim_save(filename = "./figures/animations/tuesday_window_1.gif")
-
-
-allSlopes %>% filter(percent_change < 500, lake == "L", shift == 4) %>% 
-  ggplot( aes(x=percent_change, fill = period)) +
-  geom_density(alpha=.5)+
-  theme_classic()+
-  #  gganimate::transition_time(shift)+
-  labs(title = "Days after heatwave for Peter Lake: {frame_time}")
-
-
-#gganimate::anim_save(filename = "./figures/animations/peter_window_1.gif")
-
-
-
-allSlopes %>% filter(percent_change < 500, lake == "L") %>% 
-  ggplot( aes(x=percent_change, fill = period)) +
-  geom_density(alpha=.5)+
-  theme_classic()+
- # gganimate::transition_time(shift)+
-  labs(title = "Days after heatwave for Paul Lake: {frame_time}")
-
-
-
-
-shift4HW = allSlopes %>% filter(shift %in% c(4, 5, 6, 7, 8), period == "after heatwave")
-shift4other = allSlopes %>% filter(shift %in% c(4, 5, 6, 7, 8), period == "all other days")
-shift4during = allSlopes %>% filter(shift %in% c(4, 5, 6, 7, 8), period == "during heatwave")
-
-
-t.test(shift4HW$percent_change, shift4other$percent_change)
-
-t.test(shift4during$percent_change, shift4other$percent_change)
 
 
 #==============================================================================#
@@ -505,209 +437,8 @@ mean_dfR %>% filter(daysAfter > 0) %>%
 
 
 
-
 #==============================================================================#
 #### PLOTTING DISTRIBUTIONS ####
-
-mean_dfT %>% filter(shift > 0 & period != "during heatwave") %>% 
-  ggplot(aes( x= shift, y = mean_percent_change, color = period))+
-  scale_color_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE"))+
-  scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE"))+
-  geom_line(size = 1)+
-  geom_point()+
-  geom_ribbon(aes(ymin = mean_percent_change - sd_percent_change, ymax = mean_percent_change + sd_percent_change, fill = period), alpha = 0.1)+
-  labs(x = "days after heatwave")+
-  theme_classic()
-
-
-
-
-
-
-#==============================================================================#
-#### PLOTTING DISTRIBUTIONS ####
-
-# all days, with a shift of 4 days after the heatwave
-allSlopes %>% 
-  filter( period != "exclude after heatwave", shift == 4) %>% 
-  ggplot(aes(x = percent_change,
-             y = period,
-             fill = period)) +
-  geom_density_ridges(alpha = .7,
-                      quantile_lines = TRUE,
-                      quantile_fun = function(x, ...) mean(x), 
-                      scale = 3) +
-  geom_text(data = mean_df %>% filter(shift == 4),
-            aes(x = mean_percent_change,
-                y = period,
-                label = as.character(round(mean_percent_change, digits = 0))),
-            color = "black",
-            size = 4,
-            vjust = 2) +
-  
-  geom_text(data = mean_df %>% filter(shift == 4),
-            aes(x = -200,
-                y = period,
-                label = paste("n = ", number_percent_change, sep = "")),
-            color = "black",
-            size = 4,
-            vjust = 2) +
-  ylab("")+
-  labs(title = "All lakes")+
-  theme_classic()
-
-
-
-
-
-
-
-# Peter
-allSlopes %>% filter(lake == "R") %>% 
-  filter( shift == 4) %>% 
-  ggplot(aes(x = percent_change,
-             y = period,
-             fill = period)) +
-  geom_density_ridges(alpha = .7,
-                      quantile_lines = TRUE,
-                      quantile_fun = function(x, ...) mean(x), 
-                      scale = 3) +
-  geom_text(data = mean_dfR %>% filter(shift == 1),
-            aes(x = mean_percent_change,
-                y = period,
-                label = as.character(round(mean_percent_change, digits = 0))),
-            color = "black",
-            size = 4,
-            vjust = 2) +
-  
-  geom_text(data = mean_dfR %>% filter(shift == 4),
-            aes(x = -200,
-                y = period,
-                label = paste("n = ", number_percent_change, sep = "")),
-            color = "black",
-            size = 4,
-            vjust = 2) +
-  ylab("")+
-  labs(title = "Peter")+
-  theme_classic()
-
-
-
-
-#Paul
-
-allSlopes %>% filter(lake == "L") %>% 
-  filter( shift == 4) %>% 
-  ggplot(aes(x = percent_change,
-             y = period,
-             fill = period)) +
-  geom_density_ridges(alpha = .7,
-                      quantile_lines = TRUE,
-                      quantile_fun = function(x, ...) mean(x), 
-                      scale = 3) +
-  geom_text(data = mean_dfL %>% filter(shift == 4),
-            aes(x = mean_percent_change,
-                y = period,
-                label = as.character(round(mean_percent_change, digits = 0))),
-            color = "black",
-            size = 4,
-            vjust = 2) +
-  geom_text(data = mean_dfL %>% filter(shift == 1),
-            aes(x = -200,
-                y = period,
-                label = paste("n = ", number_percent_change, sep = "")),
-            color = "black",
-            size = 4,
-            vjust = 2) +
-  ylab("")+
-  labs(title = "Paul")+
-  theme_classic()
-
-
-
-
-#Tuesday
-allSlopes %>% filter(lake == "T") %>% 
-  filter(shift == 4) %>% 
-  ggplot(aes(x = percent_change,
-             y = period,
-             fill = period)) +
-  geom_density_ridges(alpha = .7,
-                      quantile_lines = TRUE,
-                      quantile_fun = function(x, ...) mean(x), 
-                      scale = 3) +
-  geom_text(data = mean_dfT %>% filter(shift == 4),
-            aes(x = mean_percent_change,
-                y = period,
-                label = as.character(round(mean_percent_change, digits = 0))),
-            color = "black",
-            size = 4,
-            vjust = 2) +
-  
-  geom_text(data = mean_dfT %>% filter(shift == 1),
-            aes(x = -200,
-                y = period,
-                label = paste("n = ", number_percent_change, sep = "")),
-            color = "black",
-            size = 4,
-            vjust = 2) +
-  ylab("")+
-  labs(title = "Tuesday")+
-  scale_fill_manual(values = c("all other days" = "#88CCEE", "after heatwave" = "#117733", "during heatwave" = "#CC6677")) +  # Specify fill colors for groups
-  theme_classic()
-
-
-
-
-
-
-
-# Create a factor variable with the desired order for 'period'
-desired_order <- c("after heatwave", "during heatwave", "all other days")
-
-allSlopes %>%
-  filter(lake == "T") %>%
-  filter(period != "exclude after heatwave", shift == 4) %>%
-  ggplot(aes(x = percent_change,
-             y = factor(period, levels = desired_order),  # Use factor with desired order
-             fill = period)) +
-  geom_density_ridges(alpha = 0.7,
-                      quantile_lines = TRUE,
-                      quantile_fun = function(x, ...) mean(x), 
-                      scale = 3, size = 0.7) +
-  geom_text(data = mean_dfT %>% filter(shift == 4),
-            aes(x = mean_percent_change,
-                y = factor(period, levels = desired_order),  # Use factor with desired order
-                label = as.character(round(mean_percent_change, digits = 0))),
-            color = "black",
-            size = 4,
-            vjust = 2) +
-  geom_text(data = mean_dfT %>% filter(shift == 1),
-            aes(x = -200,
-                y = factor(period, levels = desired_order),  # Use factor with desired order
-                label = paste("n = ", number_percent_change, sep = "")),
-            color = "black",
-            size = 4,
-            vjust = 2) +
-  ylab("") +
-  xlab("% change in surface chlorophyll-a")+
-  labs(title = "Tuesday") +
-  scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE")) +  # Specify fill colors for groups
-  theme_classic()
-
-
-
-
-history = read.csv("./formatted data/manipulation_history.csv")
-
-
-
-
-
-#==============================================================================#
-#### SITN figures 2023 ####
-
-
 
 # Create a factor variable with the desired order for 'period'
 desired_order <- c("after heatwave", "during heatwave", "all other days")
@@ -867,6 +598,7 @@ Ldist <- allSlopes %>%
 #==============================================================================#
 #### CREATE PDF OF OUTPUTS ####
 
+pdfName = paste("daysAfter", daysAfter, "slopeLength", slopeLength, sep = "_")
 
 pdf("./figures/sensitivity tests/testing.pdf", height = 6, width = 10)
 
