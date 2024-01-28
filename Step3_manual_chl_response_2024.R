@@ -45,13 +45,13 @@ library(ggpubr)
 #### levers we can pull ####
 
 # slope and percent calculations
-slopeLength = 7 # length of the rolling window slope to be calculated
+slopeLength = 10 # length of the rolling window slope to be calculated
 
 # build in options here for during the heatwave, or at the beginning of the calculated slope
 
 # slope aggregation choices
 
-daysAfter = 0 # time lag of how many days after the heatwave we want to look
+daysAfter = 2 # time lag of how many days after the heatwave we want to look
 numSlopes = 7 # the number of slopes we want to include in analysis
 
 exclude.after.heatwaves = FALSE # if TRUE, excludes slopes for days within 20 days 
@@ -89,6 +89,26 @@ metadata_plot <- ggplot() +
   geom_text(data = plot_metadata, aes(x = 5, y = 5, label = time),
             size = 5, hjust = 0.5, vjust = 14)
                   
+
+#==============================================================================#
+#### loop for the whole code to investigate across combinations ####
+
+# the dataframe looped results will contain the mean values for the specified combinations
+looped.results = data.frame(matrix(nrow = 105, ncol = 15))
+names(looped.results) = c("slopeLength", "daysAfter", "numSlopes", 
+                          "all.all.other.days", "all.during.heatwave", "all.after.heatwave",
+                          "R.all.other.days", "R.during.heatwave", "R.after.heatwave",
+                          "L.all.other.days", "L.during.heatwave", "L.after.heatwave",
+                          "T.all.other.days", "T.during.heatwave", "T.after.heatwave")
+L = 1
+for(slopeLength in 5:11){
+  for(daysAfter in 0:2){
+    for(numSlopes in 5:9){
+      
+      looped.results$slopeLength[L] = slopeLength
+      looped.results$daysAfter[L] = daysAfter
+      looped.results$numSlopes[L] = numSlopes
+
 
 
 
@@ -168,9 +188,6 @@ for(i in 1:length(lake_years)){
 # heatwave is the date of a heatwave, targLake is the lake, data is our dataset of all the calculated slopes
 
 hwSlopes <- function(heatwaveStart, heatwaveEnd,  targLake, data){
-
-  # because our slopes are calculated over a 7-day rolling window, the first slope considered will
-  # encompass the first week after the heatwave
   
   startDate = as.Date(heatwaveEnd)+daysAfter 
   endDate = as.Date(heatwaveEnd)+daysAfter+numSlopes
@@ -372,6 +389,70 @@ mean_dfT <- allSlopes %>% filter(lake == "T") %>%
   dplyr::summarise(mean_percent_change = mean(percent_change), 
                    sd_percent_change = sd(percent_change), 
                    number_percent_change = n()) 
+
+#### END OF FOR LOOPS ####
+
+# save results to the looped dataframe
+looped.results$all.all.other.days[L] = mean_df$mean_percent_change[mean_df$period == "all other days" & 
+                                                                     mean_df$daysAfter == get("daysAfter", envir=globalenv())]
+# results aggregated across all lakes
+looped.results$all.all.other.days[L] = mean_df %>%
+  filter(daysAfter == daysAfter & period == "all other days") %>% 
+  pull(mean_percent_change)
+
+looped.results$all.during.heatwave[L] = mean_df %>%
+          filter(daysAfter == daysAfter & period == "during heatwave") %>% 
+          pull(mean_percent_change)
+
+looped.results$all.after.heatwave[L] = mean_df %>%
+  filter(daysAfter == daysAfter & period == "after heatwave") %>% 
+  pull(mean_percent_change)
+
+# results for R
+looped.results$R.all.other.days[L] = mean_dfR %>%
+  filter(daysAfter == daysAfter & period == "all other days") %>% 
+  pull(mean_percent_change)
+
+looped.results$R.during.heatwave[L] = mean_dfR %>%
+  filter(daysAfter == daysAfter & period == "during heatwave") %>% 
+  pull(mean_percent_change)
+
+looped.results$R.after.heatwave[L] = mean_dfR %>%
+  filter(daysAfter == daysAfter & period == "after heatwave") %>% 
+  pull(mean_percent_change)
+
+# results for L
+looped.results$L.all.other.days[L] = mean_dfL %>%
+  filter(daysAfter == daysAfter & period == "all other days") %>% 
+  pull(mean_percent_change)
+
+looped.results$L.during.heatwave[L] = mean_dfL %>%
+  filter(daysAfter == daysAfter & period == "during heatwave") %>% 
+  pull(mean_percent_change)
+
+looped.results$L.after.heatwave[L] = mean_dfL %>%
+  filter(daysAfter == daysAfter & period == "after heatwave") %>% 
+  pull(mean_percent_change)
+
+# results for T
+looped.results$T.all.other.days[L] = mean_dfT %>%
+  filter(daysAfter == daysAfter & period == "all other days") %>% 
+  pull(mean_percent_change)
+
+looped.results$T.during.heatwave[L] = mean_dfT %>%
+  filter(daysAfter == daysAfter & period == "during heatwave") %>% 
+  pull(mean_percent_change)
+
+looped.results$T.after.heatwave[L] = mean_dfT %>%
+  filter(daysAfter == daysAfter & period == "after heatwave") %>% 
+  pull(mean_percent_change)
+
+print(L)
+L = L+1
+
+    }
+  }
+}
 
 
 # combine individual estimates of the mean so we can standardize axes
@@ -653,9 +734,7 @@ hw.length <- ggplot(data = exp, aes(x = length, y = abs(percent_change), fill = 
   labs(y = "abs. % change in surface chl", x = "heatwave length (days)")+
   scale_fill_manual(values = c("L" = "steelblue2", "R" = "black", "T" = "white"))
 
-ggarrange(hw.pload, hw.color, hw.doy.start, hw.length, nrow = 2, ncol = 2)
-
-
+#==============================================================================#
 #### Example plot of what the heatwave window is looking at ####
 
 #==============================================================================#
@@ -683,7 +762,7 @@ dev.off()
 
 
 
-
+# secondary output that has the raw data plots, all of them with the dates that were analyzed
 
 
 
@@ -760,3 +839,16 @@ dev.off()
 #   theme_classic()+
 #   xlim(min = 3, max = 15)+
 #   ylim(min =0 , max = 1)
+
+
+#==============================================================================#
+#### PLOT LOOPED RESULTS ####
+ggplot(data = looped.results, aes(x = daysAfter, y = numSlopes, fill = R.after.heatwave))+
+  geom_tile(color = "black")+
+  geom_text(aes(label = R.after.heatwave), color = "white", size = 4)
+
+ggplot(data = looped.results, aes(x = slopeLength, y = numSlopes, fill = T.after.heatwave))+
+  geom_tile(color = "black")
+
+ggplot(data = looped.results, aes(x = slopeLength, y = daysAfter, fill = T.all.other.days))+
+  geom_tile(color = "black")
