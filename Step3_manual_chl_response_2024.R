@@ -38,6 +38,9 @@ library(ggridges)
 if (!require(readxl)) install.packages('readxl')
 library(readxl)
 
+if (!require(ggpubr)) install.packages('ggpubr')
+library(ggpubr)
+
 #==============================================================================#
 #### levers we can pull ####
 
@@ -605,6 +608,9 @@ Ldist <- allSlopes %>%
 # add the new calculated average slopes to the old exp dataframe
 exp = read_xlsx("./formatted data/explanatory_variables_heatwaves.xlsx")
 
+# length of each heatwave
+exp$length = as.numeric(exp$end_date - exp$start_date)
+
 # make a new dataframe that only has the columns of results we are interested in for now
 priority.results = results %>% select(lake, year, date_start, date_end, percentChange) %>% 
   rename(start_date = date_start, end_date = date_end) %>% 
@@ -618,32 +624,39 @@ exp = exp %>% full_join(priority.results, by = c("lake", "year", "start_date", "
 exp$percent_change = as.numeric(exp$percent_change)
 
 
-ggplot(data = exp, aes(x = p_loading_mg_m2, y = abs(percent_change)))+
-  geom_point(size = 3, color = "steelblue2")+
-  theme_classic()
+hw.pload <- ggplot(data = exp, aes(x = p_loading_mg_m2, y = abs(percent_change)))+
+  geom_point(size = 3, fill = "orangered3", pch = 21)+
+  theme_classic()+
+  labs(y = "abs. % change in surface chl",  x = "P loading (mg/m2)")
 
-ggplot(data = exp, aes(x = color_m_1, y = abs(percent_change)))+
-  geom_point(size = 3, color = "steelblue2")+
-  theme_classic()
+
+hw.color <- ggplot(data = exp, aes(x = color_m_1, y = abs(percent_change)))+
+  geom_point(size = 3, fill = "saddlebrown", pch = 21)+
+  theme_classic()+
+  labs(y = "abs. % change in surface chl",  x = "water color g440 (m-1)")
+
 
 # plot of the percent change in chlorophyll seasonally
 
 exp = exp %>% mutate(doy.start = yday(start_date)) %>% 
   mutate(month = month(start_date))
 
-ggplot(data = exp, aes(x = doy.start, y = abs(percent_change), fill = lake))+
+hw.doy.start <- ggplot(data = exp, aes(x = doy.start, y = abs(percent_change), fill = lake))+
   geom_point(size = 3, color = "black", shape = 21, stroke = 1, alpha = 0.7)+
   theme_classic()+
-  labs(y = "percent change in surface chlorophyll", x = "day of year of heatwave")+
+  labs(y = "abs. % change in surface chl", x = "heatwave day of year")+
   scale_fill_manual(values = c("L" = "steelblue2", "R" = "black", "T" = "white"))
 
-ggplot(data = exp, aes(x = month, y = abs(percent_change), fill = lake))+
+hw.length <- ggplot(data = exp, aes(x = length, y = abs(percent_change), fill = lake))+
   geom_point(size = 3, color = "black", shape = 21, stroke = 1, alpha = 0.7)+
   theme_classic()+
-  labs(y = "percent change in surface chlorophyll", x = "day of year of heatwave")+
+  labs(y = "abs. % change in surface chl", x = "heatwave length (days)")+
   scale_fill_manual(values = c("L" = "steelblue2", "R" = "black", "T" = "white"))
 
+ggarrange(hw.pload, hw.color, hw.doy.start, hw.length, nrow = 2, ncol = 2)
 
+
+#### Example plot of what the heatwave window is looking at ####
 
 #==============================================================================#
 #### CREATE PDF OF OUTPUTS ####
@@ -662,7 +675,7 @@ print(All.over.time)
 print(R.over.time)
 print(L.over.time)
 print(T.over.time)
-
+print(ggarrange(hw.pload, hw.color, hw.doy.start, hw.length, nrow = 2, ncol = 2))
 
 dev.off()
 
