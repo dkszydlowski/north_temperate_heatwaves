@@ -93,21 +93,21 @@ metadata_plot <- ggplot() +
 #==============================================================================#
 #### loop for the whole code to investigate across combinations ####
 
-# the dataframe looped results will contain the mean values for the specified combinations
-looped.results = data.frame(matrix(nrow = 3024, ncol = 15))
-names(looped.results) = c("slopeLength", "daysAfter", "numSlopes", 
-                          "all.all.other.days", "all.during.heatwave", "all.after.heatwave",
-                          "R.all.other.days", "R.during.heatwave", "R.after.heatwave",
-                          "L.all.other.days", "L.during.heatwave", "L.after.heatwave",
-                          "T.all.other.days", "T.during.heatwave", "T.after.heatwave")
-L = 1
-for(slopeLength in 3:14){
-  for(daysAfter in 0:20){
-    for(numSlopes in 3:14){
-      
-      looped.results$slopeLength[L] = slopeLength
-      looped.results$daysAfter[L] = daysAfter
-      looped.results$numSlopes[L] = numSlopes
+# # the dataframe looped results will contain the mean values for the specified combinations
+# looped.results = data.frame(matrix(nrow = 3024, ncol = 15))
+# names(looped.results) = c("slopeLength", "daysAfter", "numSlopes", 
+#                           "all.all.other.days", "all.during.heatwave", "all.after.heatwave",
+#                           "R.all.other.days", "R.during.heatwave", "R.after.heatwave",
+#                           "L.all.other.days", "L.during.heatwave", "L.after.heatwave",
+#                           "T.all.other.days", "T.during.heatwave", "T.after.heatwave")
+# L = 1
+# for(slopeLength in 3:14){
+#   for(daysAfter in 0:20){
+#     for(numSlopes in 3:14){
+#       
+#       looped.results$slopeLength[L] = slopeLength
+#       looped.results$daysAfter[L] = daysAfter
+#       looped.results$numSlopes[L] = numSlopes
 
 
 
@@ -392,68 +392,68 @@ mean_dfT <- allSlopes %>% filter(lake == "T") %>%
 #==============================================================================#
 #==============================================================================#
 #### END OF FOR LOOPS ####
-
-# save results to the looped dataframe
-# being careful tp specify daysAfter as the global environment variable
-# and not the column
-
-looped.results$all.all.other.days[L] = mean_df %>%
-  filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "all other days") %>% 
-  pull(mean_percent_change)
-
-looped.results$all.during.heatwave[L] = mean_df %>%
-          filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "during heatwave") %>% 
-          pull(mean_percent_change)
-
-looped.results$all.after.heatwave[L] = mean_df %>%
-  filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "after heatwave") %>% 
-  pull(mean_percent_change)
-
-# results for R
-looped.results$R.all.other.days[L] = mean_dfR %>%
-  filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "all other days") %>% 
-  pull(mean_percent_change)
-
-looped.results$R.during.heatwave[L] = mean_dfR %>%
-  filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "during heatwave") %>% 
-  pull(mean_percent_change)
-
-looped.results$R.after.heatwave[L] = mean_dfR %>%
-  filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "after heatwave") %>% 
-  pull(mean_percent_change)
-
-# results for L
-looped.results$L.all.other.days[L] = mean_dfL %>%
-  filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "all other days") %>% 
-  pull(mean_percent_change)
-
-looped.results$L.during.heatwave[L] = mean_dfL %>%
-  filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "during heatwave") %>% 
-  pull(mean_percent_change)
-
-looped.results$L.after.heatwave[L] = mean_dfL %>%
-  filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "after heatwave") %>% 
-  pull(mean_percent_change)
-
-# results for T
-looped.results$T.all.other.days[L] = mean_dfT %>%
-  filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "all other days") %>% 
-  pull(mean_percent_change)
-
-looped.results$T.during.heatwave[L] = mean_dfT %>%
-  filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "during heatwave") %>% 
-  pull(mean_percent_change)
-
-looped.results$T.after.heatwave[L] = mean_dfT %>%
-  filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "after heatwave") %>% 
-  pull(mean_percent_change)
-
-print(L)
-L = L+1
-
-    }
-  }
-}
+# 
+# # save results to the looped dataframe
+# # being careful tp specify daysAfter as the global environment variable
+# # and not the column
+# 
+# looped.results$all.all.other.days[L] = mean_df %>%
+#   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "all other days") %>% 
+#   pull(mean_percent_change)
+# 
+# looped.results$all.during.heatwave[L] = mean_df %>%
+#           filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "during heatwave") %>% 
+#           pull(mean_percent_change)
+# 
+# looped.results$all.after.heatwave[L] = mean_df %>%
+#   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "after heatwave") %>% 
+#   pull(mean_percent_change)
+# 
+# # results for R
+# looped.results$R.all.other.days[L] = mean_dfR %>%
+#   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "all other days") %>% 
+#   pull(mean_percent_change)
+# 
+# looped.results$R.during.heatwave[L] = mean_dfR %>%
+#   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "during heatwave") %>% 
+#   pull(mean_percent_change)
+# 
+# looped.results$R.after.heatwave[L] = mean_dfR %>%
+#   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "after heatwave") %>% 
+#   pull(mean_percent_change)
+# 
+# # results for L
+# looped.results$L.all.other.days[L] = mean_dfL %>%
+#   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "all other days") %>% 
+#   pull(mean_percent_change)
+# 
+# looped.results$L.during.heatwave[L] = mean_dfL %>%
+#   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "during heatwave") %>% 
+#   pull(mean_percent_change)
+# 
+# looped.results$L.after.heatwave[L] = mean_dfL %>%
+#   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "after heatwave") %>% 
+#   pull(mean_percent_change)
+# 
+# # results for T
+# looped.results$T.all.other.days[L] = mean_dfT %>%
+#   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "all other days") %>% 
+#   pull(mean_percent_change)
+# 
+# looped.results$T.during.heatwave[L] = mean_dfT %>%
+#   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "during heatwave") %>% 
+#   pull(mean_percent_change)
+# 
+# looped.results$T.after.heatwave[L] = mean_dfT %>%
+#   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "after heatwave") %>% 
+#   pull(mean_percent_change)
+# 
+# print(L)
+# L = L+1
+# 
+#     }
+#   }
+# }
 #==============================================================================#
 #==============================================================================#
 
@@ -844,19 +844,235 @@ dev.off()
 
 #==============================================================================#
 #### PLOT LOOPED RESULTS ####
-ggplot(data = looped.results, aes(x = daysAfter, y = numSlopes, fill = R.all.other.days))+
-  geom_tile(color = "black")
 
-ggplot(data = looped.results, aes(x = daysAfter, y = numSlopes, fill = L.after.heatwave))+
-  geom_tile(color = "black")
+# Peter
+R.after.days.num <- ggplot(data = looped.results, aes(x = daysAfter, y = numSlopes, fill = R.after.heatwave))+
+  geom_tile(color = "black")+
+  scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse")
 
-ggplot(data = looped.results, aes(x = daysAfter, y = numSlopes, fill = T.after.heatwave))+
-  geom_tile(color = "black")
+R.after.days.slope <- ggplot(data = looped.results, aes(x = daysAfter, y = slopeLength, fill = R.after.heatwave))+
+  geom_tile(color = "black")+
+  scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse")
 
-ggplot(data = looped.results, aes(x = slopeLength, y = numSlopes, fill = L.after.heatwave))+
-  geom_tile(color = "black")
+R.after.num.slope <- ggplot(data = looped.results %>% filter(daysAfter == 7), aes(x = slopeLength, y = numSlopes, fill = R.after.heatwave))+
+  geom_tile(color = "black")+
+  scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse")
 
-ggplot(data = looped.results, aes(x = slopeLength, y = daysAfter, fill = T.after.heatwave))+
-  geom_tile(color = "black")
+# Paul
+L.after.days.num <- ggplot(data = looped.results, aes(x = daysAfter, y = numSlopes, fill = L.after.heatwave))+
+  geom_tile(color = "black")+
+  scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse")
 
-write.csv(looped.results, "./results/sensitivity results/looped results.csv", row.names = FALSE)
+L.after.days.slope <- ggplot(data = looped.results, aes(x = daysAfter, y = slopeLength, fill = L.after.heatwave))+
+  geom_tile(color = "black")+
+  scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse")
+
+L.after.num.slope <- ggplot(data = looped.results %>% filter(daysAfter == 7), aes(x = slopeLength, y = numSlopes, fill = L.after.heatwave))+
+  geom_tile(color = "black")+
+  scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse")
+
+# Tuesday
+T.after.days.num <- ggplot(data = looped.results, aes(x = daysAfter, y = numSlopes, fill = T.after.heatwave))+
+  geom_tile(color = "black")+
+  scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse")
+
+T.after.days.slope <- ggplot(data = looped.results, aes(x = daysAfter, y = slopeLength, fill = T.after.heatwave))+
+  geom_tile(color = "black")+
+  scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse")
+
+T.after.num.slope <- ggplot(data = looped.results %>% filter(daysAfter == 7), aes(x = slopeLength, y = numSlopes, fill = T.after.heatwave))+
+  geom_tile(color = "black")+
+  scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse")
+
+ggarrange(R.after.days.num, R.after.days.slope, R.after.num.slope, 
+          L.after.days.num, L.after.days.slope, L.after.num.slope,
+          T.after.days.num, T.after.days.slope, T.after.num.slope, nrow = 3, ncol = 3)
+
+
+
+
+
+# Peter
+R.during.days.num <- ggplot(data = looped.results, aes(x = daysAfter, y = numSlopes, fill = R.during.heatwave))+
+  geom_tile(color = "black")+
+  scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse")
+
+R.during.days.slope <- ggplot(data = looped.results, aes(x = daysAfter, y = slopeLength, fill = R.during.heatwave))+
+  geom_tile(color = "black")+
+  scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse")
+
+R.during.num.slope <- ggplot(data = looped.results, aes(x = slopeLength, y = numSlopes, fill = R.during.heatwave))+
+  geom_tile(color = "black")+
+  scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse")
+
+# Paul
+L.during.days.num <- ggplot(data = looped.results, aes(x = daysAfter, y = numSlopes, fill = L.during.heatwave))+
+  geom_tile(color = "black")+
+  scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse")
+
+L.during.days.slope <- ggplot(data = looped.results, aes(x = daysAfter, y = slopeLength, fill = L.during.heatwave))+
+  geom_tile(color = "black")+
+  scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse")
+
+L.during.num.slope <- ggplot(data = looped.results, aes(x = slopeLength, y = numSlopes, fill = L.during.heatwave))+
+  geom_tile(color = "black")+
+  scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse")
+
+# Tuesday
+T.during.days.num <- ggplot(data = looped.results, aes(x = daysAfter, y = numSlopes, fill = T.during.heatwave))+
+  geom_tile(color = "black")+
+  scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse")
+
+T.during.days.slope <- ggplot(data = looped.results, aes(x = daysAfter, y = slopeLength, fill = T.during.heatwave))+
+  geom_tile(color = "black")+
+  scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse")
+
+T.during.num.slope <- ggplot(data = looped.results %>% filter(daysAfter == 7), aes(x = slopeLength, y = numSlopes, fill = T.during.heatwave))+
+  geom_tile(color = "black")+
+  scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse")
+
+
+ggarrange(R.during.days.num, R.during.days.slope, R.during.num.slope, 
+          L.during.days.num, L.during.days.slope, L.during.num.slope,
+          T.during.days.num, T.during.days.slope, T.during.num.slope, nrow = 3, ncol = 3)
+
+
+
+
+# Peter
+R.other.days.num <- ggplot(data = looped.results, aes(x = daysAfter, y = numSlopes, fill = R.all.other.days))+
+  geom_tile(color = "black")+
+  scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse")
+
+R.other.days.slope <- ggplot(data = looped.results, aes(x = daysAfter, y = slopeLength, fill = R.all.other.days))+
+  geom_tile(color = "black")+
+  scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse")
+
+R.other.num.slope <- ggplot(data = looped.results, aes(x = slopeLength, y = numSlopes, fill = R.all.other.days))+
+  geom_tile(color = "black")+
+  scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse")
+
+# Paul
+L.other.days.num <- ggplot(data = looped.results, aes(x = daysAfter, y = numSlopes, fill = L.all.other.days))+
+  geom_tile(color = "black")+
+  scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse")
+
+L.other.days.slope <- ggplot(data = looped.results, aes(x = daysAfter, y = slopeLength, fill = L.all.other.days))+
+  geom_tile(color = "black")+
+  scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse")
+
+L.other.num.slope <- ggplot(data = looped.results, aes(x = slopeLength, y = numSlopes, fill = L.all.other.days))+
+  geom_tile(color = "black")+
+  scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse")
+
+# Tuesday
+T.other.days.num <- ggplot(data = looped.results, aes(x = daysAfter, y = numSlopes, fill = T.all.other.days))+
+  geom_tile(color = "black")+
+  scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse")
+
+T.other.days.slope <- ggplot(data = looped.results, aes(x = daysAfter, y = slopeLength, fill = T.all.other.days))+
+  geom_tile(color = "black")+
+  scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse")
+
+T.other.num.slope <- ggplot(data = looped.results %>% filter(daysAfter == 7), aes(x = slopeLength, y = numSlopes, fill = T.all.other.days))+
+  geom_tile(color = "black")+
+  scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse")
+
+
+ggarrange(R.other.days.num, R.other.days.slope, R.other.num.slope, 
+          L.other.days.num, L.other.days.slope, L.other.num.slope,
+          T.other.days.num, T.other.days.slope, T.other.num.slope, nrow = 3, ncol = 3)
+
+
+
+# compare heatwave responses between lakes
+ggplot(data = looped.results, aes(x = T.all.other.days, y = R.after.heatwave))+
+  geom_point()+
+  geom_smooth(stat = "smooth")
+
+ggplot(data = looped.results, aes(x = T.during.heatwave, y = R.during.heatwave))+
+  geom_point()+
+  geom_smooth(stat = "smooth")
+
+ggplot(data = looped.results, aes(x = L.all.other.days, y = R.all.other.days))+
+  geom_point()+
+  geom_smooth(stat = "smooth")
+
+#write.csv(looped.results, "./results/sensitivity results/looped results.csv", row.names = FALSE)
+
+
+#### Shiny app ####
+
+looped.results = read.csv("./results/sensitivity results/looped results.csv")
+
+# Define UI
+ui <- fluidPage(
+  titlePanel("Vary slope length"),
+  sidebarLayout(
+    sidebarPanel(
+      sliderInput("slope_length_slider", "Select slopeLength:", min = 3, max = 14, value = 7)
+    ),
+    mainPanel(
+      plotOutput("plot")
+    )
+  )
+)
+
+
+
+
+# Define server logic
+server <- function(input, output) {
+  # Filter data based on slider input
+  filtered_data <- reactive({
+    looped.results %>% filter(slopeLength == input$slope_length_slider)
+  })
+  
+  # Create ggplot
+  output$plot <- renderPlot({
+    
+    a =   ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = R.after.heatwave)) +
+      geom_tile(color = "black") +
+      scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
+      labs(title = "Peter")
+    
+    b =   ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = L.after.heatwave)) +
+      geom_tile(color = "black") +
+      scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
+      labs(title = "Paul")
+    
+    c =   ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = T.after.heatwave)) +
+      geom_tile(color = "black") +
+      scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
+      labs(title = "Tuesday")
+    
+    
+    d =   ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = R.all.other.days)) +
+      geom_tile(color = "black") +
+      scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
+      labs(title = "Peter")
+    
+    e =   ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = L.all.other.days)) +
+      geom_tile(color = "black") +
+      scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
+      labs(title = "Paul")
+    
+    f =   ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = T.all.other.days)) +
+      geom_tile(color = "black") +
+      scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
+      labs(title = "Tuesday")
+
+  
+  ggarrange(a, b, c, d, e, f, nrow = 2, ncol = 3)
+    
+  })
+}
+
+# Run the application
+shinyApp(ui, server)
+
+
+
+
+
+
