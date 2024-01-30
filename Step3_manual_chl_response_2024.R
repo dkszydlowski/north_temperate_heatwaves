@@ -197,67 +197,66 @@ hwSlopes <- function(heatwaveStart, heatwaveEnd,  targLake, data){
   
 }
 
-# COMMENT
-# #==============================================================================#
-# #### CALCULATE AVG CHL SLOPES FOLLOWING HEATWAVES ####
-# heatwaves$averageSlope = NA
-# heatwaves$percentChange = NA
-# heatwaves$sdSlope = NA
-# heatwaves$sdSlopePercent = NA
-# 
-# #Using a For Loop
-# lengthHW = nrow(heatwaves)
-# 
-# # take the average slope and calculate the percent change in chlorophyll based on the slope
-# 
-# for(i in 1:lengthHW){
-#   slopes.subset = hwSlopes(heatwaves$date_start[i], heatwaves$date_end[i], heatwaves$lake[i], slopes)
-#   
-#   # save the mean of the slopes to the heatwaves dataframe
-#   heatwaves$averageSlope[i] = mean(slopes.subset$chl_slope, na.rm = TRUE)
-#   
-#   # save the standard deviation of the slopes to the heatwaves dataframe
-#   heatwaves$sdSlope[i] = sd(slopes.subset$chl_slope, na.rm = TRUE)
-#   
-#   # save the mean of the percent change to the heatwaves dataframe
-#   heatwaves$percentChange[i] = mean(slopes.subset$percent_change, na.rm = TRUE)
-# }
-# 
-# # save the static results
-# # write.csv(heatwaves, "./results/heatwaves_with_average_slopes_MANUAL_CHL.csv", row.names = FALSE)
-# 
-# 
-# 
-# 
-# 
-# #==============================================================================#
-# #### PLOT AVG SLOPES ####
-# #results = read.csv("./results/heatwaves_with_average_slopes_MANUAL_CHL.csv")
-# 
-# 
-# results = heatwaves
-# 
-# #break up by lake by filtering data
-# resultsT = results %>% filter(lake == "T")
-# resultsL = results %>% filter(lake == "L")
-# resultsR = results %>% filter(lake == "R")
-# 
-# # make sure heatwaves date is a date
-# heatwaves = heatwaves %>% mutate(date_start = as.Date(date_start))
+
+ #==============================================================================#
+ #### CALCULATE AVG CHL SLOPES FOLLOWING HEATWAVES ####
+ heatwaves$averageSlope = NA
+ heatwaves$percentChange = NA
+ heatwaves$sdSlope = NA
+ heatwaves$sdSlopePercent = NA
+
+ #Using a For Loop
+ lengthHW = nrow(heatwaves)
+
+ # take the average slope and calculate the percent change in chlorophyll based on the slope
+
+ for(i in 1:lengthHW){
+   slopes.subset = hwSlopes(heatwaves$date_start[i], heatwaves$date_end[i], heatwaves$lake[i], slopes)
+
+   # save the mean of the slopes to the heatwaves dataframe
+   heatwaves$averageSlope[i] = mean(slopes.subset$chl_slope, na.rm = TRUE)
+
+   # save the standard deviation of the slopes to the heatwaves dataframe
+   heatwaves$sdSlope[i] = sd(slopes.subset$chl_slope, na.rm = TRUE)
+
+   # save the mean of the percent change to the heatwaves dataframe
+   heatwaves$percentChange[i] = mean(slopes.subset$percent_change, na.rm = TRUE)
+ }
+
+ # save the static results
+ # write.csv(heatwaves, "./results/heatwaves_with_average_slopes_MANUAL_CHL.csv", row.names = FALSE)
+
+
+
+
+ #==============================================================================#
+ #### PLOT AVG SLOPES ####
+ #results = read.csv("./results/heatwaves_with_average_slopes_MANUAL_CHL.csv")
+
+
+ results = heatwaves
+
+ #break up by lake by filtering data
+ resultsT = results %>% filter(lake == "T")
+ resultsL = results %>% filter(lake == "L")
+ resultsR = results %>% filter(lake == "R")
+
+ # make sure heatwaves date is a date
+ heatwaves = heatwaves %>% mutate(date_start = as.Date(date_start))
 
 
 #png(filename = "./figures/preliminary figures/R_slopes_2023_02_09", height = 8, width = 11, units = "in", res = 300)
 
-# indHWResp <- ggplot(data = results, aes(x = as.character(date_start), y = percentChange, fill = lake))+
-#   geom_bar(stat = "identity", position = "identity", alpha = 0.5, color = "black")+
-#   theme_classic()+
-#   ylab("percent change in chl")+
-#   xlab("start date of heatwave")+
-#   ggtitle("Average chl percent change by event")+
-#   scale_fill_manual(values = c("R"=  "#4AB5C4", "L" = "#ADDAE3", "T"=  "#BAAD8D"))+
-#   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-#   annotate("text",  x=Inf, y = Inf, label = paste("Days after heatwave: ", daysAfter, sep = ""), vjust=1, hjust=1)+
-#   annotate("text",  x=Inf, y = Inf, label = paste("Number of slopes averaged per event: ", numSlopes, sep = ""), vjust=2.5, hjust=1)
+ indHWResp <- ggplot(data = results, aes(x = as.character(date_start), y = percentChange, fill = lake))+
+   geom_bar(stat = "identity", position = "identity", alpha = 0.5, color = "black")+
+   theme_classic()+  
+   ylab("percent change in chl")+
+   xlab("start date of heatwave")+
+   ggtitle("Average chl percent change by event")+
+   scale_fill_manual(values = c("R"=  "#4AB5C4", "L" = "#ADDAE3", "T"=  "#BAAD8D"))+
+   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+   annotate("text",  x=Inf, y = Inf, label = paste("Days after heatwave: ", daysAfter, sep = ""), vjust=1, hjust=1)+
+   annotate("text",  x=Inf, y = Inf, label = paste("Number of slopes averaged per event: ", numSlopes, sep = ""), vjust=2.5, hjust=1)
 
 
 
@@ -999,80 +998,4 @@ ggplot(data = looped.results, aes(x = L.all.other.days, y = R.all.other.days))+
   geom_smooth(stat = "smooth")
 
 #write.csv(looped.results, "./results/sensitivity results/looped results.csv", row.names = FALSE)
-
-
-#### Shiny app ####
-
-looped.results = read.csv("./results/sensitivity results/looped results.csv")
-
-# Define UI
-ui <- fluidPage(
-  titlePanel("Vary slope length"),
-  sidebarLayout(
-    sidebarPanel(
-      sliderInput("slope_length_slider", "Select slopeLength:", min = 3, max = 14, value = 7)
-    ),
-    mainPanel(
-      plotOutput("plot")
-    )
-  )
-)
-
-
-
-
-# Define server logic
-server <- function(input, output) {
-  # Filter data based on slider input
-  filtered_data <- reactive({
-    looped.results %>% filter(slopeLength == input$slope_length_slider)
-  })
-  
-  # Create ggplot
-  output$plot <- renderPlot({
-    
-    a =   ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = R.after.heatwave)) +
-      geom_tile(color = "black") +
-      scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
-      labs(title = "Peter")
-    
-    b =   ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = L.after.heatwave)) +
-      geom_tile(color = "black") +
-      scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
-      labs(title = "Paul")
-    
-    c =   ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = T.after.heatwave)) +
-      geom_tile(color = "black") +
-      scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
-      labs(title = "Tuesday")
-    
-    
-    d =   ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = R.all.other.days)) +
-      geom_tile(color = "black") +
-      scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
-      labs(title = "Peter")
-    
-    e =   ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = L.all.other.days)) +
-      geom_tile(color = "black") +
-      scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
-      labs(title = "Paul")
-    
-    f =   ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = T.all.other.days)) +
-      geom_tile(color = "black") +
-      scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
-      labs(title = "Tuesday")
-
-  
-  ggarrange(a, b, c, d, e, f, nrow = 2, ncol = 3)
-    
-  })
-}
-
-# Run the application
-shinyApp(ui, server)
-
-
-
-
-
 
