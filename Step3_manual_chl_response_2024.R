@@ -45,13 +45,13 @@ library(ggpubr)
 #### levers we can pull ####
 
 # slope and percent calculations
-slopeLength = 10 # length of the rolling window slope to be calculated
+slopeLength = 7 # length of the rolling window slope to be calculated
 
 # build in options here for during the heatwave, or at the beginning of the calculated slope
 
 # slope aggregation choices
 
-daysAfter = 2 # time lag of how many days after the heatwave we want to look
+daysAfter = 0 # time lag of how many days after the heatwave we want to look
 numSlopes = 7 # the number of slopes we want to include in analysis
 
 exclude.after.heatwaves = FALSE # if TRUE, excludes slopes for days within 20 days 
@@ -737,12 +737,30 @@ hw.length <- ggplot(data = exp, aes(x = length, y = abs(percent_change), fill = 
 #==============================================================================#
 #### Example plot of what the heatwave window is looking at ####
 
+
+
+
 #==============================================================================#
 #### CREATE PDF OF OUTPUTS ####
 
-pdfName = paste("daysAfter", daysAfter, "slopeLength", slopeLength, sep = "_")
+# save numbers of old runs
+oldRuns = list.files("./figures/sensitivity tests/")
+oldRuns <- data.frame(oldRuns)
 
-pdf("./figures/sensitivity tests/testing.pdf", height = 6, width = 10)
+# Use the tidyverse to extract the first chunk of characters before the first '_'
+# Then number the new run based on what runs are already in the folder
+
+oldRuns <- oldRuns %>%
+  mutate(numbersUsed = str_extract(oldRuns, "^[^_]+"))
+
+runNumber = as.numeric(max(oldRuns$numbersUsed))+1
+
+# name the pdf with the current date and the variables
+curDate = cur_date_time = format(Sys.Date(), "%Y_%m_%d")
+pdfName = paste(runNumber, "_date_", curDate, "_slopeLength_", slopeLength, "_daysAfter_", daysAfter, "_numSlopes_", numSlopes, ".pdf", sep = "")
+
+
+pdf(paste("./figures/sensitivity tests/" , pdfName, sep = ""), height = 6, width = 10)
 
 print(metadata_plot)
 print(Alldist)
@@ -763,6 +781,8 @@ dev.off()
 
 
 # secondary output that has the raw data plots, all of them with the dates that were analyzed
+# call the function which is in a second R script
+# pass it allSlopes, daysAfter, numSlopes, slopeLength, runNumber, along with the output information
 
 
 

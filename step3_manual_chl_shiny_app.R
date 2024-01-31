@@ -19,10 +19,10 @@ ui <- fluidPage(
   titlePanel("Vary slope length"),
   sidebarLayout(
     sidebarPanel(
-      sliderInput("slope_length_slider", "Select slopeLength:", min = 3, max = 14, value = 7)
+      sliderInput("slope_length_slider", "slopeLength:", min = 3, max = 14, value = 7, step = 1)
     ),
     mainPanel(
-      plotOutput("plot")
+      plotOutput("plot", height = "600px", width = "1000px")
     )
   )
 )
@@ -43,36 +43,43 @@ server <- function(input, output) {
     a =   ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = R.after.heatwave)) +
       geom_tile(color = "black") +
       scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
-      labs(title = "Peter")
+      labs(title = "Peter after heatwave")+
+      theme_classic()
     
     b =   ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = L.after.heatwave)) +
       geom_tile(color = "black") +
       scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
-      labs(title = "Paul")
+      labs(title = "Paul after heatwave")+
+      theme_classic()
     
     c =   ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = T.after.heatwave)) +
       geom_tile(color = "black") +
       scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
-      labs(title = "Tuesday")
+      labs(title = "Tuesday after heatwave")+
+      theme_classic()
     
     
     d =   ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = R.all.other.days)) +
       geom_tile(color = "black") +
       scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
-      labs(title = "Peter")
+      labs(title = "Peter all other days")+
+      theme_classic()
     
     e =   ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = L.all.other.days)) +
       geom_tile(color = "black") +
       scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
-      labs(title = "Paul")
+      labs(title = "Paul all other days")+
+      theme_classic()
     
     f =   ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = T.all.other.days)) +
       geom_tile(color = "black") +
       scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
-      labs(title = "Tuesday")
+      labs(title = "Tuesday all other days")+
+      theme_classic()
     
     
-    ggarrange(a, b, c, d, e, f, nrow = 2, ncol = 3)
+    
+    ggarrange(a, b, c, d, e, f, nrow = 3, ncol = 3)
     
   })
 }
