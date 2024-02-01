@@ -45,14 +45,14 @@ library(ggpubr)
 #### levers we can pull ####
 
 # slope and percent calculations
-slopeLength = 7 # length of the rolling window slope to be calculated
+slopeLength = 6 # length of the rolling window slope to be calculated
 
 # build in options here for during the heatwave, or at the beginning of the calculated slope
 
 # slope aggregation choices
 
 daysAfter = 0 # time lag of how many days after the heatwave we want to look
-numSlopes = 1 # the number of slopes we want to include in analysis
+numSlopes = 5 # the number of slopes we want to include in analysis
 
 exclude.after.heatwaves = FALSE # if TRUE, excludes slopes for days within 20 days 
 # of the heatwave that don't fall within our aggregating window

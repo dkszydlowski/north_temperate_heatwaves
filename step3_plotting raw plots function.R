@@ -79,9 +79,9 @@ l09slope = ggplot(data = l09, aes( x = doy, y = chl_slope))+
   theme_classic()+
   ylim(-4.7, 5.5)+
   annotate("rect", xmin = as.Date(171), xmax = as.Date(178), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
-  annotate("rect", xmin = as.Date(178+daysAfter), xmax = as.Date(178+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-           fill = "steelblue", alpha = 0.3)
+           fill = "red", alpha = 0.5)+
+  annotate("rect", xmin = as.Date(178+daysAfter - slopeLength), xmax = as.Date(178+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
+           fill = "steelblue", alpha = 0.5)
 
 l09chl = ggplot(data = l09, aes(x = doy, y = manual_chl))+
   geom_line(color = "forestgreen", size = 1)+
@@ -92,7 +92,7 @@ l09temp = ggplot(data = l09, aes(x = doy, y = mean_temp))+
   theme_classic()+
   labs(title = "Paul 2009")+
   annotate("rect", xmin = as.Date(171), xmax = as.Date(178), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)
+           fill = "red", alpha = 0.5)
 
 
 # Peter
@@ -101,9 +101,9 @@ r09slope = ggplot(data = r09, aes( x = doy, y = chl_slope))+
   theme_classic()+
   ylim(-4.7, 5.5)+
   annotate("rect", xmin = as.Date(171), xmax = as.Date(178), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
-  annotate("rect", xmin = as.Date(178+daysAfter), xmax = as.Date(178+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-                                               fill = "steelblue", alpha = 0.3)
+           fill = "red", alpha = 0.5)+
+  annotate("rect", xmin = as.Date(178+daysAfter - slopeLength), xmax = as.Date(178+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
+                                               fill = "steelblue", alpha = 0.5)
 
 r09chl = ggplot(data = r09, aes(x = doy, y = manual_chl))+
   geom_line(color = "forestgreen", size = 1)+
@@ -115,7 +115,7 @@ r09temp = ggplot(data = r09, aes(x = doy, y = mean_temp))+
   theme_classic()+
   labs(title = "Peter 2009")+
   annotate("rect", xmin = as.Date(171), xmax = as.Date(178), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)
+           fill = "red", alpha = 0.5)
 
 print(ggarrange(nrow = 3, ncol = 2, r09temp, l09temp, r09chl, l09chl, r09slope, l09slope))
 
@@ -131,13 +131,13 @@ l10slope = ggplot(data = l10, aes( x = doy, y = chl_slope))+
   theme_classic()+
   ylim(-4.7, 5.5)+
   annotate("rect", xmin = as.Date(144), xmax = as.Date(154), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
+           fill = "red", alpha = 0.5)+
   annotate("rect", xmin = as.Date(221), xmax = as.Date(227), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
-  annotate("rect", xmin = as.Date(154+daysAfter), xmax = as.Date(154+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-           fill = "steelblue", alpha = 0.3)+
-  annotate("rect", xmin = as.Date(227+daysAfter), xmax = as.Date(227+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-           fill = "steelblue", alpha = 0.3)
+           fill = "red", alpha = 0.5)+
+  annotate("rect", xmin = as.Date(154+daysAfter - slopeLength), xmax = as.Date(154+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
+           fill = "steelblue", alpha = 0.5)+
+  annotate("rect", xmin = as.Date(227+daysAfter - slopeLength), xmax = as.Date(227+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
+           fill = "steelblue", alpha = 0.5)
 
 l10chl = ggplot(data = l10, aes(x = doy, y = manual_chl))+
   geom_line(color = "forestgreen", size = 1)+
@@ -148,9 +148,9 @@ l10temp = ggplot(data = l10, aes(x = doy, y = mean_temp))+
   theme_classic()+
   labs(title = "Paul 2010")+
   annotate("rect", xmin = as.Date(144), xmax = as.Date(154), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
+           fill = "red", alpha = 0.5)+
   annotate("rect", xmin = as.Date(221), xmax = as.Date(227), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)
+           fill = "red", alpha = 0.5)
 
 
 # Peter
@@ -159,13 +159,13 @@ r10slope = ggplot(data = r10, aes( x = doy, y = chl_slope))+
   theme_classic()+
   ylim(-4.7, 5.5)+
   annotate("rect", xmin = as.Date(144), xmax = as.Date(154), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
+           fill = "red", alpha = 0.5)+
   annotate("rect", xmin = as.Date(221), xmax = as.Date(227), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
-  annotate("rect", xmin = as.Date(154+daysAfter), xmax = as.Date(154+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-           fill = "steelblue", alpha = 0.3)+
-  annotate("rect", xmin = as.Date(227+daysAfter), xmax = as.Date(227+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-           fill = "steelblue", alpha = 0.3)
+           fill = "red", alpha = 0.5)+
+  annotate("rect", xmin = as.Date(154+daysAfter - slopeLength), xmax = as.Date(154+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
+           fill = "steelblue", alpha = 0.5)+
+  annotate("rect", xmin = as.Date(227+daysAfter - slopeLength), xmax = as.Date(227+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
+           fill = "steelblue", alpha = 0.5)
 
 
 r10chl = ggplot(data = r10, aes(x = doy, y = manual_chl))+
@@ -178,9 +178,9 @@ r10temp = ggplot(data = r10, aes(x = doy, y = mean_temp))+
   theme_classic()+
   labs(title = "Peter 2010")+
   annotate("rect", xmin = as.Date(144), xmax = as.Date(154), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
+           fill = "red", alpha = 0.5)+
   annotate("rect", xmin = as.Date(221), xmax = as.Date(227), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)
+           fill = "red", alpha = 0.5)
 
 
 print(ggarrange(nrow = 3, ncol = 2,r10temp, l10temp, r10chl, l10chl, r10slope, l10slope))
@@ -199,9 +199,9 @@ l11slope = ggplot(data = l11, aes( x = doy, y = chl_slope))+
   theme_classic()+
   ylim(-4.1, 4.5)+
   annotate("rect", xmin = as.Date(199), xmax = as.Date(205), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
-  annotate("rect", xmin = as.Date(205+daysAfter), xmax = as.Date(205+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-           fill = "steelblue", alpha = 0.3)
+           fill = "red", alpha = 0.5)+
+  annotate("rect", xmin = as.Date(205+daysAfter - slopeLength), xmax = as.Date(205+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
+           fill = "steelblue", alpha = 0.5)
 
 l11chl = ggplot(data = l11, aes(x = doy, y = manual_chl))+
   geom_line(color = "forestgreen", size = 1)+
@@ -213,7 +213,7 @@ l11temp = ggplot(data = l11, aes(x = doy, y = mean_temp))+
   theme_classic()+
   labs(title = "Paul 2011")+
   annotate("rect", xmin = as.Date(199), xmax = as.Date(205), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)
+           fill = "red", alpha = 0.5)
 
 
 # Peter
@@ -222,9 +222,9 @@ r11slope = ggplot(data = r11, aes( x = doy, y = chl_slope))+
   theme_classic()+
   ylim(-4.1, 4.5)+
   annotate("rect", xmin = as.Date(199), xmax = as.Date(205), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
-  annotate("rect", xmin = as.Date(205+daysAfter), xmax = as.Date(205+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-           fill = "steelblue", alpha = 0.3)
+           fill = "red", alpha = 0.5)+
+  annotate("rect", xmin = as.Date(205+daysAfter - slopeLength), xmax = as.Date(205+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
+           fill = "steelblue", alpha = 0.5)
 
 r11chl = ggplot(data = r11, aes(x = doy, y = manual_chl))+
   geom_line(color = "forestgreen", size = 1)+
@@ -235,7 +235,7 @@ r11temp = ggplot(data = r11, aes(x = doy, y = mean_temp))+
   theme_classic()+
   labs(title = "Peter 2011")+
   annotate("rect", xmin = as.Date(199), xmax = as.Date(205), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)
+           fill = "red", alpha = 0.5)
 
 print(ggarrange(nrow = 3, ncol = 2, r11temp, l11temp, r11chl, l11chl, r11slope, l11slope))
 
@@ -253,13 +253,13 @@ t13slope = ggplot(data = t13, aes( x = doy, y = chl_slope))+
   theme_classic()+
   ylim(-4.7, 5.5)+
   annotate("rect", xmin = as.Date(186), xmax = as.Date(190), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
+           fill = "red", alpha = 0.5)+
   annotate("rect", xmin = as.Date(196), xmax = as.Date(201), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
+           fill = "red", alpha = 0.5)+
   annotate("rect", xmin = as.Date(190 + daysAfter), xmax = as.Date(190+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-           fill = "steelblue", alpha = 0.3)+
-  annotate("rect", xmin = as.Date(201+daysAfter), xmax = as.Date(201+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-           fill = "steelblue", alpha = 0.3)
+           fill = "steelblue", alpha = 0.5)+
+  annotate("rect", xmin = as.Date(201+daysAfter - slopeLength), xmax = as.Date(201+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
+           fill = "steelblue", alpha = 0.5)
 
 t13chl = ggplot(data = t13, aes(x = doy, y = manual_chl))+
   geom_line(color = "forestgreen", size = 1)+
@@ -270,9 +270,9 @@ t13temp = ggplot(data = t13, aes(x = doy, y = mean_temp))+
   theme_classic()+
   labs(title = "Tuesday 2013")+
   annotate("rect", xmin = as.Date(186), xmax = as.Date(190), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
+           fill = "red", alpha = 0.5)+
   annotate("rect", xmin = as.Date(196), xmax = as.Date(201), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)
+           fill = "red", alpha = 0.5)
 
 
 # Paul
@@ -281,9 +281,9 @@ l13slope = ggplot(data = l13, aes( x = doy, y = chl_slope))+
   theme_classic()+
   ylim(-4.7, 5.5)+
   annotate("rect", xmin = as.Date(196), xmax = as.Date(201), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
-  annotate("rect", xmin = as.Date(201+daysAfter), xmax = as.Date(201+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-           fill = "steelblue", alpha = 0.3)
+           fill = "red", alpha = 0.5)+
+  annotate("rect", xmin = as.Date(201+daysAfter - slopeLength), xmax = as.Date(201+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
+           fill = "steelblue", alpha = 0.5)
 
 l13chl = ggplot(data = l13, aes(x = doy, y = manual_chl))+
   geom_line(color = "forestgreen", size = 1)+
@@ -294,7 +294,7 @@ l13temp = ggplot(data = l13, aes(x = doy, y = mean_temp))+
   theme_classic()+
   labs(title = "Paul 2013")+
   annotate("rect", xmin = as.Date(196), xmax = as.Date(201), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)
+           fill = "red", alpha = 0.5)
 
 
 # Peter
@@ -303,9 +303,9 @@ r13slope = ggplot(data = r13, aes( x = doy, y = chl_slope))+
   theme_classic()+
   ylim(-4.7, 5.5)+
   annotate("rect", xmin = as.Date(196), xmax = as.Date(201), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
-  annotate("rect", xmin = as.Date(201+daysAfter), xmax = as.Date(201+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-           fill = "steelblue", alpha = 0.3)
+           fill = "red", alpha = 0.5)+
+  annotate("rect", xmin = as.Date(201+daysAfter - slopeLength), xmax = as.Date(201+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
+           fill = "steelblue", alpha = 0.5)
 
 r13chl = ggplot(data = r13, aes(x = doy, y = manual_chl))+
   geom_line(color = "forestgreen", size = 1)+
@@ -316,7 +316,7 @@ r13temp = ggplot(data = r13, aes(x = doy, y = mean_temp))+
   theme_classic()+
   labs(title = "Peter 2013")+
   annotate("rect", xmin = as.Date(196), xmax = as.Date(201), ymin = -Inf, ymax = Inf,
-                                      fill = "red", alpha = 0.3)
+                                      fill = "red", alpha = 0.5)
 
 print(ggarrange(nrow = 3, ncol = 3, r13temp, l13temp, t13temp, r13chl, l13chl, t13chl, r13slope, l13slope, t13slope))
 
@@ -332,9 +332,9 @@ t14slope = ggplot(data = t14, aes( x = doy, y = chl_slope))+
   theme_classic()+
   ylim(-4.7, 5.5)+
   annotate("rect", xmin = as.Date(146), xmax = as.Date(154), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
-  annotate("rect", xmin = as.Date(154+daysAfter), xmax = as.Date(154+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-           fill = "steelblue", alpha = 0.3)
+           fill = "red", alpha = 0.5)+
+  annotate("rect", xmin = as.Date(154+daysAfter - slopeLength), xmax = as.Date(154+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
+           fill = "steelblue", alpha = 0.5)
 
 t14chl = ggplot(data = t14, aes(x = doy, y = manual_chl))+
   geom_line(color = "forestgreen", size = 1)+
@@ -345,7 +345,7 @@ t14temp = ggplot(data = t14, aes(x = doy, y = mean_temp))+
   theme_classic()+
   labs(title = "Tuesday 2014")+
   annotate("rect", xmin = as.Date(146), xmax = as.Date(154), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)
+           fill = "red", alpha = 0.5)
 
 
 # Paul
@@ -370,9 +370,9 @@ r14slope = ggplot(data = r14, aes( x = doy, y = chl_slope))+
   theme_classic()+
   ylim(-4.1, 4.5)+
   annotate("rect", xmin = as.Date(149), xmax = as.Date(153), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
-  annotate("rect", xmin = as.Date(153+daysAfter), xmax = as.Date(153+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-           fill = "steelblue", alpha = 0.3)
+           fill = "red", alpha = 0.5)+
+  annotate("rect", xmin = as.Date(153+daysAfter - slopeLength), xmax = as.Date(153+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
+           fill = "steelblue", alpha = 0.5)
 
 r14chl = ggplot(data = r14, aes(x = doy, y = manual_chl))+
   geom_line(color = "forestgreen", size = 1)+
@@ -383,7 +383,7 @@ r14temp = ggplot(data = l14, aes(x = doy, y = mean_temp))+
   theme_classic()+
   labs(title = "Peter 2014")+
   annotate("rect", xmin = as.Date(149), xmax = as.Date(153), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)
+           fill = "red", alpha = 0.5)
 
 print(ggarrange(nrow = 3, ncol = 3, r14temp, l14temp, t14temp, r14chl, l14chl, t14chl, r14slope, l14slope, t14slope))
 
@@ -401,13 +401,13 @@ t15slope = ggplot(data = t15, aes( x = doy, y = chl_slope))+
   theme_classic()+
   ylim(-4.7, 5.5)+
   annotate("rect", xmin = 206, xmax = as.Date(210), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
+           fill = "red", alpha = 0.5)+
   annotate("rect", xmin = as.Date(226), xmax = as.Date(230), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
-  annotate("rect", xmin = as.Date(210+daysAfter), xmax = as.Date(210+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-           fill = "steelblue", alpha = 0.3)+
-  annotate("rect", xmin = as.Date(230+daysAfter), xmax = as.Date(230+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-           fill = "steelblue", alpha = 0.3)
+           fill = "red", alpha = 0.5)+
+  annotate("rect", xmin = as.Date(210+daysAfter - slopeLength), xmax = as.Date(210+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
+           fill = "steelblue", alpha = 0.5)+
+  annotate("rect", xmin = as.Date(230+daysAfter - slopeLength), xmax = as.Date(230+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
+           fill = "steelblue", alpha = 0.5)
 
 t15chl = ggplot(data = t15, aes(x = doy, y = manual_chl))+
   geom_line(color = "forestgreen", size = 1)+
@@ -418,9 +418,9 @@ t15temp = ggplot(data = l14, aes(x = doy, y = mean_temp))+
   theme_classic()+
   labs(title = "Tuesday 2015")+
   annotate("rect", xmin = 206, xmax = as.Date(210), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
+           fill = "red", alpha = 0.5)+
   annotate("rect", xmin = as.Date(226), xmax = as.Date(230), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)
+           fill = "red", alpha = 0.5)
 
 # Paul
 l15slope = ggplot(data = l15, aes( x = doy, y = chl_slope))+
@@ -471,21 +471,21 @@ l18slope = ggplot(data = l18, aes( x = doy, y = chl_slope))+
   theme_classic()+
   ylim(-4.7, 5.5)+
   annotate("rect", xmin = as.Date(144), xmax = as.Date(152), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
+           fill = "red", alpha = 0.5)+
   annotate("rect", xmin = as.Date(169), xmax = as.Date(175), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
+           fill = "red", alpha = 0.5)+
   annotate("rect", xmin = as.Date(180), xmax = as.Date(188), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
+           fill = "red", alpha = 0.5)+
   annotate("rect", xmin = as.Date(223), xmax = as.Date(231), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
-  annotate("rect", xmin = as.Date(152+daysAfter), xmax = as.Date(152+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-           fill = "steelblue", alpha = 0.3)+
-  annotate("rect", xmin = as.Date(175+daysAfter), xmax = as.Date(175+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-           fill = "steelblue", alpha = 0.3)+
-  annotate("rect", xmin = as.Date(188+daysAfter), xmax = as.Date(188+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-           fill = "steelblue", alpha = 0.3)+
-  annotate("rect", xmin = as.Date(231+daysAfter), xmax = as.Date(231+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-           fill = "steelblue", alpha = 0.3)
+           fill = "red", alpha = 0.5)+
+  annotate("rect", xmin = as.Date(152+daysAfter - slopeLength), xmax = as.Date(152+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
+           fill = "steelblue", alpha = 0.5)+
+  annotate("rect", xmin = as.Date(175+daysAfter - slopeLength), xmax = as.Date(175+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
+           fill = "steelblue", alpha = 0.5)+
+  annotate("rect", xmin = as.Date(188+daysAfter - slopeLength), xmax = as.Date(188+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
+           fill = "steelblue", alpha = 0.5)+
+  annotate("rect", xmin = as.Date(231+daysAfter - slopeLength), xmax = as.Date(231+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
+           fill = "steelblue", alpha = 0.5)
 
 l18chl = ggplot(data = l18, aes(x = doy, y = manual_chl))+
   geom_line(color = "forestgreen", size = 1)+
@@ -496,13 +496,13 @@ l18temp = ggplot(data = l18, aes(x = doy, y = mean_temp))+
   theme_classic()+
   labs(title = "Paul 2018")+
   annotate("rect", xmin = as.Date(144), xmax = as.Date(152), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
+           fill = "red", alpha = 0.5)+
   annotate("rect", xmin = as.Date(169), xmax = as.Date(175), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
+           fill = "red", alpha = 0.5)+
   annotate("rect", xmin = as.Date(180), xmax = as.Date(188), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
+           fill = "red", alpha = 0.5)+
   annotate("rect", xmin = as.Date(223), xmax = as.Date(231), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)
+           fill = "red", alpha = 0.5)
 
 # Peter
 r18slope = ggplot(data = r18, aes( x = doy, y = chl_slope))+
@@ -510,21 +510,21 @@ r18slope = ggplot(data = r18, aes( x = doy, y = chl_slope))+
   theme_classic()+
  ylim(-4.7, 5.5)+
   annotate("rect", xmin = as.Date(144), xmax = as.Date(152), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
+           fill = "red", alpha = 0.5)+
   annotate("rect", xmin = as.Date(169), xmax = as.Date(175), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
+           fill = "red", alpha = 0.5)+
   annotate("rect", xmin = as.Date(180), xmax = as.Date(192), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
+           fill = "red", alpha = 0.5)+
   annotate("rect", xmin = as.Date(223), xmax = as.Date(232), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
-  annotate("rect", xmin = as.Date(152+daysAfter), xmax = as.Date(152+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-           fill = "steelblue", alpha = 0.3)+
-  annotate("rect", xmin = as.Date(175+daysAfter), xmax = as.Date(175+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-           fill = "steelblue", alpha = 0.3)+
-  annotate("rect", xmin = as.Date(192+daysAfter), xmax = as.Date(192+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-           fill = "steelblue", alpha = 0.3)+
-  annotate("rect", xmin = as.Date(232+daysAfter), xmax = as.Date(232+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-           fill = "steelblue", alpha = 0.3)
+           fill = "red", alpha = 0.5)+
+  annotate("rect", xmin = as.Date(152+daysAfter - slopeLength), xmax = as.Date(152+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
+           fill = "steelblue", alpha = 0.5)+
+  annotate("rect", xmin = as.Date(175+daysAfter - slopeLength), xmax = as.Date(175+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
+           fill = "steelblue", alpha = 0.5)+
+  annotate("rect", xmin = as.Date(192+daysAfter - slopeLength), xmax = as.Date(192+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
+           fill = "steelblue", alpha = 0.5)+
+  annotate("rect", xmin = as.Date(232+daysAfter - slopeLength), xmax = as.Date(232+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
+           fill = "steelblue", alpha = 0.5)
 
 r18chl = ggplot(data = r18, aes(x = doy, y = manual_chl))+
   geom_line(color = "forestgreen", size = 1)+
@@ -535,13 +535,13 @@ r18temp = ggplot(data = r18, aes(x = doy, y = mean_temp))+
   theme_classic()+
   labs(title = "Peter 2018")+
   annotate("rect", xmin = as.Date(144), xmax = as.Date(152), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
+           fill = "red", alpha = 0.5)+
   annotate("rect", xmin = as.Date(169), xmax = as.Date(175), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
+           fill = "red", alpha = 0.5)+
   annotate("rect", xmin = as.Date(180), xmax = as.Date(192), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
+           fill = "red", alpha = 0.5)+
   annotate("rect", xmin = as.Date(223), xmax = as.Date(232), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)
+           fill = "red", alpha = 0.5)
 
 print(ggarrange(nrow = 3, ncol = 2, r18temp, l18temp, r18chl, l18chl, r18slope, l18slope))
 
@@ -559,9 +559,9 @@ l19slope = ggplot(data = l19, aes( x = doy, y = chl_slope))+
   theme_classic()+
   ylim(-4.7, 5.5)+
   annotate('rect', xmin = as.Date(196), xmax = as.Date(200), ymin = -Inf, ymax = Inf,
-           fill = 'red', alpha = 0.3)+
-  annotate('rect', xmin = as.Date(200+daysAfter), xmax = as.Date(200+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-           fill = 'steelblue', alpha = 0.3)
+           fill = 'red', alpha = 0.5)+
+  annotate('rect', xmin = as.Date(200+daysAfter - slopeLength), xmax = as.Date(200+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
+           fill = 'steelblue', alpha = 0.5)
 
 l19chl = ggplot(data = l19, aes(x = doy, y = manual_chl))+
   geom_line(color = "forestgreen", size = 1)+
@@ -572,7 +572,7 @@ l19temp = ggplot(data = l19, aes(x = doy, y = mean_temp))+
   theme_classic()+
   labs(title = "Paul 2019")+
   annotate('rect', xmin = as.Date(196), xmax = as.Date(200), ymin = -Inf, ymax = Inf,
-           fill = 'red', alpha = 0.3)
+           fill = 'red', alpha = 0.5)
 
 
 # Peter
@@ -581,9 +581,9 @@ r19slope = ggplot(data = r19, aes( x = doy, y = chl_slope))+
   theme_classic()+
   ylim(-4.7, 5.5)+
   annotate("rect", xmin = as.Date(215), xmax = as.Date(219), ymin = -Inf, ymax = Inf,
-           fill = "red", alpha = 0.3)+
-  annotate("rect", xmin = as.Date(219+daysAfter), xmax = as.Date(219+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-           fill = "steelblue", alpha = 0.3)
+           fill = "red", alpha = 0.5)+
+  annotate("rect", xmin = as.Date(219+daysAfter - slopeLength), xmax = as.Date(219+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
+           fill = "steelblue", alpha = 0.5)
 
 r19chl = ggplot(data = r19, aes(x = doy, y = manual_chl))+
   geom_line(color = "forestgreen", size = 1)+
@@ -594,7 +594,7 @@ r19temp = ggplot(data = r19, aes(x = doy, y = mean_temp))+
   theme_classic()+
   labs(title = "Peter 2019")+
   annotate('rect', xmin = as.Date(215), xmax = as.Date(219), ymin = -Inf, ymax = Inf,
-           fill = 'red', alpha = 0.3)
+           fill = 'red', alpha = 0.5)
 
 print(ggarrange(nrow = 3, ncol = 2, r19temp, l19temp, r19chl, l19chl, r19slope, l19slope))
 
