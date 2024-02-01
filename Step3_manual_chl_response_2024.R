@@ -52,7 +52,7 @@ slopeLength = 7 # length of the rolling window slope to be calculated
 # slope aggregation choices
 
 daysAfter = 0 # time lag of how many days after the heatwave we want to look
-numSlopes = 7 # the number of slopes we want to include in analysis
+numSlopes = 1 # the number of slopes we want to include in analysis
 
 exclude.after.heatwaves = FALSE # if TRUE, excludes slopes for days within 20 days 
 # of the heatwave that don't fall within our aggregating window
@@ -190,7 +190,7 @@ for(i in 1:length(lake_years)){
 hwSlopes <- function(heatwaveStart, heatwaveEnd,  targLake, data){
   
   startDate = as.Date(heatwaveEnd)+daysAfter 
-  endDate = as.Date(heatwaveEnd)+daysAfter+numSlopes
+  endDate = as.Date(heatwaveEnd)+daysAfter+numSlopes-1
   
   # filter out the slopes we are interested in
   selected.slopes = data %>% filter(lake == targLake, date >= startDate, date <= endDate)
@@ -305,7 +305,7 @@ for(daysAfterLoop in 0:20){
     # daysAfterLoop is set to, to that same value plus the numSlopes. So it sets a window daysAfterLooped
     # X number of days after the heatwave
     
-    datesAnalyzed = seq(end+daysAfterLoop, end + daysAfterLoop+numSlopes, 1)
+    datesAnalyzed = seq(end+daysAfterLoop, end + daysAfterLoop+numSlopes-1, 1)
     
     # fill the dataframe "period" column with the correct categorization
 
@@ -776,6 +776,8 @@ print(ggarrange(hw.pload, hw.color, hw.doy.start, hw.length, nrow = 2, ncol = 2)
 
 dev.off()
 
+# make a PDF of all the raw plots with highlighted areas showing where slopes are calculated
+makePDFrawPlots(allSlopes, daysAfter, numSlopes, metadata_plot, runNumber)
 
 
 
