@@ -22,7 +22,7 @@ ui <- fluidPage(
       sliderInput("slope_length_slider", "slopeLength:", min = 3, max = 14, value = 7, step = 1)
     ),
     mainPanel(
-      plotOutput("plot", height = "600px", width = "1000px")
+      plotOutput("plot", height = "500px", width = "800px")
     )
   )
 )
