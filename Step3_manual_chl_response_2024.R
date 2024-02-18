@@ -51,7 +51,7 @@ slopeLength = 7 # length of the rolling window slope to be calculated
 
 # slope aggregation choices
 
-daysAfter = 3 # time lag of how many days after the heatwave we want to look
+daysAfter = 0 # time lag of how many days after the heatwave we want to look
 numSlopes = 5 # the number of slopes we want to include in analysis
 
 exclude.after.heatwaves = FALSE # if TRUE, excludes slopes for days within 20 days 
@@ -694,13 +694,13 @@ exp$length = as.numeric(exp$end_date - exp$start_date)
 
 # make a new dataframe that only has the columns of results we are interested in for now
 priority.results = results %>% select(lake, year, date_start, date_end, percentChange) %>% 
-  rename(start_date = date_start, end_date = date_end) %>% 
+  dplyr::rename(start_date = date_start, end_date = date_end) %>% 
   mutate(start_date = as.Date(start_date), end_date = as.Date(end_date))
 
 exp = exp %>% select(-comments, -percent_change)
 
 exp = exp %>% full_join(priority.results, by = c("lake", "year", "start_date", "end_date")) %>% 
-  rename(percent_change = percentChange)
+  dplyr::rename(percent_change = percentChange)
 
 exp$percent_change = as.numeric(exp$percent_change)
 
@@ -768,10 +768,10 @@ print(Rdist)
 print(Ldist)
 print(Tdist)
 print(indHWResp)
-print(All.over.time)
-print(R.over.time)
-print(L.over.time)
-print(T.over.time)
+#print(All.over.time)
+#print(R.over.time)
+#print(L.over.time)
+#print(T.over.time)
 print(ggarrange(hw.pload, hw.color, hw.doy.start, hw.length, nrow = 2, ncol = 2))
 
 dev.off()
