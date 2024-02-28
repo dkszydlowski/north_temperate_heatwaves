@@ -35,8 +35,12 @@ climOutputL = ts2clm(paulHWinput, climatologyPeriod = c(min(paulHWinput$t), max(
 paulHW = detect_event(climOutputL)
 
 # check the output from the heatwave code
-event_line(paulHW, metric = "intensity_max", start_date = "2019-06-01", end_date = "2019-09-15")+
-  geom_point()
+event_line(paulHW, metric = "intensity_max", start_date = "2010-06-01", end_date = "2010-09-15")+
+  geom_point()+
+  xlim(xmin = as.Date("2010-06-01"), xmax = as.Date("2010-09-15"))+
+  theme_classic()
+ # geom_density_line(aes(stat = "identity", size = 0.5, fill = "steelblue3", alpha = 0.3))
+  
 
 climOutputR = ts2clm(peterHWinput, climatologyPeriod = c(min(peterHWinput$t), max(peterHWinput$t)))
 peterHW = detect_event(climOutputR)

@@ -29,7 +29,7 @@ ggplot(prism %>% filter(month >= 5 & month <= 9 & year == 2013), aes(x = doy, y 
 
 
 
-#### Read in the Cascade temperature data ####
+#### Read in the Cascade routine temperature data ####
 
 # Package ID: knb-lter-ntl.352.4 Cataloging System:https://pasta.edirepository.org.
 # Data set title: Cascade Project at North Temperate Lakes LTER Core Data Physical and Chemical Limnology 1984 - 2016.
@@ -372,9 +372,27 @@ summary(lm(temp.sonde.prism.L$mean_temp~temp.sonde.prism.L$tmean))
 # temp.sonde.prism.carbon
 temp.sonde.prism.carbon = temp.sonde.prism %>% left_join(carbon, by = c("date", "doy", "lake"))
 
-test = lmer(mean_temp~tmean*doy + (1|lake), data = temp.sonde.prism.carbon)
+temp.sonde.prism.carbon = temp.sonde.prism.carbon %>% filter(doy >= 152)
+
+temp.sonde.prism.carbon = temp.sonde.prism.carbon %>% mutate(year.x = as.factor(year.x))
+
+test = lmer(mean_temp~tmean*lag(tmean, 1)*lag(tmean, 2)*lag(tmean, 3)*lag(tmean, 4)*lag(tmean, 5)*doy + (1|lake), data = temp.sonde.prism.carbon)
 summary(test)
 r.squaredGLMM(test)
+
+temp.sonde.prism.carbon$modeled = predict(test, temp.sonde.prism.carbon)
+
+ggplot(temp.sonde.prism.carbon %>% filter(year.x == 2015), aes(x = doy, y = mean_temp, color = lake))+
+  geom_line(linewidth = 0.8)+
+  #geom_point(aes(x = doy, y = mean_temp), size = 1, color = "red", alpha = 0.5)+
+  geom_line(aes(x = doy, y = modeled), size = 1, color = "red", alpha = 0.3)+
+ # geom_line(aes(x = doy, y = tmean), size = 0.3, color = "purple", alpha = 0.5)+
+  facet_wrap(lake~year.x)+
+  labs(y = "predicted temperature", x = "doy")+
+  scale_color_manual(values = c("L" = "#ADDAE3", "R"=  "#4AB5C4", "T"=  "#BAAD8D"))
+ # geom_smooth(method = "lm", se = TRUE, color = "black", size = 1)# Add linear regression lines
+
+
 
 
 
@@ -445,9 +463,24 @@ ggplot(lrt.temp.all %>% year == 2014, aes(x = datetime, y = avg_air_temp, color 
   scale_color_manual(values = c("Paul" = "#ADDAE3", "Peter"=  "#4AB5C4", "Tuesday"=  "#BAAD8D"))   
 
 
-test = lmer(wtr_0.5~avg_air_temp*doy*hour + (1|lake), data = lrt.temp.all)
+test = lmer(wtr_0.5~avg_air_temp*doy*hour*year + (1|lake), data = lrt.temp.all)
 summary(test)
 r.squaredGLMM(test)
+
+
+
+lrt.temp.all$modeled = predict(test, lrt.temp.all)
+
+ggplot(lrt.temp.all, aes(x = doy, y = modeled, color = lake))+
+  geom_line(linewidth = 0.8)+
+  geom_point(aes(x = doy, y = wtr_0.5), size = 0.3, color = "red", alpha = 0.5)+
+  geom_line(aes(x = doy, y = avg_air_temp), size = 0.3, color = "purple", alpha = 0.5)+
+  facet_wrap(lake~year)+
+  labs(y = "predicted temperature", x = "doy")+
+  scale_color_manual(values = c("L" = "#ADDAE3", "R"=  "#4AB5C4", "T"=  "#BAAD8D"))
+# geom_smooth(method = "lm", se = TRUE, color = "black", size = 1)# Add linear regression lines
+
+
 
 
 l.lrt.temp.all = lrt.temp.all %>% filter(lake == "Paul")
