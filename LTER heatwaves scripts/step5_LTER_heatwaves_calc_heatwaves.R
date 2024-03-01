@@ -2,6 +2,7 @@
 
 library(tidyverse)
 library(heatwaveR)
+library(ggridges)
 
 # read in the data
 SP.surface.HWR = read.csv("./formatted data/LTER daily temperature/SP surface for heatwaveR.csv") %>% mutate(t = as.Date(t))
@@ -21,6 +22,28 @@ TBHW = detect_event(climOutputTB)
 
 climOutputCB = ts2clm(CB.surface.HWR, climatologyPeriod = c(min(CB.surface.HWR$t), max(CB.surface.HWR$t)))
 CBHW = detect_event(climOutputCB)
+
+#### Create a document with all of the heatwaves plotted ####
+SPclimatology = SPHW$climatology
+SPevent =SPHW$event 
+
+CBclimatology = CBHW$climatology
+CBevent =CBHW$event 
+
+ggplot(CBclimatology %>% filter(year(t) == 2010), aes(x = t, y = temp)) +
+  geom_density_line( stat = "identity", size = 0.5, fill = "steelblue3", alpha = 0.3)+
+  geom_line(aes(y = seas), color = "blue")+
+  geom_line(aes(y = thresh))+
+  xlab("Date") + ylab(expression(paste("Temperature [", degree, "C]")))+
+  theme_classic()+
+  xlim(as.Date("2010-05-31"), as.Date("2010-09-01"))+
+  geom_flame(aes(y2 = thresh)) 
+
+event_line(CBHW, metric = "intensity_max", start_date = "2009-06-01", end_date = "2009-09-15", y_axis_range = c(12, 32))+
+  #geom_point()+
+  geom_density_line( stat = "identity", size = 0.5, fill = "steelblue3", alpha = 0.3)+
+  xlim(as.Date("2009-05-31"), as.Date("2009-09-01"))+
+  theme_classic()
 
 # summarize how many heatwaves per year
 sparklingHW.perYear = sparklingHW %>% group_by(year) %>% 
@@ -201,4 +224,16 @@ for(i in 1:length(years)){
 
 ### make geom_flame plots #####
 
+ts <- ts2clm(sst_WA, climatologyPeriod = c("1983-01-01", "2012-12-31"))
+res <- detect_event(ts)
+mhw <- res$clim
+mhw <- mhw[10580:10690,]
 
+library(ggplot2)
+
+ggplot(mhw, aes(x = t, y = temp)) +
+  geom_flame(aes(y2 = thresh)) +
+  geom_line()+
+  geom_line(aes(y = seas), color = "blue")+
+  xlab("Date") + ylab(expression(paste("Temperature [", degree, "C]")))+
+  theme_classic()

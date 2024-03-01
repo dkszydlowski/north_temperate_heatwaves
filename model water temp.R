@@ -411,8 +411,6 @@ ccf(temp.sonde.prism$mean_temp, temp.sonde.prism$tmean)
 
 
 ##### model with woodruff air temperature from LTER ######
-
-
 woodruff = read.csv("./formatted data/LTER daily temperature/woodruff airport temperature LTER.csv")
 
 woodruff = woodruff %>% rename(year = year4, date = sampledate, doy = daynum)
@@ -486,3 +484,97 @@ ggplot(lrt.temp.all, aes(x = doy, y = modeled, color = lake))+
 l.lrt.temp.all = lrt.temp.all %>% filter(lake == "Paul")
 
 ccf(l.lrt.temp.all$wtr_0.5, l.lrt.temp.all$avg_air_temp, na.action = na.rm)
+
+
+
+
+
+##### Model with Sparkling Lake temperature and woodruff air temperature as predictors ####
+
+SP.temp = read.csv("./formatted data/LTER daily temperature/Sparkling Lake daily temperature all depths.csv")
+
+SP.temp.1 = SP.temp %>% filter(depth == 1) %>% 
+  rename(year = year4, date = sampledate, doy = daynum) %>% select(-depth, -flag_wtemp) %>% 
+  rename(SP.temp.1 = wtemp)
+
+lrt.temp.all.SP = lrt.temp.all %>% left_join(SP.temp.1, by = c("doy", "date", "year"))
+
+ggplot(lrt.temp.all.SP, aes(x = wtr_0.5, y = SP.temp.1, fill = lake))+
+  geom_point(pch = 21)+
+  # geom_line()+
+  #  geom_line(aes(x = date, y = mean_temp, color = "black"), size = 1)+
+  facet_wrap(~lake)+
+  labs(y = "prism temperature", x = "temp sensor 0.5 m temperature")+
+  scale_fill_manual(values = c("Paul" = "#ADDAE3", "Peter"=  "#4AB5C4", "Tuesday"=  "#BAAD8D"))  
+
+summary(lm(lrt.temp.all.SP$wtr_0.5~lrt.temp.all.SP$SP.temp.1))
+
+
+
+test = lmer(wtr_0.5~SP.temp.1*avg_air_temp*doy*lag(avg_air_temp, 1)*lag(avg_air_temp, 2)+lag(avg_air_temp, 3) + (1|lake), data = lrt.temp.all.SP)
+summary(test)
+r.squaredGLMM(test)
+
+
+
+#### Try this on a daily timescale ####
+
+# modeling dataset
+fitting = daily.lrt.temp.all.SP %>% mutate(lake_year = paste(lake, year, sep = "_")) %>%
+  filter(lake_year != "Peter_2013")
+
+daily.lrt.temp.all.SP = daily.lrt.temp.all.SP %>% mutate(lake_year = paste(lake, year, sep = "_"))
+
+daily.lrt.temp.all.SP = lrt.temp.all.SP %>% group_by(lake, year, date, doy) %>%
+  summarize(daily.sonde.temp = mean(wtr_0.5), daily.air.temp = mean(avg_air_temp), daily.sp.temp = mean(SP.temp.1))
+
+
+test = lmer(daily.sonde.temp~daily.sp.temp*daily.air.temp*doy+lag(daily.air.temp, 1)+lag(daily.air.temp, 2)+lag(daily.sp.temp, 1) + (1|lake), data = fitting)
+summary(test)
+r.squaredGLMM(test)
+
+daily.lrt.temp.all.SP$modeled = predict(test, daily.lrt.temp.all.SP)
+
+daily.lrt.temp.all.SP = daily.lrt.temp.all.SP %>% mutate(lake_year = paste(lake, year, sep = "_"))
+
+
+ggplot(daily.lrt.temp.all.SP %>% filter(lake_year == "Tuesday_2013"), aes(x = doy, y = modeled, color = lake))+
+  geom_line(linewidth = 1, color = "black")+
+  geom_line(aes(x = doy, y = daily.sonde.temp, color = lake), size = 1, color = "steelblue4", alpha = 0.5)+
+  geom_point(aes(x = doy, y = daily.sonde.temp, color = lake), size = 1, color = "steelblue4", alpha = 0.5)+
+  facet_wrap(lake~year)+
+  labs(y = "predicted temperature", x = "doy")+
+  scale_color_manual(values = c("L" = "#ADDAE3", "R"=  "#4AB5C4", "T"=  "#BAAD8D"))+
+  theme_classic()
+# geom_smooth(method = "lm", se = TRUE, color = "black", size = 1)# Add linear regression lines
+
+
+ggplot(daily.lrt.temp.all.SP %>% filter(year == 2013), aes(x = doy, y = modeled, color = lake))+
+  geom_line(size = 1)+
+  geom_point(aes(x = doy, y = daily.sonde.temp, color = lake), size = 1, alpha = 0.5)+
+  #geom_point(aes(x = doy, y = daily.sonde.temp, color = lake), size = 1, color = "steelblue4", alpha = 0.5)+
+ # facet_wrap(lake~year)+
+  labs(y = "predicted temperature", x = "doy")+
+  scale_color_manual(values = c("Paul" = "#ADDAE3", "Peter"=  "#4AB5C4", "Tuesday"=  "#BAAD8D"))+
+  theme_classic()
+# geom_smooth(method = "lm", se = TRUE, color = "black", size = 1)# Add linear regression lines
+
+ggplot(daily.lrt.temp.all.SP, aes(x = daily.sonde.temp, y = daily.sp.temp, fill = lake))+
+  geom_point(pch = 21)+
+  # geom_line()+
+  #  geom_line(aes(x = date, y = mean_temp, color = "black"), size = 1)+
+  facet_wrap(~lake)+
+  labs(y = "prism temperature", x = "temp sensor 0.5 m temperature")+
+  scale_fill_manual(values = c("Paul" = "#ADDAE3", "Peter"=  "#4AB5C4", "Tuesday"=  "#BAAD8D"))  
+
+
+
+
+##### Make a model for all years of Sparkling temperature data #####
+# add the Woodruff data to the Sparkling Lake data
+
+# get daily woodruff temperature data
+
+# add daily woodruff temperature data to Sparkling
+SP.temp.1 = SP.temp.1 %>% left_join()
+
