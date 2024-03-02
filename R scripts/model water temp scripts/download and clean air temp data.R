@@ -1,6 +1,5 @@
 #### Woodruff airport meteorlogical data #####
 
-
 # Package ID: knb-lter-ntl.17.38 Cataloging System:https://pasta.edirepository.org.
 # Data set title: North Temperate Lakes LTER: Meteorological Data - Woodruff Airport 1989 - current.
 # Data set creator:  John Magnuson - University of Wisconsin-Madison 

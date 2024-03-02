@@ -8,7 +8,7 @@ library(lme4)
 library(lmerTest)
 library(MuMIn)
 
-# read in the PRISM data
+# read in the PRISM temperature data
 
 prism = read.csv("./formatted data/PRISM_tmin_tmean_tmax_tdmean_provisional_4km_19810101_20240101_46.2514_-89.4958.csv")
 
