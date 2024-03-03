@@ -2,7 +2,7 @@
 # based off of PRISM air temperature data
 
 library(tidyverse)
-
+library(heatwaveR)
 
 library(lme4)
 library(lmerTest)
@@ -338,11 +338,6 @@ r.squaredGLMM(test)
 
 
 
-
-
-
-
-
 ####### Try making  a model with the daily sonde temperature data #########
 
 temp.sonde = read.csv("./formatted data/allSonde_interpolated.csv")
@@ -490,7 +485,6 @@ ccf(l.lrt.temp.all$wtr_0.5, l.lrt.temp.all$avg_air_temp, na.action = na.rm)
 
 
 ##### Model with Sparkling Lake temperature and woodruff air temperature as predictors ####
-
 SP.temp = read.csv("./formatted data/LTER daily temperature/Sparkling Lake daily temperature all depths.csv")
 
 SP.temp.1 = SP.temp %>% filter(depth == 1) %>% 
@@ -577,4 +571,123 @@ ggplot(daily.lrt.temp.all.SP, aes(x = daily.sonde.temp, y = daily.sp.temp, fill 
 
 # add daily woodruff temperature data to Sparkling
 SP.temp.1 = SP.temp.1 %>% left_join()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+######### Model water temp of RLT #########
+
+# use sonde temperature data, woodruff airport data, and Sparkling Lake data
+
+# sonde temperature
+temp.sonde = read.csv("./formatted data/allSonde_interpolated.csv")
+
+temp.sonde = temp.sonde %>% select(lake, year, date, doyCat, mean_temp) %>% 
+  rename(doy = doyCat)
+
+temp.sonde = temp.sonde %>% mutate(date = as.Date(date))
+
+
+# Sparkling Lake temperature
+SP.temp = read.csv("./formatted data/LTER daily temperature/Sparkling Lake daily temperature all depths.csv")
+
+SP.temp.1 = SP.temp %>% filter(depth == 0 | depth == 0.01) %>% 
+  rename(year = year4, date = sampledate, doy = daynum) %>% select(-depth, -flag_wtemp) %>% 
+  rename(SP.temp.1 = wtemp) %>% 
+  mutate(date = as.Date(date))
+
+# Woodruff airport temperature
+woodruff = read.csv("./formatted data/LTER daily temperature/woodruff airport temperature LTER.csv")
+
+woodruff = woodruff %>% rename(year = year4, date = sampledate, doy = daynum)
+
+# make a daily woodruff dataframe
+woodruff = woodruff %>% group_by(year, date, doy) %>% 
+  summarize(woodruff.temp = mean(avg_air_temp, na.rm = TRUE)) %>% 
+  mutate(date = as.Date(date))
+
+
+# combine woodruff, Sparkling, and LRT sonde temp
+sonde.SP.woodruff = temp.sonde %>% left_join(SP.temp.1, by = c("doy", "date", "year"))
+sonde.SP.woodruff = sonde.SP.woodruff %>% left_join(woodruff, by = c("doy", "date", "year"))
+
+# run the model
+test = lmer(mean_temp~SP.temp.1 + (1|lake), data = sonde.SP.woodruff)
+summary(test)
+r.squaredGLMM(test)
+
+summary(lm(sonde.SP.woodruff$mean_temp~sonde.SP.woodruff$SP.temp.1))
+
+### make a fitting dataset and a testing dataset
+
+
+
+
+
+##### Use the model to predict temperature of RLT for every year of Sparkling data ######
+SP.woodruff = SP.temp.1 %>% left_join(woodruff, by = c("date", "doy", "year"))
+
+SP.woodruff$lake = "L"
+
+SP.woodruff$modeled.temp = predict(test, SP.woodruff)
+
+ggplot(SP.woodruff, aes(x = doy, y = modeled.temp, fill = lake))+
+  #geom_point(pch = 21)+
+   geom_line()+
+  geom_line(aes(x = doy, y = SP.temp.1, color = "black"), size = 1)+
+  facet_wrap(~year)+
+  labs(y = "prism temperature", x = "temp sensor 0.5 m temperature")+
+  scale_fill_manual(values = c("L" = "#ADDAE3", "Peter"=  "#4AB5C4", "Tuesday"=  "#BAAD8D"))  +
+  xlim(152, 259)+
+  ylim(15, 30)
+
+
+
+
+##### Calculate heatwaves from the modeled data #####
+SP.woodruff.subset = SP.woodruff %>% filter(year %in% c(1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+                                                        2002, 2003, 2009, 2010, 2011, 2012, 2014,
+                                                        2016, 2019, 2020, 2021, 2022)) %>% 
+                                                        filter(doy > 120 & doy < 275)
+
+# format for heatwaveR
+
+modeled.heatwaveR = SP.woodruff.subset %>% mutate(t = date, temp = modeled.temp) %>% 
+  select(t, temp)
+
+modeled.climOutputL = ts2clm(modeled.heatwaveR, climatologyPeriod = c(min(modeled.heatwaveR$t), max(modeled.heatwaveR$t)))
+paulHW = detect_event(modeled.climOutputL)
+
+View(paulHW$event)
+
+
+# apply the new climatology and thresholds to the old data
+L.temp.sonde = temp.sonde %>% filter(lake == "L") %>% 
+  rename(temp = mean_temp, t = date) %>% 
+  select(doy, t, temp)
+
+climatology = modeled.climOutputL %>% filter(year(t) == 1990) %>%  select(doy, seas, thresh)
+
+L.climatology = left_join(L.temp.sonde, climatology, by = c("doy"), relationship = "many-to-many")
+
+paulHW = detect_event(L.climatology)
+
+View(paulHW$event)
+
+
+
+### Model temp with the hourly data ###
 
