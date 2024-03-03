@@ -640,19 +640,25 @@ summary(lm(sonde.SP.woodruff$mean_temp~sonde.SP.woodruff$SP.temp.1))
 ##### Use the model to predict temperature of RLT for every year of Sparkling data ######
 SP.woodruff = SP.temp.1 %>% left_join(woodruff, by = c("date", "doy", "year"))
 
-SP.woodruff$lake = "L"
+# make columns of lake that can be input to the model
+SP.woodruffL = SP.woodruff %>% mutate(lake = "L")
+SP.woodruffR = SP.woodruff %>% mutate(lake = "R")
+SP.woodruffT = SP.woodruff %>% mutate(lake = "T")
+
+# combine into one for predicting temp
+SP.woodruff = rbind(SP.woodruffL, SP.woodruffR, SP.woodruffT)
 
 SP.woodruff$modeled.temp = predict(test, SP.woodruff)
 
-ggplot(SP.woodruff, aes(x = doy, y = modeled.temp, fill = lake))+
-  #geom_point(pch = 21)+
+ggplot(SP.woodruff, aes(x = doy, y = modeled.temp, color = lake))+
    geom_line()+
-  geom_line(aes(x = doy, y = SP.temp.1, color = "black"), size = 1)+
+  #geom_line(aes(x = doy, y = SP.temp.1, color = "black"), size = 1)+
   facet_wrap(~year)+
-  labs(y = "prism temperature", x = "temp sensor 0.5 m temperature")+
-  scale_fill_manual(values = c("L" = "#ADDAE3", "Peter"=  "#4AB5C4", "Tuesday"=  "#BAAD8D"))  +
+  labs(y = "modeled temperature", x = "day of year")+
+  scale_color_manual(values = c("L" = "#ADDAE3", "R"=  "#4AB5C4", "T"=  "#BAAD8D"))  +
   xlim(152, 259)+
-  ylim(15, 30)
+  ylim(15, 30)+
+  theme_classic()
 
 
 
@@ -664,17 +670,30 @@ SP.woodruff.subset = SP.woodruff %>% filter(year %in% c(1989, 1990, 1991, 1992, 
                                                         filter(doy > 120 & doy < 275)
 
 # format for heatwaveR
-
-modeled.heatwaveR = SP.woodruff.subset %>% mutate(t = date, temp = modeled.temp) %>% 
+modeled.heatwaveR.L = SP.woodruff.subset %>% filter(lake == "L") %>% mutate(t = date, temp = modeled.temp) %>% 
   select(t, temp)
 
-modeled.climOutputL = ts2clm(modeled.heatwaveR, climatologyPeriod = c(min(modeled.heatwaveR$t), max(modeled.heatwaveR$t)))
+modeled.heatwaveR.R = SP.woodruff.subset %>% filter(lake == "R") %>% mutate(t = date, temp = modeled.temp) %>% 
+  select(t, temp)
+
+modeled.heatwaveR.T = SP.woodruff.subset %>% filter(lake == "T") %>% mutate(t = date, temp = modeled.temp) %>% 
+  select(t, temp)
+
+# calculate climatology and thresholds
+modeled.climOutputL = ts2clm(modeled.heatwaveR.L, climatologyPeriod = c(min(modeled.heatwaveR.L$t), max(modeled.heatwaveR.L$t)))
 paulHW = detect_event(modeled.climOutputL)
+
+modeled.climOutputR = ts2clm(modeled.heatwaveR.R, climatologyPeriod = c(min(modeled.heatwaveR.R$t), max(modeled.heatwaveR.R$t)))
+peterHW = detect_event(modeled.climOutputR)
+
+modeled.climOutputT = ts2clm(modeled.heatwaveR.T, climatologyPeriod = c(min(modeled.heatwaveR.T$t), max(modeled.heatwaveR.T$t)))
+tuesdayHW = detect_event(modeled.climOutputT)
 
 View(paulHW$event)
 
 
 # apply the new climatology and thresholds to the old data
+# Paul
 L.temp.sonde = temp.sonde %>% filter(lake == "L") %>% 
   rename(temp = mean_temp, t = date) %>% 
   select(doy, t, temp)
@@ -687,7 +706,42 @@ paulHW = detect_event(L.climatology)
 
 View(paulHW$event)
 
+event_line(paulHW, category = TRUE, start_date = "2019-05-15", end_date= "2019-09-15")+geom_point()+
+  theme_classic()
+
+# Peter
+R.temp.sonde = temp.sonde %>% filter(lake == "R") %>% 
+  rename(temp = mean_temp, t = date) %>% 
+  select(doy, t, temp)
+
+climatology = modeled.climOutputR %>% filter(year(t) == 1990) %>%  select(doy, seas, thresh)
+
+R.climatology = left_join(R.temp.sonde, climatology, by = c("doy"), relationship = "many-to-many")
+
+peterHW = detect_event(R.climatology)
+
+View(peterHW$event)
+
+event_line(peterHW, category = TRUE, start_date = "2019-05-15", end_date= "2019-09-15")+geom_point()+
+  theme_classic()
 
 
-### Model temp with the hourly data ###
+# Tuesday
+T.temp.sonde = temp.sonde %>% filter(lake == "T") %>% 
+  rename(temp = mean_temp, t = date) %>% 
+  select(doy, t, temp)
 
+climatology = modeled.climOutputT %>% filter(year(t) == 1990) %>%  select(doy, seas, thresh)
+
+T.climatology = left_join(T.temp.sonde, climatology, by = c("doy"), relationship = "many-to-many")
+
+tuesdayHW = detect_event(T.climatology)
+
+View(tuesdayHW$event)
+
+event_line(tuesdayHW, category = TRUE, start_date = "2013-05-15", end_date= "2013-09-15")+geom_point()+
+  theme_classic()
+
+saveRDS(paulHW, file = "./results/heatwave modeled outputs/paul heatwave outputs modeled.rds")
+saveRDS(peterHW, file = "./results/heatwave modeled outputs/peter heatwave outputs modeled.rds")
+saveRDS(tuesdayHW, file = "./results/heatwave modeled outputs/tuesday heatwave outputs modeled.rds")
