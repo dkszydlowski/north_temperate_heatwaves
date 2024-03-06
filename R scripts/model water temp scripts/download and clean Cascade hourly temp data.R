@@ -260,60 +260,44 @@ detach(dt1)
 
 cascade.13.15.sonde = dt1
 
-cascade.13.15.sonde = read.csv( "./formatted data/Cascade hourly sonde data 2013 - 2015.csv")
-
-
-
+ cascade.13.15.sonde = read.csv( "./formatted data/Cascade hourly sonde data 2013 - 2015.csv")
+ cascade.08.11.sonde = read.csv( "./formatted data/Cascade hourly sonde data 2008 - 2011.csv")
+ 
 # format 2013-2015 data to be more compatible with 2008-2011 data
 cascade.13.15.sonde = cascade.13.15.sonde %>% rename(lake = Lake, year = Year, doy = DoY) 
 
-cascade.13.15.sonde <- cascade.13.15.sonde %>%
-  mutate(datetime = ymd("1970-01-01") + days(as.integer(doy * 365.25 + year - 1970)))
-
+# the day of year fraction is the number of minutes into the day divided by 24*60
 cascade.13.15.sonde <- cascade.13.15.sonde %>%
   mutate(time = times(doy %% 1)) %>% 
   mutate(doy2 = as.integer(doy)) %>% 
+  mutate(date = as.Date(paste(year, doy2, sep = "-"), format = "%Y-%j")) %>% 
+  mutate(datetime = ymd_hms(paste(date, time)))
   
+# code to test that the day fraction to datetime conversion works using a dataframe 
+# where we already know the datetime
 
-  
-# the day of year fraction is the number of minutes into the day divided by 24*60
+# cascade.08.11.sonde <- cascade.08.11.sonde %>%
+#     mutate(year2 = as.numeric(year), doy2 = as.integer(doy), times2 = times(doy %% 1))  %>% 
+#     mutate(date2 = as.Date(paste(year2, doy2, sep = "-"), format = "%Y-%j")) %>% 
+#     mutate(datetime2 = ymd_hms(paste(date2, times2)))
 
+# combine the two dataframes to make a master hourly sonde dataframe
 
-    
-    
+# hydrolab or EXO data? Going to pick hydrolab to match 08-11...
+cascade.08.11.sonde = cascade.08.11.sonde %>% select(lake, year, doy, datetime, stemp) %>% 
+  rename(temp = stemp) %>% 
+  mutate(datetime = ymd_hms(datetime))
 
-      cascade.08.11.sonde$datetime2 <- as.POSIXlt(paste(cascade.08.11.sonde$year, "-01-01", sep = "")) + 
-    (cascade.08.11.sonde$doy - 1) * 86400
-  
-  # Format the datetime column
-  cascade.08.11.sonde$datetime2 <- format(cascade.08.11.sonde$datetime2, "%Y-%m-%d %H:%M:%S")
-  
-  # Print the updated dataframe
-  print(cascade.08.11.sonde$datetime2)  
-  
-  
-  cascade.08.11.sonde <- cascade.08.11.sonde %>%
-    mutate(datetime2 = ymd("1970-01-01") + days(doy - 1),
-           datetime2 = format(datetime, "%Y-%m-%d %H:%M:%S"))
+cascade.13.15.sonde = cascade.13.15.sonde %>% select(lake, year, doy, datetime, Temp_HYLB) %>% 
+  rename(temp = Temp_HYLB)
 
-  cascade.08.11.sonde <- cascade.08.11.sonde %>%
-    mutate(datetime2 = ymd("1970-01-01") + days(doy - 1),
-           datetime2 = format(datetime2, "%Y-%m-%d %H:%M:%S"))
-  
-  
-  cascade.08.11.sonde <- cascade.08.11.sonde %>%
-    mutate(datetime2 = as.POSIXlt(paste(year, "-01-01", sep = "")) + 
-             doy * 86400,  # Convert fraction of day to seconds
-           datetime2 = format(datetime2, "%Y-%m-%d %H:%M:%S"))
-  
-  cascade.08.11.sonde <- cascade.08.11.sonde %>%
-    mutate(year2 = year, doy2 = yday(floor(doy)), times2 = times(doy %% 1))
-  
+cascade.sonde.temp.all = rbind(cascade.08.11.sonde, cascade.13.15.sonde) %>% mutate(doy = as.integer(doy))
 
 ### save files to csv ###
 write.csv(cascade.08.11.sonde, "./formatted data/Cascade hourly sonde data/Cascade hourly sonde data 2008 - 2011.csv", row.names = FALSE)
 write.csv(cascade.13.15.sonde, "./formatted data/Cascade hourly sonde data/Cascade hourly sonde data 2013 - 2015.csv", row.names = FALSE)
 
+write.csv(cascade.sonde.temp.all, "./formatted data/Cascade hourly sonde data/Cascade hourly sonde data 2008-2015.csv", row.names = FALSE)
 
 
 

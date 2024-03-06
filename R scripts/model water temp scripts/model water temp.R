@@ -759,5 +759,10 @@ saveRDS(tuesdayHW, file = "./results/heatwave modeled outputs/tuesday heatwave o
 
 
 ####### Model temperature with hourly data #########
+cascade.sonde.temp.all = read.csv("./formatted data/Cascade hourly sonde data/Cascade hourly sonde data 2008-2015.csv")
+
+# Add in the woodruff hourly and Sparkling Lake hourly data
+woodruff = read.csv("./formatted data/LTER daily temperature/woodruff airport temperature LTER.csv")
+woodruff = woodruff %>% rename(year = year4, date = sampledate, doy = daynum)
 
 

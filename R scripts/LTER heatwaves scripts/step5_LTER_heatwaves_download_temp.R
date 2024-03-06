@@ -269,5 +269,67 @@ TB.temp = dt1
 write.csv(TB.temp, "./formatted data/LTER daily temperature/Trout Bog daily temperature all depths.csv", row.names = FALSE)
 
 
+#### Download hourly temperature data for Sparkling to be used in temperature model ####
+
+inUrl2  <- "https://pasta.lternet.edu/package/data/eml/knb-lter-ntl/5/24/67b6b2c94be0a47c42d1307c680bbecb" 
+infile2 <- tempfile()
+try(download.file(inUrl2,infile2,method="curl"))
+if (is.na(file.size(infile2))) download.file(inUrl2,infile2,method="auto")
 
 
+dt2 <-read.csv(infile2,header=F 
+               ,skip=1
+               ,sep=","  
+               ,quot='"' 
+               , col.names=c(
+                 "year4",     
+                 "sampledate",     
+                 "hour",     
+                 "depth",     
+                 "wtemp",     
+                 "flag_wtemp"    ), check.names=TRUE)
+
+unlink(infile2)
+
+# Fix any interval or ratio columns mistakenly read in as nominal and nominal columns read as numeric or dates read as strings
+
+if (class(dt2$year4)=="factor") dt2$year4 <-as.numeric(levels(dt2$year4))[as.integer(dt2$year4) ]               
+if (class(dt2$year4)=="character") dt2$year4 <-as.numeric(dt2$year4)                                   
+# attempting to convert dt2$sampledate dateTime string to R date structure (date or POSIXct)                                
+tmpDateFormat<-"%Y-%m-%d"
+tmp2sampledate<-as.Date(dt2$sampledate,format=tmpDateFormat)
+# Keep the new dates only if they all converted correctly
+if(length(tmp2sampledate) == length(tmp2sampledate[!is.na(tmp2sampledate)])){dt2$sampledate <- tmp2sampledate } else {print("Date conversion failed for dt2$sampledate. Please inspect the data and do the date conversion yourself.")}                                                                    
+rm(tmpDateFormat,tmp2sampledate) 
+if (class(dt2$hour)=="factor") dt2$hour <-as.numeric(levels(dt2$hour))[as.integer(dt2$hour) ]               
+if (class(dt2$hour)=="character") dt2$hour <-as.numeric(dt2$hour)
+if (class(dt2$depth)=="factor") dt2$depth <-as.numeric(levels(dt2$depth))[as.integer(dt2$depth) ]               
+if (class(dt2$depth)=="character") dt2$depth <-as.numeric(dt2$depth)
+if (class(dt2$wtemp)=="factor") dt2$wtemp <-as.numeric(levels(dt2$wtemp))[as.integer(dt2$wtemp) ]               
+if (class(dt2$wtemp)=="character") dt2$wtemp <-as.numeric(dt2$wtemp)
+if (class(dt2$flag_wtemp)!="factor") dt2$flag_wtemp<- as.factor(dt2$flag_wtemp)
+
+# Convert Missing Values to NA for non-dates
+
+
+
+# Here is the structure of the input data frame:
+str(dt2)                            
+attach(dt2)                            
+# The analyses below are basic descriptions of the variables. After testing, they should be replaced.                 
+
+summary(year4)
+summary(sampledate)
+summary(hour)
+summary(depth)
+summary(wtemp)
+summary(flag_wtemp) 
+# Get more details on character variables
+
+summary(as.factor(dt2$flag_wtemp))
+detach(dt2)     
+
+
+sp.hourly = dt2
+
+write.csv(sp.hourly, "./formatted data/LTER hourly temperature/Sparkling Lake hourly temperature.csv", row.names = FALSE)
