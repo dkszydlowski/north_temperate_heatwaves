@@ -3,6 +3,8 @@
 
 library(tidyverse)
 
+library(chron)
+
 
 #### 2008 to 2011 ####
 # Package ID: knb-lter-ntl.360.2 Cataloging System:https://pasta.edirepository.org.
@@ -258,11 +260,59 @@ detach(dt1)
 
 cascade.13.15.sonde = dt1
 
+cascade.13.15.sonde = read.csv( "./formatted data/Cascade hourly sonde data 2013 - 2015.csv")
 
 
 
-#### 2018 + 2019 ####
+# format 2013-2015 data to be more compatible with 2008-2011 data
+cascade.13.15.sonde = cascade.13.15.sonde %>% rename(lake = Lake, year = Year, doy = DoY) 
 
+cascade.13.15.sonde <- cascade.13.15.sonde %>%
+  mutate(datetime = ymd("1970-01-01") + days(as.integer(doy * 365.25 + year - 1970)))
+
+cascade.13.15.sonde <- cascade.13.15.sonde %>%
+  mutate(time = times(doy %% 1)) %>% 
+  mutate(doy2 = as.integer(doy)) %>% 
+  
+
+  
+# the day of year fraction is the number of minutes into the day divided by 24*60
+
+
+    
+    
+
+      cascade.08.11.sonde$datetime2 <- as.POSIXlt(paste(cascade.08.11.sonde$year, "-01-01", sep = "")) + 
+    (cascade.08.11.sonde$doy - 1) * 86400
+  
+  # Format the datetime column
+  cascade.08.11.sonde$datetime2 <- format(cascade.08.11.sonde$datetime2, "%Y-%m-%d %H:%M:%S")
+  
+  # Print the updated dataframe
+  print(cascade.08.11.sonde$datetime2)  
+  
+  
+  cascade.08.11.sonde <- cascade.08.11.sonde %>%
+    mutate(datetime2 = ymd("1970-01-01") + days(doy - 1),
+           datetime2 = format(datetime, "%Y-%m-%d %H:%M:%S"))
+
+  cascade.08.11.sonde <- cascade.08.11.sonde %>%
+    mutate(datetime2 = ymd("1970-01-01") + days(doy - 1),
+           datetime2 = format(datetime2, "%Y-%m-%d %H:%M:%S"))
+  
+  
+  cascade.08.11.sonde <- cascade.08.11.sonde %>%
+    mutate(datetime2 = as.POSIXlt(paste(year, "-01-01", sep = "")) + 
+             doy * 86400,  # Convert fraction of day to seconds
+           datetime2 = format(datetime2, "%Y-%m-%d %H:%M:%S"))
+  
+  cascade.08.11.sonde <- cascade.08.11.sonde %>%
+    mutate(year2 = year, doy2 = yday(floor(doy)), times2 = times(doy %% 1))
+  
+
+### save files to csv ###
+write.csv(cascade.08.11.sonde, "./formatted data/Cascade hourly sonde data/Cascade hourly sonde data 2008 - 2011.csv", row.names = FALSE)
+write.csv(cascade.13.15.sonde, "./formatted data/Cascade hourly sonde data/Cascade hourly sonde data 2013 - 2015.csv", row.names = FALSE)
 
 
 

@@ -624,12 +624,17 @@ woodruff = woodruff %>% group_by(year, date, doy) %>%
 sonde.SP.woodruff = temp.sonde %>% left_join(SP.temp.1, by = c("doy", "date", "year"))
 sonde.SP.woodruff = sonde.SP.woodruff %>% left_join(woodruff, by = c("doy", "date", "year"))
 
+# add new lag columns in case we want to include time lags
+sonde.SP.woodruff = sonde.SP.woodruff %>% mutate(woodruff.temp.lag.1 = lead(woodruff.temp, 1))
+
+
 # run the model
-test = lmer(mean_temp~SP.temp.1 + (1|lake), data = sonde.SP.woodruff)
+test = lmer(mean_temp~SP.temp.1 + woodruff.temp + woodruff.temp.lag.1 + (1|lake), data = sonde.SP.woodruff)
 summary(test)
 r.squaredGLMM(test)
 
-summary(lm(sonde.SP.woodruff$mean_temp~sonde.SP.woodruff$SP.temp.1))
+# model with just sparkling lake temperature and air temperature
+# summary(lm(sonde.SP.woodruff$mean_temp~sonde.SP.woodruff$SP.temp.1))
 
 ### make a fitting dataset and a testing dataset
 
@@ -745,3 +750,14 @@ event_line(tuesdayHW, category = TRUE, start_date = "2013-05-15", end_date= "201
 saveRDS(paulHW, file = "./results/heatwave modeled outputs/paul heatwave outputs modeled.rds")
 saveRDS(peterHW, file = "./results/heatwave modeled outputs/peter heatwave outputs modeled.rds")
 saveRDS(tuesdayHW, file = "./results/heatwave modeled outputs/tuesday heatwave outputs modeled.rds")
+
+
+
+
+
+
+
+
+####### Model temperature with hourly data #########
+
+
