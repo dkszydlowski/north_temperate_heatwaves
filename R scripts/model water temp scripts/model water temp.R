@@ -603,11 +603,17 @@ temp.sonde = temp.sonde %>% mutate(date = as.Date(date))
 
 # Sparkling Lake temperature
 SP.temp = read.csv("./formatted data/LTER daily temperature/Sparkling Lake daily temperature all depths.csv")
+# 
+# SP.temp.1 = SP.temp %>% filter(depth == 0 | depth == 0.01 | (depth == 0.25 & year4 == 2013)) %>% 
+#   rename(year = year4, date = sampledate, doy = daynum) %>% select(-depth, -flag_wtemp) %>% 
+#   rename(SP.temp.1 = wtemp) %>% 
+#   mutate(date = as.Date(date))
 
-SP.temp.1 = SP.temp %>% filter(depth == 0 | depth == 0.01) %>% 
-  rename(year = year4, date = sampledate, doy = daynum) %>% select(-depth, -flag_wtemp) %>% 
-  rename(SP.temp.1 = wtemp) %>% 
+SP.temp.1 = SP.temp %>% filter(depth == 1) %>%
+  rename(year = year4, date = sampledate, doy = daynum) %>% select(-depth, -flag_wtemp) %>%
+  rename(SP.temp.1 = wtemp) %>%
   mutate(date = as.Date(date))
+
 
 # Woodruff airport temperature
 woodruff = read.csv("./formatted data/LTER daily temperature/woodruff airport temperature LTER.csv")
@@ -627,9 +633,8 @@ sonde.SP.woodruff = sonde.SP.woodruff %>% left_join(woodruff, by = c("doy", "dat
 # add new lag columns in case we want to include time lags
 sonde.SP.woodruff = sonde.SP.woodruff %>% mutate(woodruff.temp.lag.1 = lead(woodruff.temp, 1))
 
-
 # run the model
-test = lmer(mean_temp~SP.temp.1 + woodruff.temp + woodruff.temp.lag.1 + (1|lake), data = sonde.SP.woodruff)
+test = lmer(mean_temp~SP.temp.1* woodruff.temp +doy + (1|lake), data = sonde.SP.woodruff)
 summary(test)
 r.squaredGLMM(test)
 
@@ -655,6 +660,9 @@ SP.woodruff = rbind(SP.woodruffL, SP.woodruffR, SP.woodruffT)
 
 SP.woodruff$modeled.temp = predict(test, SP.woodruff)
 
+pdf("./figures/modeled temperature/modeled temperature daily sp 1 m.pdf", width = 12, height = 18)
+
+
 ggplot(SP.woodruff, aes(x = doy, y = modeled.temp, color = lake))+
    geom_line()+
   #geom_line(aes(x = doy, y = SP.temp.1, color = "black"), size = 1)+
@@ -665,8 +673,41 @@ ggplot(SP.woodruff, aes(x = doy, y = modeled.temp, color = lake))+
   ylim(15, 30)+
   theme_classic()
 
+dev.off()
+
+# compare the predicted temperature to the actual temperature
+SP.woodruff.cascade = temp.sonde %>% left_join(SP.woodruff, by = c("year", "date", "doy", "lake"))
+
+SP.woodruff.cascade.real.data = SP.woodruff.cascade %>% filter(!is.na(mean_temp))
+
+# pivot longer for plotting
+SP.woodruff.cascade.real.data = SP.woodruff.cascade.real.data %>% pivot_longer()
 
 
+SP.woodruff.cascade.real.data_long <- SP.woodruff.cascade.real.data %>%
+  pivot_longer(
+    cols = c("modeled.temp", "mean_temp"),
+    names_to = "temp.type",
+    values_to = "temperature"
+  )
+
+
+pdf("./figures/modeled temperature/modeled vs real temperature daily sp 1 m.pdf", width = 12, height = 12)
+
+ggplot(SP.woodruff.cascade.real.data_long, aes(x = doy, y = temperature, color = temp.type))+
+  geom_line(size = 1, alpha = 0.8)+
+  #geom_point()+
+  #geom_line(aes(x = doy, y = SP.temp.1, color = "black"), size = 1)+
+  facet_wrap(lake~year)+
+  labs( x = "day of year")+
+ # scale_color_manual(values = c("L" = "#ADDAE3", "R"=  "#4AB5C4", "T"=  "#BAAD8D"))  +
+ # strip.background = element_rect(fill = c(L = "#ADDAE3", R = "#4AB5C4", T = "#BAAD8D"), strip.text = element_text(color = "white"))+
+  xlim(152, 259)+
+  ylim(15, 30)+
+  theme_classic()
+
+
+dev.off()
 
 ##### Calculate heatwaves from the modeled data #####
 SP.woodruff.subset = SP.woodruff %>% filter(year %in% c(1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
@@ -763,6 +804,29 @@ cascade.sonde.temp.all = read.csv("./formatted data/Cascade hourly sonde data/Ca
 
 # Add in the woodruff hourly and Sparkling Lake hourly data
 woodruff = read.csv("./formatted data/LTER daily temperature/woodruff airport temperature LTER.csv")
-woodruff = woodruff %>% rename(year = year4, date = sampledate, doy = daynum)
+woodruff = woodruff %>% rename(year = year4, date = sampledate, doy = daynum) %>% 
+  select(year, date, doy, hour, avg_air_temp) %>% 
+  rename(woodruff.temp = avg_air_temp)
 
+sp.hourly = read.csv("./formatted data/LTER hourly temperature/Sparkling Lake hourly temperature.csv")
+
+# sp.hourly = sp.hourly %>% rename(date = sampledate, year = year4) %>% filter(depth == 0 | depth == 0.01)
+sp.hourly = sp.hourly %>% rename(date = sampledate, year = year4) %>% filter(depth == 1)
+
+sp.woodruff.hourly = left_join(woodruff, sp.hourly, by = c("year", "date", "hour")) %>% rename(sp.temp = wtemp)
+
+# Need to make the Cascade data hourly now
+cascade.sonde.temp.all = cascade.sonde.temp.all %>% mutate(hour = hour(ymd_hms(datetime))*100)
+
+cascade.sonde.temp.all = cascade.sonde.temp.all %>% group_by(lake, year, doy, hour) %>% summarize(temp = mean(temp, na.rm = TRUE))
+
+
+# add hourly sparkling woodruff data to Cascade
+cascade.sonde.temp.all = cascade.sonde.temp.all %>% left_join(sp.woodruff.hourly, by = c("year", "doy", "hour"))
+
+cascade.sonde.temp.all = cascade.sonde.temp.all %>% mutate(lead.woodruff.temp.5 = lead(woodruff.temp, 5))
+
+hourly.model = lmer(temp~sp.temp +woodruff.temp*lead.woodruff.temp.5 + doy + (1|lake), data = cascade.sonde.temp.all)
+summary(hourly.model)
+r.squaredGLMM(hourly.model)
 

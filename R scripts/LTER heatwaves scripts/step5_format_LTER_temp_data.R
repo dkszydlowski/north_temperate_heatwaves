@@ -16,6 +16,8 @@ SP.depths <- SP.temp %>%
   ungroup() %>% 
   mutate(lake = "Sparkling Lake")
 
+write.csv(SP.depths, "./formatted data/LTER daily temperature/SP lake depths by year.csv")
+
 TR.depths <- TR.temp %>%
   filter(depth < 2) %>% 
   group_by(year4) %>%
