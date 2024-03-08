@@ -553,6 +553,54 @@ Alldist <- allSlopes %>%
 
 
 
+ 
+# testing color
+
+
+allSlopes %>%
+  filter(period != "exclude after heatwave", daysAfter == get("daysAfter", envir=globalenv())) %>%
+ggplot(aes(x = percent_change, y = factor(period, levels = desired_order), fill = stat(x))) +
+  geom_density_ridges(alpha = 0.7,
+                      quantile_lines = TRUE,
+                      quantile_fun = function(x, ...) mean(x), 
+                      scale = 2, size = 0.7)+
+  scale_fill_gradientn( colours =  c("steelblue2", "forestgreen"), 
+                        breaks = c(seq(-200, 100, by = 1), seq(100, 600, by = 1)))+
+  labs(title = 'All Lakes')+
+  theme_classic()+
+  geom_text(data = mean_df %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+            aes(x = mean_percent_change,
+                y = factor(period, levels = desired_order),
+                label = as.character(round(mean_percent_change, digits = 0))),
+            color = "black",
+            size = 4,
+            vjust = 2) 
+
+
+allSlopes %>%
+  filter(period != "exclude after heatwave", lake == "R", daysAfter == get("daysAfter", envir=globalenv())) %>%
+  ggplot(aes(x = percent_change, y = factor(period, levels = desired_order), fill = stat(x))) +
+  geom_density_ridges_gradient(scale = 3, rel_min_height = 0.01) +
+  scale_fill_gradientn(colours = c("#4AB5C4", "forestgreen"),
+                       values = scales::rescale(c(-200, 300, 300, 600))) +
+  labs(title = 'All Lakes') +
+  theme_classic() +
+  geom_text(data = mean_df %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+            aes(x = mean_percent_change,
+                y = factor(period, levels = desired_order),
+                label = as.character(round(mean_percent_change, digits = 0))),
+            color = "black",
+            size = 4,
+            vjust = 2)
+
+
+
+#"R" = "#4AB5C4", "L" = "#ADDAE3", "T"=  "#BAAD8D"
+  
+  
+  
+
+# Tuesday
 Tdist <- allSlopes %>%
   filter(lake == "T") %>%
   filter(period != "exclude after heatwave", daysAfter == get("daysAfter", envir=globalenv())) %>%

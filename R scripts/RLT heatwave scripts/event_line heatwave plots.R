@@ -1,6 +1,7 @@
 # Script for making heatwave plots using event_line from heatwaveR
 
 library(tidyverse)
+library(heatwaveR)
 
 # read in the heatwave outputs
 peterHW = readRDS(file = "./results/heatwave modeled outputs/peter heatwave outputs modeled.rds")
@@ -65,13 +66,15 @@ for(i in 1:length(years)){
         geom_point() +
         geom_line(aes(x = doy, y = seas, color = "Climatology", linetype = "solid")) +
         geom_line(aes(x = doy, y = thresh, color = "Threshold", linetype = "solid")) +
-        geom_line(aes(x = doy, y = thresh2, color = "2x Threshold", linetype = "solid")) +
+       # geom_line(aes(x = doy, y = thresh2, color = "2x Threshold", linetype = "solid")) +
         theme_classic() +
-        labs(title = paste(cur.lake, years[i], sep = " ")) +
+        labs(title = paste(cur.lake, years[i], sep = " "), y = "Temperature [°C]", x = "day of year") +
         ylim(12, 30) +
-        scale_color_manual(values = c("black", "black", "forestgreen", "black")) +
-      #  scale_linetype_manual(values = c("solid", "solid", "dotted", "dashed")) +
-        guides(color = guide_legend(title = "", override.aes = list(linetype = "solid"))))
+        scale_color_manual(values = c("black", "black", "forestgreen", "black"), 
+                           guide = guide_legend(title = NULL, override.aes = list(linetype = "solid")))+
+         guides(linetype = FALSE))
+      #  scale_linetype_manual(values = c("solid", "solid", "dotted", "dashed"), ) +
+      #  guides(color = guide_legend(title = "", override.aes = list(linetype = "solid"))))
       
       
     })

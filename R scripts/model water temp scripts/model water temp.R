@@ -634,9 +634,13 @@ sonde.SP.woodruff = sonde.SP.woodruff %>% left_join(woodruff, by = c("doy", "dat
 sonde.SP.woodruff = sonde.SP.woodruff %>% mutate(woodruff.temp.lag.1 = lead(woodruff.temp, 1))
 
 # run the model
-test = lmer(mean_temp~SP.temp.1* woodruff.temp +doy + (1|lake), data = sonde.SP.woodruff)
+test = lmer(mean_temp~SP.temp.1+ woodruff.temp +doy + (1|lake), data = sonde.SP.woodruff)
 summary(test)
 r.squaredGLMM(test)
+
+plot(test)
+
+qqnorm(residuals(test))
 
 # model with just sparkling lake temperature and air temperature
 # summary(lm(sonde.SP.woodruff$mean_temp~sonde.SP.woodruff$SP.temp.1))
@@ -664,7 +668,7 @@ pdf("./figures/modeled temperature/modeled temperature daily sp 1 m.pdf", width 
 
 
 ggplot(SP.woodruff, aes(x = doy, y = modeled.temp, color = lake))+
-   geom_line()+
+   geom_line(size = 0.9)+
   #geom_line(aes(x = doy, y = SP.temp.1, color = "black"), size = 1)+
   facet_wrap(~year)+
   labs(y = "modeled temperature", x = "day of year")+
@@ -735,8 +739,32 @@ peterHW = detect_event(modeled.climOutputR)
 modeled.climOutputT = ts2clm(modeled.heatwaveR.T, climatologyPeriod = c(min(modeled.heatwaveR.T$t), max(modeled.heatwaveR.T$t)))
 tuesdayHW = detect_event(modeled.climOutputT)
 
-View(paulHW$event)
 
+
+modeled.climOutputL = ts2clm(modeled.heatwaveR.L, climatologyPeriod = c(min(modeled.heatwaveR.L$t), max(modeled.heatwaveR.L$t)))
+paulHW.categories = detect_event(modeled.climOutputL, categories = TRUE)
+
+modeled.climOutputR = ts2clm(modeled.heatwaveR.R, climatologyPeriod = c(min(modeled.heatwaveR.R$t), max(modeled.heatwaveR.R$t)))
+peterHW.categories = detect_event(modeled.climOutputR, categories = TRUE)
+
+modeled.climOutputT = ts2clm(modeled.heatwaveR.T, climatologyPeriod = c(min(modeled.heatwaveR.T$t), max(modeled.heatwaveR.T$t)))
+tuesdayHW.categories = detect_event(modeled.climOutputT, categories = TRUE)
+
+
+# # check if increasing heatwave frequency over time
+# paul.hw.modeled.temp = paulHW$event %>% mutate(year = year(date_start))
+# 
+# paul.n.hw = paul.hw.modeled.temp %>% group_by(year) %>% summarize(n = n())
+# 
+# years = c(1991:2022)
+# 
+# paul.n.hw.all.years = data.frame(year = years)
+# paul.n.hw.all.years = paul.n.hw.all.years %>% left_join(paul.n.hw, by = c("year")) %>% mutate(n = replace(n, is.na(n), 0))
+# 
+# ggplot(paul.n.hw.all.years, aes(x = year,  y = n))+
+#   geom_line()+
+#   geom_point()+
+#   geom_smooth(method = "lm")
 
 # apply the new climatology and thresholds to the old data
 # Paul
@@ -749,6 +777,7 @@ climatology = modeled.climOutputL %>% filter(year(t) == 1990) %>%  select(doy, s
 L.climatology = left_join(L.temp.sonde, climatology, by = c("doy"), relationship = "many-to-many")
 
 paulHW = detect_event(L.climatology)
+paulHW.categories = detect_event(L.climatology, categories = TRUE)
 
 View(paulHW$event)
 
@@ -767,6 +796,7 @@ R.climatology = left_join(R.temp.sonde, climatology, by = c("doy"), relationship
 peterHW = detect_event(R.climatology)
 
 View(peterHW$event)
+peterHW.categories = detect_event(R.climatology, categories = TRUE)
 
 event_line(peterHW, category = TRUE, start_date = "2019-05-15", end_date= "2019-09-15")+geom_point()+
   theme_classic()
@@ -782,17 +812,21 @@ climatology = modeled.climOutputT %>% filter(year(t) == 1990) %>%  select(doy, s
 T.climatology = left_join(T.temp.sonde, climatology, by = c("doy"), relationship = "many-to-many")
 
 tuesdayHW = detect_event(T.climatology)
+tuesdayHW.categories = detect_event(T.climatology, categories = TRUE)
 
 View(tuesdayHW$event)
 
 event_line(tuesdayHW, category = TRUE, start_date = "2013-05-15", end_date= "2013-09-15")+geom_point()+
   theme_classic()
 
+
 saveRDS(paulHW, file = "./results/heatwave modeled outputs/paul heatwave outputs modeled.rds")
 saveRDS(peterHW, file = "./results/heatwave modeled outputs/peter heatwave outputs modeled.rds")
 saveRDS(tuesdayHW, file = "./results/heatwave modeled outputs/tuesday heatwave outputs modeled.rds")
 
-
+saveRDS(paulHW.categories, file = "./results/heatwave modeled outputs/paul heatwave outputs modeled categories.rds")
+saveRDS(peterHW.categories, file = "./results/heatwave modeled outputs/peter heatwave outputs modeled categories.rds")
+saveRDS(tuesdayHW.categories, file = "./results/heatwave modeled outputs/tuesday heatwave outputs modeled categories.rds")
 
 
 
