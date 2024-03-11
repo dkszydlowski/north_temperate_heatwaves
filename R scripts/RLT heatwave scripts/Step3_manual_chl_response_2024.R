@@ -115,7 +115,10 @@ metadata_plot <- ggplot() +
 #==============================================================================#
 #### read in the data ####
 # read in the heatwaves data calculated in the previous step
-heatwaves = read.csv("./formatted data/heatwavesdata.csv")
+# heatwaves = read.csv("./formatted data/heatwavesdata.csv")
+
+heatwaves = read.csv("./results/heatwave modeled outputs/heatwave events LRT.csv")
+
 
 # read in the manual chl data
 allData = read.csv("./formatted data/interpolated_manual_chl_for_slopes.csv")
@@ -259,7 +262,7 @@ hwSlopes <- function(heatwaveStart, heatwaveEnd,  targLake, data){
    annotate("text",  x=Inf, y = Inf, label = paste("Number of slopes averaged per event: ", numSlopes, sep = ""), vjust=2.5, hjust=1)
 
 
-
+write.csv(heatwaves, "./formatted data/explanatory variables heatwaves/heatwaves with percent.csv")
 
 
 #==============================================================================#
@@ -328,7 +331,8 @@ for(daysAfterLoop in 0:20){
 }
 
 # update so that we are not excluding other dates after the heatwave
-allSlopes = allSlopes %>% mutate(period = replace(period, period == "exclude after heatwave", "all other days"))
+allSlopes = allSlopes %>% mutate(period = replace(period, period == "exclude after heatwave", "all other days")) %>%
+  mutate(period = replace(period, period == "during heatwave", "all other days"))
 
 
 # save the allPercent data to a dataframe
@@ -557,35 +561,17 @@ Alldist <- allSlopes %>%
 # testing color
 
 
-allSlopes %>%
-  filter(period != "exclude after heatwave", daysAfter == get("daysAfter", envir=globalenv())) %>%
-ggplot(aes(x = percent_change, y = factor(period, levels = desired_order), fill = stat(x))) +
-  geom_density_ridges(alpha = 0.7,
-                      quantile_lines = TRUE,
-                      quantile_fun = function(x, ...) mean(x), 
-                      scale = 2, size = 0.7)+
-  scale_fill_gradientn( colours =  c("steelblue2", "forestgreen"), 
-                        breaks = c(seq(-200, 100, by = 1), seq(100, 600, by = 1)))+
-  labs(title = 'All Lakes')+
-  theme_classic()+
-  geom_text(data = mean_df %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
-            aes(x = mean_percent_change,
-                y = factor(period, levels = desired_order),
-                label = as.character(round(mean_percent_change, digits = 0))),
-            color = "black",
-            size = 4,
-            vjust = 2) 
 
 
 allSlopes %>%
-  filter(period != "exclude after heatwave", lake == "R", daysAfter == get("daysAfter", envir=globalenv())) %>%
+  filter(period != "exclude after heatwave", lake == "L", daysAfter == get("daysAfter", envir=globalenv())) %>%
   ggplot(aes(x = percent_change, y = factor(period, levels = desired_order), fill = stat(x))) +
   geom_density_ridges_gradient(scale = 3, rel_min_height = 0.01) +
   scale_fill_gradientn(colours = c("#4AB5C4", "forestgreen"),
                        values = scales::rescale(c(-200, 300, 300, 600))) +
   labs(title = 'All Lakes') +
   theme_classic() +
-  geom_text(data = mean_df %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+  geom_text(data = mean_dfL %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
             aes(x = mean_percent_change,
                 y = factor(period, levels = desired_order),
                 label = as.character(round(mean_percent_change, digits = 0))),

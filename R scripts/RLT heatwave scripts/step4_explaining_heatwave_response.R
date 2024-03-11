@@ -2,6 +2,7 @@
 # compare to color and TP
 
 library(readxl)
+library(lme4)
 
 
 ### Old code with old values 
@@ -53,8 +54,37 @@ tuesdayHW = tuesdayHW %>% mutate(lake = "T")
 
 hw.all = rbind(peterHW, paulHW, tuesdayHW) %>% select(-season)
 
+hw.all = hw.all %>% mutate(year = year(date_start), lake_year = paste(lake, year, sep = "_"))
+
+write.csv(hw.all, "./results/heatwave modeled outputs/heatwave events LRT.csv", row.names = FALSE)
 
 
 
 
 
+
+
+# check if heatwave characteristics are at all related to heatwave response
+heatwave.char = read.csv("./formatted data/explanatory variables heatwaves/heatwaves with percent.csv")
+
+
+global.model = lm(data = heatwave.char, percentChange ~ intensity_max+     +   intensity_mean    +                        +   intensity_max    +                         +   intensity_var    +                    
+      +   intensity_cumulative    +                  +   intensity_mean_relThresh    +              +   intensity_max_relThresh    +          
+       +   intensity_var_relThresh    +               +   intensity_cumulative_relThresh    +        +   intensity_mean_abs    +               
+        +   intensity_max_abs    +                     +   intensity_var_abs    +                     +   intensity_cumulative_abs    +         
+       +   rate_onset    +                            +   rate_decline,    na.action = na.pass)
+
+summary(lm(data = heatwave.char, ))
+
+
+summary(global.model)
+dredge(global.model)
+
+
+
+
+
+
+
+
+#### Gather stats on the lakes as a whole during this time period
