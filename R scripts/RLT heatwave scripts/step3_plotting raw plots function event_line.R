@@ -4,16 +4,16 @@
 library(dplyr)
 library(ggpubr)
 
-slopes = read.csv("./formatted data/slopes.csv")
-slopes = read.csv("./formatted data/slopes_3day.csv")
+#slopes = read.csv("./formatted data/slopes.csv")
+#slopes = read.csv("./formatted data/slopes_3day.csv")
 
-slopes = slopes %>% dplyr::rename(doy = doyCat)
+#slopes = slopes %>% dplyr::rename(doy = doyCat)
 
 # pdf("./figures/Heatwave raw data plots/temp_chl_heatwaves_slopes_7day.pdf", onefile = TRUE)
 
 # set the number of days after heatwave and number of days to include
-daysAfter = 1 # 3 days after heatwave
-numSlopes = 5 # 5-day numSlopes
+#daysAfter = 1 # 3 days after heatwave
+#numSlopes = 5 # 5-day numSlopes
 
 makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runNumber){
   
@@ -23,121 +23,150 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
   # make all of the event_line plots so they are not plotted to the pdf
   l08temp = event_line_DKS("paul", 2008)+
     labs(title = "Paul 2008")+
-    theme(legend.position="none")
+    theme(legend.position="none")+
+    xlim(140, 250)
   
   r08temp = event_line_DKS("peter", 2008)+
     labs(title = "Peter 2008")+
-    theme(legend.position="none")
+    theme(legend.position="none")+
+    xlim(140, 250)
   
   l09temp = event_line_DKS("paul", 2009)+
     labs(title = "Paul 2009")+
-    theme(legend.position="none")
+    theme(legend.position="none")+
+    xlim(140, 250)
   
   r09temp = event_line_DKS("peter", 2009)+
     labs(title = "Peter 2009")+
-    theme(legend.position="none")
+    theme(legend.position="none")+
+    xlim(140, 250)
   
   l10temp = event_line_DKS("paul", 2010)+
     labs(title = "Paul 2010")+
-    theme(legend.position="none")
+    theme(legend.position="none")+
+    xlim(140, 250)
   
   r10temp = event_line_DKS("peter", 2010)+
     labs(title = "Peter 2010")+
-    theme(legend.position="none")
+    theme(legend.position="none")+
+    xlim(140, 250)
   
   l11temp = event_line_DKS("paul", 2011)+
     labs(title = "Paul 2011")+
-    theme(legend.position="none")
+    theme(legend.position="none")+
+    xlim(140, 250)
   
   r11temp = event_line_DKS("peter", 2011)+
     labs(title = "Peter 2011")+
-    theme(legend.position="none")
+    theme(legend.position="none")+
+    xlim(140, 250)
   
   l10temp = event_line_DKS("paul", 2010)+
     labs(title = "Paul 2010")+
-    theme(legend.position="none")
+    theme(legend.position="none")+
+    xlim(140, 250)
   
   r10temp = event_line_DKS("peter", 2010)+
     labs(title = "Peter 2010")+
-    theme(legend.position="none")
+    theme(legend.position="none")+
+    xlim(140, 250)
   
   l13temp = event_line_DKS("paul", 2013)+
     labs(title = "Paul 2013")+
-    theme(legend.position="none")
+    theme(legend.position="none")+
+    xlim(140, 250)
   
   r13temp = event_line_DKS("peter", 2013)+
     labs(title = "Peter 2013")+
-    theme(legend.position="none")
+    theme(legend.position="none")+
+    xlim(140, 250)
   
   
   l10temp = event_line_DKS("paul", 2010)+
     labs(title = "Paul 2010")+
-    theme(legend.position="none")
+    theme(legend.position="none")+
+    xlim(140, 250)
   
   r10temp = event_line_DKS("peter", 2010)+
     labs(title = "Peter 2010")+
-    theme(legend.position="none")
+    theme(legend.position="none")+
+    xlim(140, 250)
   
   l14temp = event_line_DKS("paul", 2014)+
     labs(title = "Paul 2014")+
-    theme(legend.position="none")
+    theme(legend.position="none")+
+    xlim(140, 250)
   
   r14temp = event_line_DKS("peter", 2014)+
     labs(title = "Peter 2014")+
-    theme(legend.position="none")
+    theme(legend.position="none")+
+    xlim(140, 250)
   
   l10temp = event_line_DKS("paul", 2010)+
     labs(title = "Paul 2010")+
-    theme(legend.position="none")
+    theme(legend.position="none")+
+    xlim(140, 250)
   
   r10temp = event_line_DKS("peter", 2010)+
     labs(title = "Peter 2010")+
-    theme(legend.position="none")
+    theme(legend.position="none")+
+    xlim(140, 250)
   
   l15temp = event_line_DKS("paul", 2015)+
     labs(title = "Paul 2015")+
-    theme(legend.position="none")
+    theme(legend.position="none")+
+    xlim(140, 250)
   
   r15temp = event_line_DKS("peter", 2015)+
     labs(title = "Peter 2015")+
-    theme(legend.position="none")
+    theme(legend.position="none")+
+    xlim(140, 250)
   
   
   l10temp = event_line_DKS("paul", 2010)+
     labs(title = "Paul 2010")+
-    theme(legend.position="none")
+    theme(legend.position="none")+
+    xlim(140, 250)
   
   r10temp = event_line_DKS("peter", 2010)+
     labs(title = "Peter 2010")+
-    theme(legend.position="none")
+    theme(legend.position="none")+
+    xlim(140, 250)
   
   l18temp = event_line_DKS("paul", 2018)+
     labs(title = "Paul 2018")+
-    theme(legend.position="none")
+    theme(legend.position="none")+
+    xlim(140, 250)
   
   r18temp = event_line_DKS("peter", 2018)+
     labs(title = "Peter 2018")+
-    theme(legend.position="none")
+    theme(legend.position="none")+
+    xlim(140, 250)
   
   l19temp = event_line_DKS("paul", 2019)+
     labs(title = "Paul 2019")+
-    theme(legend.position="none")
+    theme(legend.position="none")+
+    xlim(140, 250)
   
   r19temp = event_line_DKS("peter", 2019)+
     labs(title = "Peter 2019")+
-    theme(legend.position="none")
+    theme(legend.position="none")+
+    xlim(140, 250)
   
   t13temp = event_line_DKS("tuesday", 2013)+
     labs(title = "Tuesday 2013")+
-    theme(legend.position="none")
+    theme(legend.position="none")+
+    xlim(140, 250)
   
   t14temp = event_line_DKS("tuesday", 2014)+
     labs(title = "Tuesday 2014")+
-    theme(legend.position="none")
+    theme(legend.position="none")+
+    xlim(140, 250)
   
   t15temp = event_line_DKS("tuesday", 2015)+
     labs(title = "Tuesday 2015")+
-    theme(legend.position="none")
+    theme(legend.position="none")+
+    xlim(140, 250)
   
   
   
@@ -145,14 +174,14 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
   
   print(metadata_plot)
   
-  slopes = allSlopes %>% filter(daysAfter ==0)
+  slopes = allSlopes %>% filter(daysAfter == 0)
   slopes = slopes %>% dplyr::rename(doy = doyCat)
   
-  
-  slopes.other = slopes %>% filter(period == "all other days")
-  slopes.hw = slopes %>% filter(period == "after heatwave")
-  
-  t.test(slopes.other$percent_change, slopes.hw$percent_change)
+  # 
+  # slopes.other = slopes %>% filter(period == "all other days")
+  # slopes.hw = slopes %>% filter(period == "after heatwave")
+  # 
+  # t.test(slopes.other$percent_change, slopes.hw$percent_change)
   
   # save to a pdf with a similar name to the data outputs
   
@@ -165,27 +194,44 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
   l08slope = ggplot(data = l08, aes( x = doy, y = chl_slope))+
     geom_line(color = "black", size = 1)+
     theme_classic()+
-    ylim(-4.1, 4.5)
+    ylim(-4.1, 4.5)+
+    labs(y = "Chlorophyll slope (μg/L/day)")+
+    xlim(140, 250)
   
   l08percent_change = ggplot(data = l08, aes( x = doy, y = percent_change))+
     geom_line(color = "black", size = 1)+
-    theme_classic()
+    theme_classic()+
+    xlim(140, 250)
   
   l08chl = ggplot(data = l08, aes(x = doy, y = manual_chl))+
     geom_line(color = "forestgreen", size = 1)+
-    theme_classic()
+    theme_classic()+
+    labs(y = "Chlorophyll (μg/L)")+
+    xlim(140, 250)
   
+  l13.after.hw = l13 %>% filter(period == "after heatwave")
+  
+  ggplot(l13, aes(x = doy, y = mean_temp)) +
+    geom_line() +
+    geom_rect(data = subset(l13, period == "after heatwave"), aes(xmin = doy, xmax = lead(doy), ymin = -Inf, ymax = Inf), fill = "red", alpha = 0.2) +
+    labs(x = "Day of Year", y = "Percent Change") +
+    theme_classic()+
+    xlim(140, 250)
 
   
   # Peter
   r08slope = ggplot(data = r08, aes( x = doy, y = chl_slope))+
     geom_line(color = "black", size = 1)+
     theme_classic()+
-    ylim(-4.1, 4.5)
+    ylim(-4.1, 4.5)+
+    labs(y = "Chlorophyll slope (μg/L/day)")+
+    xlim(140, 250)
   
   r08chl = ggplot(data = r08, aes(x = doy, y = manual_chl))+
     geom_line(color = "forestgreen", size = 1)+
-    theme_classic()
+    theme_classic()+
+    labs(y = "Chlorophyll (μg/L)")+
+    xlim(140, 250)
   
 
   
@@ -205,11 +251,15 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     annotate("rect", xmin = as.Date(171), xmax = as.Date(178), ymin = -Inf, ymax = Inf,
              fill = "red", alpha = 0.5)+
     annotate("rect", xmin = as.Date(178+daysAfter - slopeLength), xmax = as.Date(178+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-             fill = "steelblue", alpha = 0.5)
+             fill = "steelblue", alpha = 0.5)+
+    labs(y = "Chlorophyll slope (μg/L/day)")+
+    xlim(140, 250)
   
   l09chl = ggplot(data = l09, aes(x = doy, y = manual_chl))+
     geom_line(color = "forestgreen", size = 1)+
-    theme_classic()
+    theme_classic()+
+    labs(y = "Chlorophyll (μg/L)")+
+    xlim(140, 250)
   
 
   
@@ -221,7 +271,9 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     annotate("rect", xmin = as.Date(171), xmax = as.Date(178), ymin = -Inf, ymax = Inf,
              fill = "red", alpha = 0.5)+
     annotate("rect", xmin = as.Date(178+daysAfter - slopeLength), xmax = as.Date(178+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-             fill = "steelblue", alpha = 0.5)
+             fill = "steelblue", alpha = 0.5)+
+    labs(y = "Chlorophyll slope (μg/L/day)")+
+    xlim(140, 250)
   
   
   r09slope = ggplot(data = r09, aes( x = doy, y = percent_change))+
@@ -231,11 +283,15 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     annotate("rect", xmin = as.Date(171), xmax = as.Date(178), ymin = -Inf, ymax = Inf,
              fill = "red", alpha = 0.5)+
     annotate("rect", xmin = as.Date(178+daysAfter - slopeLength), xmax = as.Date(178+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-             fill = "steelblue", alpha = 0.5)
+             fill = "steelblue", alpha = 0.5)+
+    labs(y = "Chlorophyll slope (μg/L/day)")+
+    xlim(140, 250)
   
   r09chl = ggplot(data = r09, aes(x = doy, y = manual_chl))+
     geom_line(color = "forestgreen", size = 1)+
-    theme_classic()
+    theme_classic()+
+    labs(y = "Chlorophyll (μg/L)")+
+    xlim(140, 250)
   
 
   
@@ -259,20 +315,24 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     annotate("rect", xmin = as.Date(154+daysAfter - slopeLength), xmax = as.Date(154+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
              fill = "steelblue", alpha = 0.5)+
     annotate("rect", xmin = as.Date(227+daysAfter - slopeLength), xmax = as.Date(227+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-             fill = "steelblue", alpha = 0.5)
+             fill = "steelblue", alpha = 0.5)+
+    labs(y = "Chlorophyll slope (μg/L/day)")+
+    xlim(140, 250)
   
   l10chl = ggplot(data = l10, aes(x = doy, y = manual_chl))+
     geom_line(color = "forestgreen", size = 1)+
-    theme_classic()
-  
-  l10temp = ggplot(data = l10, aes(x = doy, y = mean_temp))+
-    geom_line(color = "steelblue", size = 1)+
     theme_classic()+
-    labs(title = "Paul 2010")+
-    annotate("rect", xmin = as.Date(144), xmax = as.Date(154), ymin = -Inf, ymax = Inf,
-             fill = "red", alpha = 0.5)+
-    annotate("rect", xmin = as.Date(221), xmax = as.Date(227), ymin = -Inf, ymax = Inf,
-             fill = "red", alpha = 0.5)
+    labs(y = "Chlorophyll (μg/L)")+
+    xlim(140, 250)
+  
+  # l10temp = ggplot(data = l10, aes(x = doy, y = mean_temp))+
+  #   geom_line(color = "steelblue", size = 1)+
+  #   theme_classic()+
+  #   labs(title = "Paul 2010")+
+  #   annotate("rect", xmin = as.Date(144), xmax = as.Date(154), ymin = -Inf, ymax = Inf,
+  #            fill = "red", alpha = 0.5)+
+  #   annotate("rect", xmin = as.Date(221), xmax = as.Date(227), ymin = -Inf, ymax = Inf,
+  #            fill = "red", alpha = 0.5)
   
   
   # Peter
@@ -287,12 +347,16 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     annotate("rect", xmin = as.Date(154+daysAfter - slopeLength), xmax = as.Date(154+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
              fill = "steelblue", alpha = 0.5)+
     annotate("rect", xmin = as.Date(227+daysAfter - slopeLength), xmax = as.Date(227+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-             fill = "steelblue", alpha = 0.5)
+             fill = "steelblue", alpha = 0.5)+
+    labs(y = "Chlorophyll slope (μg/L/day)")+
+    xlim(140, 250)
   
   
   r10chl = ggplot(data = r10, aes(x = doy, y = manual_chl))+
     geom_line(color = "forestgreen", size = 1)+
-    theme_classic()
+    theme_classic()+
+    labs(y = "Chlorophyll (μg/L)")+
+    xlim(140, 250)
   
   
   # r10temp = ggplot(data = r10, aes(x = doy, y = mean_temp))+
@@ -323,11 +387,15 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     annotate("rect", xmin = as.Date(199), xmax = as.Date(205), ymin = -Inf, ymax = Inf,
              fill = "red", alpha = 0.5)+
     annotate("rect", xmin = as.Date(205+daysAfter - slopeLength), xmax = as.Date(205+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-             fill = "steelblue", alpha = 0.5)
+             fill = "steelblue", alpha = 0.5)+
+    labs(y = "Chlorophyll slope (μg/L/day)")+
+    xlim(140, 250)
   
   l11chl = ggplot(data = l11, aes(x = doy, y = manual_chl))+
     geom_line(color = "forestgreen", size = 1)+
-    theme_classic()
+    theme_classic()+
+    labs(y = "Chlorophyll (μg/L)")+
+    xlim(140, 250)
   
   
   # l11temp = ggplot(data = l11, aes(x = doy, y = mean_temp))+
@@ -346,11 +414,15 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     annotate("rect", xmin = as.Date(199), xmax = as.Date(205), ymin = -Inf, ymax = Inf,
              fill = "red", alpha = 0.5)+
     annotate("rect", xmin = as.Date(205+daysAfter - slopeLength), xmax = as.Date(205+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-             fill = "steelblue", alpha = 0.5)
+             fill = "steelblue", alpha = 0.5)+
+    labs(y = "Chlorophyll slope (μg/L/day)")+
+    xlim(140, 250)
   
   r11chl = ggplot(data = r11, aes(x = doy, y = manual_chl))+
     geom_line(color = "forestgreen", size = 1)+
-    theme_classic()
+    theme_classic()+
+    labs(y = "Chlorophyll (μg/L)")+
+    xlim(140, 250)
   
   # r11temp = ggplot(data = r11, aes(x = doy, y = mean_temp))+
   #   geom_line(color = "steelblue", size = 1)+
@@ -381,11 +453,15 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     annotate("rect", xmin = as.Date(190 + daysAfter), xmax = as.Date(190+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
              fill = "steelblue", alpha = 0.5)+
     annotate("rect", xmin = as.Date(201+daysAfter - slopeLength), xmax = as.Date(201+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-             fill = "steelblue", alpha = 0.5)
+             fill = "steelblue", alpha = 0.5)+
+    labs(y = "Chlorophyll slope (μg/L/day)")+
+    xlim(140, 250)
   
   t13chl = ggplot(data = t13, aes(x = doy, y = manual_chl))+
     geom_line(color = "forestgreen", size = 1)+
-    theme_classic()
+    theme_classic()+
+    xlim(140, 250)+
+    labs(y = "Chlorophyll (μg/L)")
   
   # t13temp = ggplot(data = t13, aes(x = doy, y = mean_temp))+
   #   geom_line(color = "steelblue", size = 1)+
@@ -405,18 +481,22 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     annotate("rect", xmin = as.Date(196), xmax = as.Date(201), ymin = -Inf, ymax = Inf,
              fill = "red", alpha = 0.5)+
     annotate("rect", xmin = as.Date(201+daysAfter - slopeLength), xmax = as.Date(201+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-             fill = "steelblue", alpha = 0.5)
+             fill = "steelblue", alpha = 0.5)+
+    labs(y = "Chlorophyll slope (μg/L/day)")+
+    xlim(140, 250)
   
   l13chl = ggplot(data = l13, aes(x = doy, y = manual_chl))+
     geom_line(color = "forestgreen", size = 1)+
-    theme_classic()
-  
-  l13temp = ggplot(data = l13, aes(x = doy, y = mean_temp))+
-    geom_line(color = "steelblue", size = 1)+
     theme_classic()+
-    labs(title = "Paul 2013")+
-    annotate("rect", xmin = as.Date(196), xmax = as.Date(201), ymin = -Inf, ymax = Inf,
-             fill = "red", alpha = 0.5)
+    labs(y = "Chlorophyll (μg/L)")+
+    xlim(140, 250)
+  
+  # l13temp = ggplot(data = l13, aes(x = doy, y = mean_temp))+
+  #   geom_line(color = "steelblue", size = 1)+
+  #   theme_classic()+
+  #   labs(title = "Paul 2013")+
+  #   annotate("rect", xmin = as.Date(196), xmax = as.Date(201), ymin = -Inf, ymax = Inf,
+  #            fill = "red", alpha = 0.5)
   
   
   # Peter
@@ -427,11 +507,15 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     annotate("rect", xmin = as.Date(196), xmax = as.Date(201), ymin = -Inf, ymax = Inf,
              fill = "red", alpha = 0.5)+
     annotate("rect", xmin = as.Date(201+daysAfter - slopeLength), xmax = as.Date(201+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-             fill = "steelblue", alpha = 0.5)
+             fill = "steelblue", alpha = 0.5)+
+    labs(y = "Chlorophyll slope (μg/L/day)")+
+    xlim(140, 250)
   
   r13chl = ggplot(data = r13, aes(x = doy, y = manual_chl))+
     geom_line(color = "forestgreen", size = 1)+
-    theme_classic()
+    theme_classic()+
+    labs(y = "Chlorophyll (μg/L)")+
+    xlim(140, 250)
   
   # r13temp = ggplot(data = r13, aes(x = doy, y = mean_temp))+
   #   geom_line(color = "steelblue", size = 1)+
@@ -456,11 +540,15 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     annotate("rect", xmin = as.Date(146), xmax = as.Date(154), ymin = -Inf, ymax = Inf,
              fill = "red", alpha = 0.5)+
     annotate("rect", xmin = as.Date(154+daysAfter - slopeLength), xmax = as.Date(154+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-             fill = "steelblue", alpha = 0.5)
+             fill = "steelblue", alpha = 0.5)+
+    labs(y = "Chlorophyll slope (μg/L/day)")+
+    xlim(140, 250)
   
   t14chl = ggplot(data = t14, aes(x = doy, y = manual_chl))+
     geom_line(color = "forestgreen", size = 1)+
-    theme_classic()
+    theme_classic()+
+    labs(y = "Chlorophyll (μg/L)")+
+    xlim(140, 250)
   
   # t14temp = ggplot(data = t14, aes(x = doy, y = mean_temp))+
   #   geom_line(color = "steelblue", size = 1)+
@@ -474,11 +562,15 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
   l14slope = ggplot(data = l14, aes( x = doy, y = chl_slope))+
     geom_line(color = "black", size = 1)+
     theme_classic()+
-    ylim(-4.1, 4.5)
+    ylim(-4.1, 4.5)+
+    labs(y = "Chlorophyll slope (μg/L/day)")+
+    xlim(140, 250)
   
   l14chl = ggplot(data = l14, aes(x = doy, y = manual_chl))+
     geom_line(color = "forestgreen", size = 1)+
-    theme_classic()
+    theme_classic()+
+    labs(y = "Chlorophyll (μg/L)")+
+    xlim(140, 250)
   
   # l14temp = ggplot(data = l14, aes(x = doy, y = mean_temp))+
   #   geom_line(color = "steelblue", size = 1)+
@@ -494,11 +586,15 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     annotate("rect", xmin = as.Date(149), xmax = as.Date(153), ymin = -Inf, ymax = Inf,
              fill = "red", alpha = 0.5)+
     annotate("rect", xmin = as.Date(153+daysAfter - slopeLength), xmax = as.Date(153+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-             fill = "steelblue", alpha = 0.5)
+             fill = "steelblue", alpha = 0.5)+
+    labs(y = "Chlorophyll slope (μg/L/day)")+
+    xlim(140, 250)
   
   r14chl = ggplot(data = r14, aes(x = doy, y = manual_chl))+
     geom_line(color = "forestgreen", size = 1)+
-    theme_classic()
+    theme_classic()+
+    labs(y = "Chlorophyll (μg/L)")+
+    xlim(140, 250)
   
   # r14temp = ggplot(data = l14, aes(x = doy, y = mean_temp))+
   #   geom_line(color = "steelblue", size = 1)+
@@ -529,11 +625,15 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     annotate("rect", xmin = as.Date(210+daysAfter - slopeLength), xmax = as.Date(210+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
              fill = "steelblue", alpha = 0.5)+
     annotate("rect", xmin = as.Date(230+daysAfter - slopeLength), xmax = as.Date(230+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-             fill = "steelblue", alpha = 0.5)
+             fill = "steelblue", alpha = 0.5)+
+    labs(y = "Chlorophyll slope (μg/L/day)")+
+    xlim(140, 250)
   
   t15chl = ggplot(data = t15, aes(x = doy, y = manual_chl))+
     geom_line(color = "forestgreen", size = 1)+
-    theme_classic()
+    theme_classic()+
+    labs(y = "Chlorophyll (μg/L)")+
+    xlim(140, 250)
   
   # t15temp = ggplot(data = l14, aes(x = doy, y = mean_temp))+
   #   geom_line(color = "steelblue", size = 1)+
@@ -548,11 +648,15 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
   l15slope = ggplot(data = l15, aes( x = doy, y = chl_slope))+
     geom_line(color = "black", size = 1)+
     theme_classic()+
-    ylim(-4.1, 4.5)
+    ylim(-4.1, 4.5)+
+    labs(y = "Chlorophyll slope (μg/L/day)")+
+    xlim(140, 250)
   
   l15chl = ggplot(data = l15, aes(x = doy, y = manual_chl))+
     geom_line(color = "forestgreen", size = 1)+
-    theme_classic()
+    theme_classic()+
+    labs(y = "Chlorophyll (μg/L)")+
+    xlim(140, 250)
   
   # l15temp = ggplot(data = l14, aes(x = doy, y = mean_temp))+
   #   geom_line(color = "steelblue", size = 1)+
@@ -564,11 +668,15 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
   r15slope = ggplot(data = r15, aes( x = doy, y = chl_slope))+
     geom_line(color = "black", size = 1)+
     theme_classic()+
-    ylim(-6, 4.5)
+    ylim(-6, 4.5)+
+    labs(y = "Chlorophyll slope (μg/L/day)")+
+    xlim(140, 250)
   
   r15chl = ggplot(data = r15, aes(x = doy, y = manual_chl))+
     geom_line(color = "forestgreen", size = 1)+
-    theme_classic()
+    theme_classic()+
+    labs(y = "Chlorophyll (μg/L)")+
+    xlim(140, 250)
   
   # r15temp = ggplot(data = l14, aes(x = doy, y = mean_temp))+
   #   geom_line(color = "steelblue", size = 1)+
@@ -607,11 +715,15 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     annotate("rect", xmin = as.Date(188+daysAfter - slopeLength), xmax = as.Date(188+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
              fill = "steelblue", alpha = 0.5)+
     annotate("rect", xmin = as.Date(231+daysAfter - slopeLength), xmax = as.Date(231+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-             fill = "steelblue", alpha = 0.5)
+             fill = "steelblue", alpha = 0.5)+
+    labs(y = "Chlorophyll slope (μg/L/day)")+
+    xlim(140, 250)
   
   l18chl = ggplot(data = l18, aes(x = doy, y = manual_chl))+
     geom_line(color = "forestgreen", size = 1)+
-    theme_classic()
+    theme_classic()+
+    labs(y = "Chlorophyll (μg/L)")+
+    xlim(140, 250)
   
   # l18temp = ggplot(data = l18, aes(x = doy, y = mean_temp))+
   #   geom_line(color = "steelblue", size = 1)+
@@ -646,11 +758,15 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     annotate("rect", xmin = as.Date(192+daysAfter - slopeLength), xmax = as.Date(192+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
              fill = "steelblue", alpha = 0.5)+
     annotate("rect", xmin = as.Date(232+daysAfter - slopeLength), xmax = as.Date(232+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-             fill = "steelblue", alpha = 0.5)
+             fill = "steelblue", alpha = 0.5)+
+    labs(y = "Chlorophyll slope (μg/L/day)")+
+    xlim(140, 250)
   
   r18chl = ggplot(data = r18, aes(x = doy, y = manual_chl))+
     geom_line(color = "forestgreen", size = 1)+
-    theme_classic()
+    theme_classic()+
+    labs(y = "Chlorophyll (μg/L)")+
+    xlim(140, 250)
   
   # r18temp = ggplot(data = r18, aes(x = doy, y = mean_temp))+
   #   geom_line(color = "steelblue", size = 1)+
@@ -683,11 +799,16 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     annotate('rect', xmin = as.Date(196), xmax = as.Date(200), ymin = -Inf, ymax = Inf,
              fill = 'red', alpha = 0.5)+
     annotate('rect', xmin = as.Date(200+daysAfter - slopeLength), xmax = as.Date(200+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-             fill = 'steelblue', alpha = 0.5)
+             fill = 'steelblue', alpha = 0.5)+
+    labs(y = "Chlorophyll slope (μg/L/day)")+
+    xlim(140, 250)
   
   l19chl = ggplot(data = l19, aes(x = doy, y = manual_chl))+
     geom_line(color = "forestgreen", size = 1)+
-    theme_classic()
+    theme_classic()+
+    labs(y = "Chlorophyll (μg/L)")+
+    xlim(140, 250)
+    
   
   # l19temp = ggplot(data = l19, aes(x = doy, y = mean_temp))+
   #   geom_line(color = "steelblue", size = 1)+
@@ -705,11 +826,15 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     annotate("rect", xmin = as.Date(215), xmax = as.Date(219), ymin = -Inf, ymax = Inf,
              fill = "red", alpha = 0.5)+
     annotate("rect", xmin = as.Date(219+daysAfter - slopeLength), xmax = as.Date(219+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
-             fill = "steelblue", alpha = 0.5)
+             fill = "steelblue", alpha = 0.5)+
+    labs(y = "Chlorophyll slope (μg/L/day)")+
+    xlim(140, 250)
   
   r19chl = ggplot(data = r19, aes(x = doy, y = manual_chl))+
     geom_line(color = "forestgreen", size = 1)+
-    theme_classic()
+    theme_classic()+
+    labs(y = "Chlorophyll (μg/L)")+
+    xlim(140, 250)
   
   # r19temp = ggplot(data = r19, aes(x = doy, y = mean_temp))+
   #   geom_line(color = "steelblue", size = 1)+

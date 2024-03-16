@@ -148,8 +148,8 @@ if(!(lake_year %in% c("tuesday_2008", "tuesday_2009", "tuesday_2010", "tuesday_2
   
   result <- tryCatch({
     
-    print(event_line(cur.HW, category = TRUE, start_date = start_date, end_date = end_date)+
-            geom_point()+
+    print(event_line_doy(cur.HW, category = TRUE, start_date = start_date, end_date = end_date)+
+            geom_point(size = 0.5)+
             theme_classic()+
             labs(title = paste(cur.lake, year, sep = " ")))
     
@@ -159,7 +159,7 @@ if(!(lake_year %in% c("tuesday_2008", "tuesday_2009", "tuesday_2010", "tuesday_2
     
     print(ggplot(cur.climatology, aes(x = doy, y = temp)) +
             geom_line(aes(x = doy, y = temp, color = "Temperature"), size = 0.8) +
-           # geom_point() +
+            geom_point(size = 0.5) +
             geom_line(aes(x = doy, y = seas, color = "Climatology", linetype = "solid"), size = 0.7) +
             geom_line(aes(x = doy, y = thresh, color = "Threshold", linetype = "solid"), size = 0.7) +
             # geom_line(aes(x = doy, y = thresh2, color = "2x Threshold", linetype = "solid")) +
