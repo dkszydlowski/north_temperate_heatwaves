@@ -874,65 +874,65 @@ Alldist <- allSlopes %>%
 
 #"R" = "#4AB5C4", "L" = "#ADDAE3", "T"=  "#BAAD8D"
 
-
-Rdist<- allSlopes %>%
-  filter(period != "exclude after heatwave", lake == "R", daysAfter == get("daysAfter", envir=globalenv())) %>%
-  ggplot(aes(x = percent_change, y = factor(period, levels = desired_order), fill = stat(x))) +
-  geom_density_ridges_gradient(scale = 3, rel_min_height = 0.01, quantile_lines = TRUE,
-                               quantile_fun = function(x, ...) mean(x), 
-                               size = 0.7, alpha = 0.7) +
-  scale_fill_gradientn(colours = c("#4AB5C4", "forestgreen"),
-                       values = scales::rescale(c(-100, 200, 600, 600))) +
-  labs(title = 'Peter', y = "") +
-  theme_classic() +
-  geom_text(data = mean_dfR %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
-            aes(x = mean_percent_change,
-                y = factor(period, levels = desired_order),
-                label = as.character(round(mean_percent_change, digits = 0))),
-            color = "black",
-            size = 4,
-            vjust = 2)
-
-
-
-Ldist <- allSlopes %>%
-  filter(period != "exclude after heatwave", lake == "L", daysAfter == get("daysAfter", envir=globalenv())) %>%
-  ggplot(aes(x = percent_change, y = factor(period, levels = desired_order), fill = stat(x))) +
-  geom_density_ridges_gradient(scale = 3, rel_min_height = 0.01, quantile_lines = TRUE,
-                               quantile_fun = function(x, ...) mean(x), 
-                               size = 0.7, alpha = 0.7) +
-  scale_fill_gradientn(colours = c("#ADDAE3", "forestgreen"),
-                       values = scales::rescale(c(-100, 300, 600, 600))) +
-  labs(title = 'Paul', y = "") +
-  theme_classic() +
-  geom_text(data = mean_dfL %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
-            aes(x = mean_percent_change,
-                y = factor(period, levels = desired_order),
-                label = as.character(round(mean_percent_change, digits = 0))),
-            color = "black",
-            size = 4,
-            vjust = 2)
-
-
-
-Tdist <- 
-  allSlopes %>%
-  filter(period != "exclude after heatwave", lake == "T", daysAfter == get("daysAfter", envir=globalenv())) %>%
-  ggplot(aes(x = percent_change, y = factor(period, levels = desired_order), fill = stat(x))) +
-  geom_density_ridges_gradient(scale = 3, rel_min_height = 0.01, quantile_lines = TRUE,
-                               quantile_fun = function(x, ...) mean(x), 
-                               size = 0.7, alpha = 0.7) +
-  scale_fill_gradientn(colours = c("#BAAD8D", "forestgreen"),
-                       values = scales::rescale(c(-50, 200, 600))) +
-  labs(title = 'Tuesday', y = "") +
-  theme_classic() +
-  geom_text(data = mean_dfT %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
-            aes(x = mean_percent_change,
-                y = factor(period, levels = desired_order),
-                label = as.character(round(mean_percent_change, digits = 0))),
-            color = "black",
-            size = 4,
-            vjust = 2)
+# 
+# Rdist<- allSlopes %>%
+#   filter(period != "exclude after heatwave", lake == "R", daysAfter == get("daysAfter", envir=globalenv())) %>%
+#   ggplot(aes(x = percent_change, y = factor(period, levels = desired_order), fill = stat(x))) +
+#   geom_density_ridges_gradient(scale = 3, rel_min_height = 0.01, quantile_lines = TRUE,
+#                                quantile_fun = function(x, ...) mean(x), 
+#                                size = 0.7, alpha = 0.7) +
+#   scale_fill_gradientn(colours = c("#4AB5C4", "forestgreen"),
+#                        values = scales::rescale(c(-100, 200, 600, 600))) +
+#   labs(title = 'Peter', y = "") +
+#   theme_classic() +
+#   geom_text(data = mean_dfR %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+#             aes(x = mean_percent_change,
+#                 y = factor(period, levels = desired_order),
+#                 label = as.character(round(mean_percent_change, digits = 0))),
+#             color = "black",
+#             size = 4,
+#             vjust = 2)
+# 
+# 
+# 
+# Ldist <- allSlopes %>%
+#   filter(period != "exclude after heatwave", lake == "L", daysAfter == get("daysAfter", envir=globalenv())) %>%
+#   ggplot(aes(x = percent_change, y = factor(period, levels = desired_order), fill = stat(x))) +
+#   geom_density_ridges_gradient(scale = 3, rel_min_height = 0.01, quantile_lines = TRUE,
+#                                quantile_fun = function(x, ...) mean(x), 
+#                                size = 0.7, alpha = 0.7) +
+#   scale_fill_gradientn(colours = c("#ADDAE3", "forestgreen"),
+#                        values = scales::rescale(c(-100, 300, 600, 600))) +
+#   labs(title = 'Paul', y = "") +
+#   theme_classic() +
+#   geom_text(data = mean_dfL %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+#             aes(x = mean_percent_change,
+#                 y = factor(period, levels = desired_order),
+#                 label = as.character(round(mean_percent_change, digits = 0))),
+#             color = "black",
+#             size = 4,
+#             vjust = 2)
+# 
+# 
+# 
+# Tdist <- 
+#   allSlopes %>%
+#   filter(period != "exclude after heatwave", lake == "T", daysAfter == get("daysAfter", envir=globalenv())) %>%
+#   ggplot(aes(x = percent_change, y = factor(period, levels = desired_order), fill = stat(x))) +
+#   geom_density_ridges_gradient(scale = 3, rel_min_height = 0.01, quantile_lines = TRUE,
+#                                quantile_fun = function(x, ...) mean(x), 
+#                                size = 0.7, alpha = 0.7) +
+#   scale_fill_gradientn(colours = c("#BAAD8D", "forestgreen"),
+#                        values = scales::rescale(c(-50, 200, 600))) +
+#   labs(title = 'Tuesday', y = "") +
+#   theme_classic() +
+#   geom_text(data = mean_dfT %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+#             aes(x = mean_percent_change,
+#                 y = factor(period, levels = desired_order),
+#                 label = as.character(round(mean_percent_change, digits = 0))),
+#             color = "black",
+#             size = 4,
+#             vjust = 2)
 
 #"R" = "#4AB5C4", "L" = "#ADDAE3", "T"=  "#BAAD8D"
 

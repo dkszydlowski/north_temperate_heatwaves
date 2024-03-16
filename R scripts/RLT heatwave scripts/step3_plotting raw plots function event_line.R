@@ -20,8 +20,128 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
   curDate = cur_date_time = format(Sys.Date(), "%Y_%m_%d")
   pdfName = paste(runNumber, "_TIME_SERIES_date_", curDate, "_slopeLength_", slopeLength, "_daysAfter_", daysAfter, "_numSlopes_", numSlopes, ".pdf", sep = "")
   
+  # make all of the event_line plots so they are not plotted to the pdf
+  l08temp = event_line_DKS("paul", 2008)+
+    labs(title = "Paul 2008")+
+    theme(legend.position="none")
   
-  pdf(paste("./figures/sensitivity tests/" , pdfName, sep = ""), height = 6, width = 8)
+  r08temp = event_line_DKS("peter", 2008)+
+    labs(title = "Peter 2008")+
+    theme(legend.position="none")
+  
+  l09temp = event_line_DKS("paul", 2009)+
+    labs(title = "Paul 2009")+
+    theme(legend.position="none")
+  
+  r09temp = event_line_DKS("peter", 2009)+
+    labs(title = "Peter 2009")+
+    theme(legend.position="none")
+  
+  l10temp = event_line_DKS("paul", 2010)+
+    labs(title = "Paul 2010")+
+    theme(legend.position="none")
+  
+  r10temp = event_line_DKS("peter", 2010)+
+    labs(title = "Peter 2010")+
+    theme(legend.position="none")
+  
+  l11temp = event_line_DKS("paul", 2011)+
+    labs(title = "Paul 2011")+
+    theme(legend.position="none")
+  
+  r11temp = event_line_DKS("peter", 2011)+
+    labs(title = "Peter 2011")+
+    theme(legend.position="none")
+  
+  l10temp = event_line_DKS("paul", 2010)+
+    labs(title = "Paul 2010")+
+    theme(legend.position="none")
+  
+  r10temp = event_line_DKS("peter", 2010)+
+    labs(title = "Peter 2010")+
+    theme(legend.position="none")
+  
+  l13temp = event_line_DKS("paul", 2013)+
+    labs(title = "Paul 2013")+
+    theme(legend.position="none")
+  
+  r13temp = event_line_DKS("peter", 2013)+
+    labs(title = "Peter 2013")+
+    theme(legend.position="none")
+  
+  
+  l10temp = event_line_DKS("paul", 2010)+
+    labs(title = "Paul 2010")+
+    theme(legend.position="none")
+  
+  r10temp = event_line_DKS("peter", 2010)+
+    labs(title = "Peter 2010")+
+    theme(legend.position="none")
+  
+  l14temp = event_line_DKS("paul", 2014)+
+    labs(title = "Paul 2014")+
+    theme(legend.position="none")
+  
+  r14temp = event_line_DKS("peter", 2014)+
+    labs(title = "Peter 2014")+
+    theme(legend.position="none")
+  
+  l10temp = event_line_DKS("paul", 2010)+
+    labs(title = "Paul 2010")+
+    theme(legend.position="none")
+  
+  r10temp = event_line_DKS("peter", 2010)+
+    labs(title = "Peter 2010")+
+    theme(legend.position="none")
+  
+  l15temp = event_line_DKS("paul", 2015)+
+    labs(title = "Paul 2015")+
+    theme(legend.position="none")
+  
+  r15temp = event_line_DKS("peter", 2015)+
+    labs(title = "Peter 2015")+
+    theme(legend.position="none")
+  
+  
+  l10temp = event_line_DKS("paul", 2010)+
+    labs(title = "Paul 2010")+
+    theme(legend.position="none")
+  
+  r10temp = event_line_DKS("peter", 2010)+
+    labs(title = "Peter 2010")+
+    theme(legend.position="none")
+  
+  l18temp = event_line_DKS("paul", 2018)+
+    labs(title = "Paul 2018")+
+    theme(legend.position="none")
+  
+  r18temp = event_line_DKS("peter", 2018)+
+    labs(title = "Peter 2018")+
+    theme(legend.position="none")
+  
+  l19temp = event_line_DKS("paul", 2019)+
+    labs(title = "Paul 2019")+
+    theme(legend.position="none")
+  
+  r19temp = event_line_DKS("peter", 2019)+
+    labs(title = "Peter 2019")+
+    theme(legend.position="none")
+  
+  t13temp = event_line_DKS("tuesday", 2013)+
+    labs(title = "Tuesday 2013")+
+    theme(legend.position="none")
+  
+  t14temp = event_line_DKS("tuesday", 2014)+
+    labs(title = "Tuesday 2014")+
+    theme(legend.position="none")
+  
+  t15temp = event_line_DKS("tuesday", 2015)+
+    labs(title = "Tuesday 2015")+
+    theme(legend.position="none")
+  
+  
+  
+  pdf(paste("./figures/sensitivity tests/" , pdfName, sep = ""), height = 8, width = 9)
   
   print(metadata_plot)
   
@@ -55,10 +175,7 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     geom_line(color = "forestgreen", size = 1)+
     theme_classic()
   
-  l08temp = ggplot(data = l08, aes(x = doy, y = mean_temp))+
-    geom_line(color = "steelblue", size = 1)+
-    theme_classic()+
-    labs(title = "Paul 2008")
+
   
   # Peter
   r08slope = ggplot(data = r08, aes( x = doy, y = chl_slope))+
@@ -70,10 +187,7 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     geom_line(color = "forestgreen", size = 1)+
     theme_classic()
   
-  r08temp = ggplot(data = r08, aes(x = doy, y = mean_temp))+
-    geom_line(color = "steelblue", size = 1)+
-    theme_classic()+
-    labs(title = "Peter 2008")
+
   
   print(ggarrange(nrow = 3, ncol = 2, r08temp, l08temp, r08chl, l08chl, r08slope, l08slope))
   
@@ -97,13 +211,7 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     geom_line(color = "forestgreen", size = 1)+
     theme_classic()
   
-  l09temp = ggplot(data = l09, aes(x = doy, y = mean_temp))+
-    geom_line(color = "steelblue", size = 1)+
-    theme_classic()+
-    labs(title = "Paul 2009")+
-    annotate("rect", xmin = as.Date(171), xmax = as.Date(178), ymin = -Inf, ymax = Inf,
-             fill = "red", alpha = 0.5)
-  
+
   
   # Peter
   r09slope = ggplot(data = r09, aes( x = doy, y = chl_slope))+
@@ -129,13 +237,7 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     geom_line(color = "forestgreen", size = 1)+
     theme_classic()
   
-  
-  r09temp = ggplot(data = r09, aes(x = doy, y = mean_temp))+
-    geom_line(color = "steelblue", size = 1)+
-    theme_classic()+
-    labs(title = "Peter 2009")+
-    annotate("rect", xmin = as.Date(171), xmax = as.Date(178), ymin = -Inf, ymax = Inf,
-             fill = "red", alpha = 0.5)
+
   
   print(ggarrange(nrow = 3, ncol = 2, r09temp, l09temp, r09chl, l09chl, r09slope, l09slope))
   
@@ -193,14 +295,14 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     theme_classic()
   
   
-  r10temp = ggplot(data = r10, aes(x = doy, y = mean_temp))+
-    geom_line(color = "steelblue", size = 1)+
-    theme_classic()+
-    labs(title = "Peter 2010")+
-    annotate("rect", xmin = as.Date(144), xmax = as.Date(154), ymin = -Inf, ymax = Inf,
-             fill = "red", alpha = 0.5)+
-    annotate("rect", xmin = as.Date(221), xmax = as.Date(227), ymin = -Inf, ymax = Inf,
-             fill = "red", alpha = 0.5)
+  # r10temp = ggplot(data = r10, aes(x = doy, y = mean_temp))+
+  #   geom_line(color = "steelblue", size = 1)+
+  #   theme_classic()+
+  #   labs(title = "Peter 2010")+
+  #   annotate("rect", xmin = as.Date(144), xmax = as.Date(154), ymin = -Inf, ymax = Inf,
+  #            fill = "red", alpha = 0.5)+
+  #   annotate("rect", xmin = as.Date(221), xmax = as.Date(227), ymin = -Inf, ymax = Inf,
+  #            fill = "red", alpha = 0.5)
   
   
   print(ggarrange(nrow = 3, ncol = 2,r10temp, l10temp, r10chl, l10chl, r10slope, l10slope))
@@ -228,12 +330,12 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     theme_classic()
   
   
-  l11temp = ggplot(data = l11, aes(x = doy, y = mean_temp))+
-    geom_line(color = "steelblue", size = 1)+
-    theme_classic()+
-    labs(title = "Paul 2011")+
-    annotate("rect", xmin = as.Date(199), xmax = as.Date(205), ymin = -Inf, ymax = Inf,
-             fill = "red", alpha = 0.5)
+  # l11temp = ggplot(data = l11, aes(x = doy, y = mean_temp))+
+  #   geom_line(color = "steelblue", size = 1)+
+  #   theme_classic()+
+  #   labs(title = "Paul 2011")+
+  #   annotate("rect", xmin = as.Date(199), xmax = as.Date(205), ymin = -Inf, ymax = Inf,
+  #            fill = "red", alpha = 0.5)
   
   
   # Peter
@@ -250,12 +352,12 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     geom_line(color = "forestgreen", size = 1)+
     theme_classic()
   
-  r11temp = ggplot(data = r11, aes(x = doy, y = mean_temp))+
-    geom_line(color = "steelblue", size = 1)+
-    theme_classic()+
-    labs(title = "Peter 2011")+
-    annotate("rect", xmin = as.Date(199), xmax = as.Date(205), ymin = -Inf, ymax = Inf,
-             fill = "red", alpha = 0.5)
+  # r11temp = ggplot(data = r11, aes(x = doy, y = mean_temp))+
+  #   geom_line(color = "steelblue", size = 1)+
+  #   theme_classic()+
+  #   labs(title = "Peter 2011")+
+  #   annotate("rect", xmin = as.Date(199), xmax = as.Date(205), ymin = -Inf, ymax = Inf,
+  #            fill = "red", alpha = 0.5)
   
   print(ggarrange(nrow = 3, ncol = 2, r11temp, l11temp, r11chl, l11chl, r11slope, l11slope))
   
@@ -285,14 +387,14 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     geom_line(color = "forestgreen", size = 1)+
     theme_classic()
   
-  t13temp = ggplot(data = t13, aes(x = doy, y = mean_temp))+
-    geom_line(color = "steelblue", size = 1)+
-    theme_classic()+
-    labs(title = "Tuesday 2013")+
-    annotate("rect", xmin = as.Date(186), xmax = as.Date(190), ymin = -Inf, ymax = Inf,
-             fill = "red", alpha = 0.5)+
-    annotate("rect", xmin = as.Date(196), xmax = as.Date(201), ymin = -Inf, ymax = Inf,
-             fill = "red", alpha = 0.5)
+  # t13temp = ggplot(data = t13, aes(x = doy, y = mean_temp))+
+  #   geom_line(color = "steelblue", size = 1)+
+  #   theme_classic()+
+  #   labs(title = "Tuesday 2013")+
+  #   annotate("rect", xmin = as.Date(186), xmax = as.Date(190), ymin = -Inf, ymax = Inf,
+  #            fill = "red", alpha = 0.5)+
+  #   annotate("rect", xmin = as.Date(196), xmax = as.Date(201), ymin = -Inf, ymax = Inf,
+  #            fill = "red", alpha = 0.5)
   
   
   # Paul
@@ -331,12 +433,12 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     geom_line(color = "forestgreen", size = 1)+
     theme_classic()
   
-  r13temp = ggplot(data = r13, aes(x = doy, y = mean_temp))+
-    geom_line(color = "steelblue", size = 1)+
-    theme_classic()+
-    labs(title = "Peter 2013")+
-    annotate("rect", xmin = as.Date(196), xmax = as.Date(201), ymin = -Inf, ymax = Inf,
-             fill = "red", alpha = 0.5)
+  # r13temp = ggplot(data = r13, aes(x = doy, y = mean_temp))+
+  #   geom_line(color = "steelblue", size = 1)+
+  #   theme_classic()+
+  #   labs(title = "Peter 2013")+
+  #   annotate("rect", xmin = as.Date(196), xmax = as.Date(201), ymin = -Inf, ymax = Inf,
+  #            fill = "red", alpha = 0.5)
   
   print(ggarrange(nrow = 3, ncol = 3, r13temp, l13temp, t13temp, r13chl, l13chl, t13chl, r13slope, l13slope, t13slope))
   
@@ -360,12 +462,12 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     geom_line(color = "forestgreen", size = 1)+
     theme_classic()
   
-  t14temp = ggplot(data = t14, aes(x = doy, y = mean_temp))+
-    geom_line(color = "steelblue", size = 1)+
-    theme_classic()+
-    labs(title = "Tuesday 2014")+
-    annotate("rect", xmin = as.Date(146), xmax = as.Date(154), ymin = -Inf, ymax = Inf,
-             fill = "red", alpha = 0.5)
+  # t14temp = ggplot(data = t14, aes(x = doy, y = mean_temp))+
+  #   geom_line(color = "steelblue", size = 1)+
+  #   theme_classic()+
+  #   labs(title = "Tuesday 2014")+
+  #   annotate("rect", xmin = as.Date(146), xmax = as.Date(154), ymin = -Inf, ymax = Inf,
+  #            fill = "red", alpha = 0.5)
   
   
   # Paul
@@ -378,10 +480,10 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     geom_line(color = "forestgreen", size = 1)+
     theme_classic()
   
-  l14temp = ggplot(data = l14, aes(x = doy, y = mean_temp))+
-    geom_line(color = "steelblue", size = 1)+
-    theme_classic()+
-    labs(title = "Paul 2014")
+  # l14temp = ggplot(data = l14, aes(x = doy, y = mean_temp))+
+  #   geom_line(color = "steelblue", size = 1)+
+  #   theme_classic()+
+  #   labs(title = "Paul 2014")
   
   
   # Peter
@@ -398,12 +500,12 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     geom_line(color = "forestgreen", size = 1)+
     theme_classic()
   
-  r14temp = ggplot(data = l14, aes(x = doy, y = mean_temp))+
-    geom_line(color = "steelblue", size = 1)+
-    theme_classic()+
-    labs(title = "Peter 2014")+
-    annotate("rect", xmin = as.Date(149), xmax = as.Date(153), ymin = -Inf, ymax = Inf,
-             fill = "red", alpha = 0.5)
+  # r14temp = ggplot(data = l14, aes(x = doy, y = mean_temp))+
+  #   geom_line(color = "steelblue", size = 1)+
+  #   theme_classic()+
+  #   labs(title = "Peter 2014")+
+  #   annotate("rect", xmin = as.Date(149), xmax = as.Date(153), ymin = -Inf, ymax = Inf,
+  #            fill = "red", alpha = 0.5)
   
   print(ggarrange(nrow = 3, ncol = 3, r14temp, l14temp, t14temp, r14chl, l14chl, t14chl, r14slope, l14slope, t14slope))
   
@@ -433,14 +535,14 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     geom_line(color = "forestgreen", size = 1)+
     theme_classic()
   
-  t15temp = ggplot(data = l14, aes(x = doy, y = mean_temp))+
-    geom_line(color = "steelblue", size = 1)+
-    theme_classic()+
-    labs(title = "Tuesday 2015")+
-    annotate("rect", xmin = 206, xmax = as.Date(210), ymin = -Inf, ymax = Inf,
-             fill = "red", alpha = 0.5)+
-    annotate("rect", xmin = as.Date(226), xmax = as.Date(230), ymin = -Inf, ymax = Inf,
-             fill = "red", alpha = 0.5)
+  # t15temp = ggplot(data = l14, aes(x = doy, y = mean_temp))+
+  #   geom_line(color = "steelblue", size = 1)+
+  #   theme_classic()+
+  #   labs(title = "Tuesday 2015")+
+  #   annotate("rect", xmin = 206, xmax = as.Date(210), ymin = -Inf, ymax = Inf,
+  #            fill = "red", alpha = 0.5)+
+  #   annotate("rect", xmin = as.Date(226), xmax = as.Date(230), ymin = -Inf, ymax = Inf,
+  #            fill = "red", alpha = 0.5)
   
   # Paul
   l15slope = ggplot(data = l15, aes( x = doy, y = chl_slope))+
@@ -452,10 +554,10 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     geom_line(color = "forestgreen", size = 1)+
     theme_classic()
   
-  l15temp = ggplot(data = l14, aes(x = doy, y = mean_temp))+
-    geom_line(color = "steelblue", size = 1)+
-    theme_classic()+
-    labs(title = "Paul 2015")
+  # l15temp = ggplot(data = l14, aes(x = doy, y = mean_temp))+
+  #   geom_line(color = "steelblue", size = 1)+
+  #   theme_classic()+
+  #   labs(title = "Paul 2015")
   
   
   # Peter
@@ -468,10 +570,10 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     geom_line(color = "forestgreen", size = 1)+
     theme_classic()
   
-  r15temp = ggplot(data = l14, aes(x = doy, y = mean_temp))+
-    geom_line(color = "steelblue", size = 1)+
-    theme_classic()+
-    labs(title = "Peter 2015")
+  # r15temp = ggplot(data = l14, aes(x = doy, y = mean_temp))+
+  #   geom_line(color = "steelblue", size = 1)+
+  #   theme_classic()+
+  #   labs(title = "Peter 2015")
   
   print(ggarrange(nrow = 3, ncol = 3, r15temp, l15temp, t15temp, r15chl, l15chl, t15chl, r15slope, l15slope, t15slope))
   
@@ -511,18 +613,18 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     geom_line(color = "forestgreen", size = 1)+
     theme_classic()
   
-  l18temp = ggplot(data = l18, aes(x = doy, y = mean_temp))+
-    geom_line(color = "steelblue", size = 1)+
-    theme_classic()+
-    labs(title = "Paul 2018")+
-    annotate("rect", xmin = as.Date(144), xmax = as.Date(152), ymin = -Inf, ymax = Inf,
-             fill = "red", alpha = 0.5)+
-    annotate("rect", xmin = as.Date(169), xmax = as.Date(175), ymin = -Inf, ymax = Inf,
-             fill = "red", alpha = 0.5)+
-    annotate("rect", xmin = as.Date(180), xmax = as.Date(188), ymin = -Inf, ymax = Inf,
-             fill = "red", alpha = 0.5)+
-    annotate("rect", xmin = as.Date(223), xmax = as.Date(231), ymin = -Inf, ymax = Inf,
-             fill = "red", alpha = 0.5)
+  # l18temp = ggplot(data = l18, aes(x = doy, y = mean_temp))+
+  #   geom_line(color = "steelblue", size = 1)+
+  #   theme_classic()+
+  #   labs(title = "Paul 2018")+
+  #   annotate("rect", xmin = as.Date(144), xmax = as.Date(152), ymin = -Inf, ymax = Inf,
+  #            fill = "red", alpha = 0.5)+
+  #   annotate("rect", xmin = as.Date(169), xmax = as.Date(175), ymin = -Inf, ymax = Inf,
+  #            fill = "red", alpha = 0.5)+
+  #   annotate("rect", xmin = as.Date(180), xmax = as.Date(188), ymin = -Inf, ymax = Inf,
+  #            fill = "red", alpha = 0.5)+
+  #   annotate("rect", xmin = as.Date(223), xmax = as.Date(231), ymin = -Inf, ymax = Inf,
+  #            fill = "red", alpha = 0.5)
   
   # Peter
   r18slope = ggplot(data = r18, aes( x = doy, y = chl_slope))+
@@ -550,18 +652,18 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     geom_line(color = "forestgreen", size = 1)+
     theme_classic()
   
-  r18temp = ggplot(data = r18, aes(x = doy, y = mean_temp))+
-    geom_line(color = "steelblue", size = 1)+
-    theme_classic()+
-    labs(title = "Peter 2018")+
-    annotate("rect", xmin = as.Date(144), xmax = as.Date(152), ymin = -Inf, ymax = Inf,
-             fill = "red", alpha = 0.5)+
-    annotate("rect", xmin = as.Date(169), xmax = as.Date(175), ymin = -Inf, ymax = Inf,
-             fill = "red", alpha = 0.5)+
-    annotate("rect", xmin = as.Date(180), xmax = as.Date(192), ymin = -Inf, ymax = Inf,
-             fill = "red", alpha = 0.5)+
-    annotate("rect", xmin = as.Date(223), xmax = as.Date(232), ymin = -Inf, ymax = Inf,
-             fill = "red", alpha = 0.5)
+  # r18temp = ggplot(data = r18, aes(x = doy, y = mean_temp))+
+  #   geom_line(color = "steelblue", size = 1)+
+  #   theme_classic()+
+  #   labs(title = "Peter 2018")+
+  #   annotate("rect", xmin = as.Date(144), xmax = as.Date(152), ymin = -Inf, ymax = Inf,
+  #            fill = "red", alpha = 0.5)+
+  #   annotate("rect", xmin = as.Date(169), xmax = as.Date(175), ymin = -Inf, ymax = Inf,
+  #            fill = "red", alpha = 0.5)+
+  #   annotate("rect", xmin = as.Date(180), xmax = as.Date(192), ymin = -Inf, ymax = Inf,
+  #            fill = "red", alpha = 0.5)+
+  #   annotate("rect", xmin = as.Date(223), xmax = as.Date(232), ymin = -Inf, ymax = Inf,
+  #            fill = "red", alpha = 0.5)
   
   print(ggarrange(nrow = 3, ncol = 2, r18temp, l18temp, r18chl, l18chl, r18slope, l18slope))
   
@@ -587,12 +689,12 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     geom_line(color = "forestgreen", size = 1)+
     theme_classic()
   
-  l19temp = ggplot(data = l19, aes(x = doy, y = mean_temp))+
-    geom_line(color = "steelblue", size = 1)+
-    theme_classic()+
-    labs(title = "Paul 2019")+
-    annotate('rect', xmin = as.Date(196), xmax = as.Date(200), ymin = -Inf, ymax = Inf,
-             fill = 'red', alpha = 0.5)
+  # l19temp = ggplot(data = l19, aes(x = doy, y = mean_temp))+
+  #   geom_line(color = "steelblue", size = 1)+
+  #   theme_classic()+
+  #   labs(title = "Paul 2019")+
+  #   annotate('rect', xmin = as.Date(196), xmax = as.Date(200), ymin = -Inf, ymax = Inf,
+  #            fill = 'red', alpha = 0.5)
   
   
   # Peter
@@ -609,12 +711,12 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     geom_line(color = "forestgreen", size = 1)+
     theme_classic()
   
-  r19temp = ggplot(data = r19, aes(x = doy, y = mean_temp))+
-    geom_line(color = "steelblue", size = 1)+
-    theme_classic()+
-    labs(title = "Peter 2019")+
-    annotate('rect', xmin = as.Date(215), xmax = as.Date(219), ymin = -Inf, ymax = Inf,
-             fill = 'red', alpha = 0.5)
+  # r19temp = ggplot(data = r19, aes(x = doy, y = mean_temp))+
+  #   geom_line(color = "steelblue", size = 1)+
+  #   theme_classic()+
+  #   labs(title = "Peter 2019")+
+  #   annotate('rect', xmin = as.Date(215), xmax = as.Date(219), ymin = -Inf, ymax = Inf,
+  #            fill = 'red', alpha = 0.5)
   
   print(ggarrange(nrow = 3, ncol = 2, r19temp, l19temp, r19chl, l19chl, r19slope, l19slope))
   
