@@ -633,14 +633,33 @@ sonde.SP.woodruff = sonde.SP.woodruff %>% left_join(woodruff, by = c("doy", "dat
 # add new lag columns in case we want to include time lags
 sonde.SP.woodruff = sonde.SP.woodruff %>% mutate(woodruff.temp.lag.1 = lead(woodruff.temp, 1))
 
+# split the data so 75% is the training dataset and 25% is the testing dataset
+sonde.SP.woodruff.no.na = sonde.SP.woodruff %>%  
+  filter(!is.na(SP.temp.1), !is.na(woodruff.temp))
+
+# set the seed so that the same rows are selected every time
+set.seed(125)
+
+# sample 75%
+sonde.SP.woodruff.training = sonde.SP.woodruff.no.na %>%
+  ungroup() %>% 
+  sample_frac(0.75, replace = FALSE)
+
+# anti_join gets rows that are not in both
+sonde.SP.woodruff.testing = anti_join(sonde.SP.woodruff.no.na, sonde.SP.woodruff.training)  
+
+
 # run the model
-test = lmer(mean_temp~SP.temp.1+ woodruff.temp +doy + (1|lake), data = sonde.SP.woodruff)
+test = lmer(mean_temp~SP.temp.1+ woodruff.temp +doy + (1|lake), data = sonde.SP.woodruff.training)
 summary(test)
 r.squaredGLMM(test)
 
+
 plot(test)
 
-qqnorm(residuals(test))
+qqModel = qqnorm(residuals(test))
+
+ggarrange(qqModel)
 
 # model with just sparkling lake temperature and air temperature
 # summary(lm(sonde.SP.woodruff$mean_temp~sonde.SP.woodruff$SP.temp.1))
@@ -648,8 +667,10 @@ qqnorm(residuals(test))
 ### make a fitting dataset and a testing dataset
 
 
+sonde.SP.woodruff.testing$modeled = predict(test, sonde.SP.woodruff.testing)
 
-
+plot(data = sonde.SP.woodruff.testing, modeled~mean_temp)
+summary(lm(data = sonde.SP.woodruff.testing, modeled~mean_temp))
 
 ##### Use the model to predict temperature of RLT for every year of Sparkling data ######
 SP.woodruff = SP.temp.1 %>% left_join(woodruff, by = c("date", "doy", "year"))
@@ -831,9 +852,162 @@ saveRDS(tuesdayHW.categories, file = "./results/heatwave modeled outputs/tuesday
 
 
 
+#### Model climatology with Crystal Bog data ####
+
+# Crystal Bog Lake temperature
+CB.temp = read.csv("./formatted data/LTER daily temperature/Crystal Bog daily temperature all depths.csv")
+#
+# CB.temp.1 = CB.temp %>% filter(depth == 0 | depth == 0.01 | (depth == 0.25 & year4 == 2013)) %>%
+#   rename(year = year4, date = sampledate, doy = daynum) %>% select(-depth, -flag_wtemp) %>%
+#   rename(CB.temp.1 = wtemp) %>%
+#   mutate(date = as.Date(date))
+
+CB.temp.1 = CB.temp %>% filter(depth == 1) %>%
+  mutate(year = year(sampledate), date = sampledate, doy = yday(sampledate)) %>% 
+  select(-depth, -flag_wtemp) %>%
+  rename(CB.temp.1 = wtemp) %>%
+  mutate(date = as.Date(date))
 
 
-####### Model temperature with hourly data #########
+# Woodruff airport temperature
+woodruff = read.csv("./formatted data/LTER daily temperature/woodruff airport temperature LTER.csv")
+
+woodruff = woodruff %>% rename(year = year4, date = sampledate, doy = daynum)
+
+# make a daily woodruff dataframe
+woodruff = woodruff %>% group_by(year, date, doy) %>% 
+  summarize(woodruff.temp = mean(avg_air_temp, na.rm = TRUE)) %>% 
+  mutate(date = as.Date(date))
+
+
+# combine woodruff, Sparkling, and LRT sonde temp
+sonde.CB.woodruff = temp.sonde %>% left_join(CB.temp.1, by = c("doy", "date", "year"))
+sonde.CB.woodruff = sonde.CB.woodruff %>% left_join(woodruff, by = c("doy", "date", "year"))
+
+# add new lag columns in case we want to include time lags
+sonde.CB.woodruff = sonde.CB.woodruff %>% mutate(woodruff.temp.lag.1 = lead(woodruff.temp, 1))
+
+# split the data so 75% is the training dataset and 25% is the testing dataset
+
+
+# run the model
+test.CB = lmer(mean_temp~CB.temp.1+ woodruff.temp +doy + (1|lake), data = sonde.CB.woodruff)
+summary(test.CB)
+r.squaredGLMM(test.CB)
+
+plot(test.CB)
+
+qqnorm(residuals(test.CB))
+
+
+
+##### Use the model to predict temperature of RLT for every year of Crystal data ######
+CB.woodruff = CB.temp.1 %>% left_join(woodruff, by = c("date", "doy", "year"))
+
+# make columns of lake that can be input to the model
+CB.woodruffL = CB.woodruff %>% mutate(lake = "L")
+CB.woodruffR = CB.woodruff %>% mutate(lake = "R")
+CB.woodruffT = CB.woodruff %>% mutate(lake = "T")
+
+# combine into one for predicting temp
+CB.woodruff = rbind(CB.woodruffL, CB.woodruffR, CB.woodruffT)
+
+CB.woodruff$modeled.temp = predict(test.CB, CB.woodruff)
+
+pdf("./figures/modeled temperature/modeled temperature daily CB 1 m.pdf", width = 12, height = 18)
+
+
+ggplot(CB.woodruff, aes(x = doy, y = modeled.temp, color = lake))+
+  geom_line(size = 0.9)+
+  #geom_line(aes(x = doy, y = CB.temp.1, color = "black"), size = 1)+
+  facet_wrap(~year)+
+  labs(y = "modeled temperature", x = "day of year")+
+  scale_color_manual(values = c("L" = "#ADDAE3", "R"=  "#4AB5C4", "T"=  "#BAAD8D"))  +
+  xlim(152, 259)+
+  ylim(15, 30)+
+  theme_classic()
+
+dev.off()
+
+# compare the predicted temperature to the actual temperature
+CB.woodruff.cascade = temp.sonde %>% left_join(CB.woodruff, by = c("year", "date", "doy", "lake"))
+
+CB.woodruff.cascade.real.data = CB.woodruff.cascade %>% filter(!is.na(mean_temp))
+
+# pivot longer for plotting
+#CB.woodruff.cascade.real.data = CB.woodruff.cascade.real.data %>% pivot_longer()
+
+
+CB.woodruff.cascade.real.data_long <- CB.woodruff.cascade.real.data %>%
+  pivot_longer(
+    cols = c("modeled.temp", "mean_temp"),
+    names_to = "temp.type",
+    values_to = "temperature"
+  )
+
+
+pdf("./figures/modeled temperature/modeled vs real temperature daily CB 1 m.pdf", width = 12, height = 12)
+
+ggplot(CB.woodruff.cascade.real.data_long, aes(x = doy, y = temperature, color = temp.type))+
+  geom_line(size = 1, alpha = 0.8)+
+  #geom_point()+
+  #geom_line(aes(x = doy, y = CB.temp.1, color = "black"), size = 1)+
+  facet_wrap(lake~year)+
+  labs( x = "day of year")+
+  # scale_color_manual(values = c("L" = "#ADDAE3", "R"=  "#4AB5C4", "T"=  "#BAAD8D"))  +
+  # strip.background = element_rect(fill = c(L = "#ADDAE3", R = "#4AB5C4", T = "#BAAD8D"), strip.text = element_text(color = "white"))+
+  xlim(152, 259)+
+  ylim(15, 30)+
+  theme_classic()
+
+
+dev.off()
+
+##### Calculate heatwaves from the modeled data #####
+CB.woodruff.subset = CB.woodruff %>% filter(year %in% c(2008, 2009, 2010, 2013, 2014, 2019)) %>% 
+  filter(doy > 120 & doy < 275)
+
+# format for heatwaveR
+modeled.heatwaveR.L = CB.woodruff.subset %>% filter(lake == "L") %>% mutate(t = date, temp = modeled.temp) %>% 
+  select(t, temp)
+
+modeled.heatwaveR.R = CB.woodruff.subset %>% filter(lake == "R") %>% mutate(t = date, temp = modeled.temp) %>% 
+  select(t, temp)
+
+modeled.heatwaveR.T = CB.woodruff.subset %>% filter(lake == "T") %>% mutate(t = date, temp = modeled.temp) %>% 
+  select(t, temp)
+
+# calculate climatology and thresholds
+modeled.climOutputL = ts2clm(modeled.heatwaveR.L, climatologyPeriod = c(min(modeled.heatwaveR.L$t), max(modeled.heatwaveR.L$t)))
+paulHW = detect_event(modeled.climOutputL)
+
+modeled.climOutputR = ts2clm(modeled.heatwaveR.R, climatologyPeriod = c(min(modeled.heatwaveR.R$t), max(modeled.heatwaveR.R$t)))
+peterHW = detect_event(modeled.climOutputR)
+
+modeled.climOutputT = ts2clm(modeled.heatwaveR.T, climatologyPeriod = c(min(modeled.heatwaveR.T$t), max(modeled.heatwaveR.T$t)))
+tuesdayHW = detect_event(modeled.climOutputT)
+
+
+
+
+# save CB outputs
+saveRDS(paulHW, file = "./results/heatwave modeled outputs/paul heatwave outputs modeled CB 1m.rds")
+saveRDS(peterHW, file = "./results/heatwave modeled outputs/peter heatwave outputs modeled CB 1m.rds")
+saveRDS(tuesdayHW, file = "./results/heatwave modeled outputs/tuesday heatwave outputs modeled CB 1m.rds")
+
+# #### test if climatology is re-calculated by detect event
+# # it appears that, no, the climatology is not re-calculated
+# test.climatology = modeled.heatwaveR.L 
+# test.climatology$temp = sample(seq(from = 20, to = 50, by = 5), size = nrow(test.climatology), replace = TRUE)
+# 
+# test.climatology.output = ts2clm(test.climatology, climatologyPeriod = c(min(test.climatology$t), max(test.climatology$t)))
+# 
+# # replace temp with original temp, keeping climatology as random
+# test.climatology.output$temp =  sample(seq(from = 1, to = 20, by = 1), size = nrow(test.climatology.output), replace = TRUE)
+# detect_event(test.climatology.output)
+
+
+####### Model temperature with hourly Sparkling data #########
 cascade.sonde.temp.all = read.csv("./formatted data/Cascade hourly sonde data/Cascade hourly sonde data 2008-2015.csv")
 
 # Add in the woodruff hourly and Sparkling Lake hourly data

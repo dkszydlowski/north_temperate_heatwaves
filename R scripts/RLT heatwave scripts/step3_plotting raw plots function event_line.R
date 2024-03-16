@@ -4,16 +4,16 @@
 library(dplyr)
 library(ggpubr)
 
-# slopes = read.csv("./formatted data/slopes.csv")
-# slopes = read.csv("./formatted data/slopes_3day.csv")
+slopes = read.csv("./formatted data/slopes.csv")
+slopes = read.csv("./formatted data/slopes_3day.csv")
 
-# slopes = slopes %>% dplyr::rename(doy = doyCat)
+slopes = slopes %>% dplyr::rename(doy = doyCat)
 
 # pdf("./figures/Heatwave raw data plots/temp_chl_heatwaves_slopes_7day.pdf", onefile = TRUE)
 
 # set the number of days after heatwave and number of days to include
-#daysAfter = 1 # 3 days after heatwave
-#numSlopes = 5 # 5-day numSlopes
+daysAfter = 1 # 3 days after heatwave
+numSlopes = 5 # 5-day numSlopes
 
 makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runNumber){
   
@@ -25,9 +25,14 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
   
   print(metadata_plot)
   
-  slopes = allSlopes
+  slopes = allSlopes %>% filter(daysAfter ==0)
   slopes = slopes %>% dplyr::rename(doy = doyCat)
   
+  
+  slopes.other = slopes %>% filter(period == "all other days")
+  slopes.hw = slopes %>% filter(period == "after heatwave")
+  
+  t.test(slopes.other$percent_change, slopes.hw$percent_change)
   
   # save to a pdf with a similar name to the data outputs
   
@@ -41,6 +46,10 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     geom_line(color = "black", size = 1)+
     theme_classic()+
     ylim(-4.1, 4.5)
+  
+  l08percent_change = ggplot(data = l08, aes( x = doy, y = percent_change))+
+    geom_line(color = "black", size = 1)+
+    theme_classic()
   
   l08chl = ggplot(data = l08, aes(x = doy, y = manual_chl))+
     geom_line(color = "forestgreen", size = 1)+
@@ -101,6 +110,16 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     geom_line(color = "black", size = 1)+
     theme_classic()+
     ylim(-4.7, 5.5)+
+    annotate("rect", xmin = as.Date(171), xmax = as.Date(178), ymin = -Inf, ymax = Inf,
+             fill = "red", alpha = 0.5)+
+    annotate("rect", xmin = as.Date(178+daysAfter - slopeLength), xmax = as.Date(178+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,
+             fill = "steelblue", alpha = 0.5)
+  
+  
+  r09slope = ggplot(data = r09, aes( x = doy, y = percent_change))+
+    geom_line(color = "black", size = 1)+
+    theme_classic()+
+   # ylim(-4.7, 5.5)+
     annotate("rect", xmin = as.Date(171), xmax = as.Date(178), ymin = -Inf, ymax = Inf,
              fill = "red", alpha = 0.5)+
     annotate("rect", xmin = as.Date(178+daysAfter - slopeLength), xmax = as.Date(178+daysAfter+numSlopes), ymin = -Inf, ymax = Inf,

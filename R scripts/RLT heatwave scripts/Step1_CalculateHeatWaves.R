@@ -86,3 +86,9 @@ heatwaves = heatwaves %>%
 allSonde = allSonde %>% mutate(lake.year = paste(lake, year, sep = "_"))
 
 
+
+##### Save climatology from actual data #####
+saveRDS(paulHW, file = "./results/heatwave modeled outputs/paul heatwave outputs actual data.rds")
+saveRDS(peterHW, file = "./results/heatwave modeled outputs/peter heatwave outputs actual data.rds")
+saveRDS(tuesdayHW, file = "./results/heatwave modeled outputs/tuesday heatwave outputs actual data.rds")
+

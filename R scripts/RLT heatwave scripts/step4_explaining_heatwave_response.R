@@ -88,3 +88,5 @@ dredge(global.model)
 
 
 #### Gather stats on the lakes as a whole during this time period
+
+# read in the color data

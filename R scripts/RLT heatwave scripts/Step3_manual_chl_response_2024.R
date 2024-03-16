@@ -822,6 +822,263 @@ makePDFrawPlots(allSlopes, daysAfter, numSlopes, metadata_plot, runNumber)
 
 
 
+##### Arrange four distribution plots ########
+# Figure 1 of the paper
+
+
+library(patchwork)
+
+
+
+Alldist <- allSlopes %>%
+  filter(period != "exclude after heatwave", daysAfter == get("daysAfter", envir=globalenv())) %>%
+  ggplot(aes(x = percent_change,
+             y = factor(period, levels = desired_order),  # Use factor with desired order
+             fill = period)) +
+  geom_density_ridges(alpha = 0.7,
+                      quantile_lines = TRUE,
+                      quantile_fun = function(x, ...) median(x), 
+                      scale = 2, size = 0.7) +
+  geom_density_ridges(alpha = 0.7,
+                      quantile_lines = TRUE,
+                      quantile_fun = function(x, ...) mean(x), 
+                      scale = 2, size = 0.7) +
+  geom_text(data = mean_df %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+            aes(x = mean_percent_change,
+                y = factor(period, levels = desired_order),  # Use factor with desired order
+                label = as.character(round(mean_percent_change, digits = 0))),
+            color = "black",
+            size = 4,
+            vjust = 2) +
+  geom_text(data = mean_df %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+            aes(x = -200,
+                y = factor(period, levels = desired_order),  # Use factor with desired order
+                label = paste("n = ", number_percent_change, sep = "")),
+            color = "black",
+            size = 4,
+            vjust = 2) +
+  ylab("") +
+  xlab("% change in surface chlorophyll-a")+
+  labs(title = "Peter, Paul, Tuesday combined") +
+  scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE")) +  # Specify fill colors for groups
+  theme_classic()+
+  theme(axis.text=element_text(size=14),
+        axis.title=element_text(size=18,face="bold"))+
+  annotate("text",  x=Inf, y = Inf, label = paste("Days after heatwave: ", daysAfter, sep = ""), vjust=1, hjust=1)
+
+
+
+
+# testing color
+
+
+#"R" = "#4AB5C4", "L" = "#ADDAE3", "T"=  "#BAAD8D"
+
+
+Rdist<- allSlopes %>%
+  filter(period != "exclude after heatwave", lake == "R", daysAfter == get("daysAfter", envir=globalenv())) %>%
+  ggplot(aes(x = percent_change, y = factor(period, levels = desired_order), fill = stat(x))) +
+  geom_density_ridges_gradient(scale = 3, rel_min_height = 0.01, quantile_lines = TRUE,
+                               quantile_fun = function(x, ...) mean(x), 
+                               size = 0.7, alpha = 0.7) +
+  scale_fill_gradientn(colours = c("#4AB5C4", "forestgreen"),
+                       values = scales::rescale(c(-100, 200, 600, 600))) +
+  labs(title = 'Peter', y = "") +
+  theme_classic() +
+  geom_text(data = mean_dfR %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+            aes(x = mean_percent_change,
+                y = factor(period, levels = desired_order),
+                label = as.character(round(mean_percent_change, digits = 0))),
+            color = "black",
+            size = 4,
+            vjust = 2)
+
+
+
+Ldist <- allSlopes %>%
+  filter(period != "exclude after heatwave", lake == "L", daysAfter == get("daysAfter", envir=globalenv())) %>%
+  ggplot(aes(x = percent_change, y = factor(period, levels = desired_order), fill = stat(x))) +
+  geom_density_ridges_gradient(scale = 3, rel_min_height = 0.01, quantile_lines = TRUE,
+                               quantile_fun = function(x, ...) mean(x), 
+                               size = 0.7, alpha = 0.7) +
+  scale_fill_gradientn(colours = c("#ADDAE3", "forestgreen"),
+                       values = scales::rescale(c(-100, 300, 600, 600))) +
+  labs(title = 'Paul', y = "") +
+  theme_classic() +
+  geom_text(data = mean_dfL %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+            aes(x = mean_percent_change,
+                y = factor(period, levels = desired_order),
+                label = as.character(round(mean_percent_change, digits = 0))),
+            color = "black",
+            size = 4,
+            vjust = 2)
+
+
+
+Tdist <- 
+  allSlopes %>%
+  filter(period != "exclude after heatwave", lake == "T", daysAfter == get("daysAfter", envir=globalenv())) %>%
+  ggplot(aes(x = percent_change, y = factor(period, levels = desired_order), fill = stat(x))) +
+  geom_density_ridges_gradient(scale = 3, rel_min_height = 0.01, quantile_lines = TRUE,
+                               quantile_fun = function(x, ...) mean(x), 
+                               size = 0.7, alpha = 0.7) +
+  scale_fill_gradientn(colours = c("#BAAD8D", "forestgreen"),
+                       values = scales::rescale(c(-50, 200, 600))) +
+  labs(title = 'Tuesday', y = "") +
+  theme_classic() +
+  geom_text(data = mean_dfT %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+            aes(x = mean_percent_change,
+                y = factor(period, levels = desired_order),
+                label = as.character(round(mean_percent_change, digits = 0))),
+            color = "black",
+            size = 4,
+            vjust = 2)
+
+#"R" = "#4AB5C4", "L" = "#ADDAE3", "T"=  "#BAAD8D"
+
+
+
+
+# Tuesday
+Tdist <- allSlopes %>%
+  filter(lake == "T") %>%
+  filter(period != "exclude after heatwave", daysAfter == get("daysAfter", envir=globalenv())) %>%
+  ggplot(aes(x = percent_change,
+             y = factor(period, levels = desired_order),  # Use factor with desired order
+             fill = period)) +
+  geom_density_ridges(alpha = 0.7,
+                      quantile_lines = TRUE,
+                      quantile_fun = function(x, ...) median(x), 
+                      scale = 2, size = 0.7) +
+  geom_density_ridges(alpha = 0.7,
+                      quantile_lines = TRUE,
+                      quantile_fun = function(x, ...) mean(x), 
+                      scale = 2, size = 0.7) +
+  geom_text(data = mean_dfT %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+            aes(x = mean_percent_change,
+                y = factor(period, levels = desired_order),  # Use factor with desired order
+                label = as.character(round(mean_percent_change, digits = 0))),
+            color = "black",
+            size = 4,
+            vjust = 2) +
+  geom_text(data = mean_dfT %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+            aes(x = -200,
+                y = factor(period, levels = desired_order),  # Use factor with desired order
+                label = paste("n = ", number_percent_change, sep = "")),
+            color = "black",
+            size = 4,
+            vjust = 2) +
+  ylab("") +
+  xlab("% change in surface chlorophyll-a")+
+  labs(title = "Tuesday") +
+  scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE")) +  # Specify fill colors for groups
+  theme_classic()+
+  theme(axis.text=element_text(size=14),
+        axis.title=element_text(size=18,face="bold"))+
+  annotate("text",  x=Inf, y = Inf, label = paste("Days after heatwave: ", daysAfter, sep = ""), vjust=1, hjust=1)
+
+
+#dev.off()
+
+desired_order <- c("after heatwave", "during heatwave", "all other days")
+
+
+
+#png("./figures/science in the northwoods figures/Peter Lake heatwave results 4 days after.png", height = 7, width = 13, units = "in", res = 600)
+
+Rdist <- allSlopes %>%
+  filter(lake == "R") %>%
+  filter(period != "exclude after heatwave", daysAfter == get("daysAfter", envir=globalenv())) %>%
+  ggplot(aes(x = percent_change,
+             y = factor(period, levels = desired_order),  # Use factor with desired order
+             fill = period)) +
+  geom_density_ridges(alpha = 0.7,
+                      quantile_lines = TRUE,
+                      quantile_fun = function(x, ...) median(x), 
+                      scale = 2, size = 0.7) +
+  geom_density_ridges(alpha = 0.7,
+                      quantile_lines = TRUE,
+                      quantile_fun = function(x, ...) mean(x), 
+                      scale = 2, size = 0.7) +
+  geom_text(data = mean_dfR %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+            aes(x = mean_percent_change,
+                y = factor(period, levels = desired_order),  # Use factor with desired order
+                label = as.character(round(mean_percent_change, digits = 0))),
+            color = "black",
+            size = 4,
+            vjust = 2) +
+  geom_text(data = mean_dfR %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+            aes(x = -200,
+                y = factor(period, levels = desired_order),  # Use factor with desired order
+                label = paste("n = ", number_percent_change, sep = "")),
+            color = "black",
+            size = 4,
+            vjust = 2) +
+  ylab("") +
+  xlab("% change in surface chlorophyll-a")+
+  labs(title = "Peter") +
+  scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE")) +  # Specify fill colors for groups
+  theme_classic()+
+  theme(axis.text=element_text(size=14),
+        axis.title=element_text(size=18,face="bold"))+
+  annotate("text",  x=Inf, y = Inf, label = paste("Days after heatwave: ", daysAfter, sep = ""), vjust=1, hjust=1)
+
+
+#dev.off()
+
+#png("./figures/science in the northwoods figures/Paul Lake heatwave results 4 days after.png", height = 7, width = 13, units = "in", res = 600)
+
+
+Ldist <- allSlopes %>%
+  filter(lake == "L") %>%
+  filter(period != "exclude after heatwave", daysAfter == get("daysAfter", envir=globalenv())) %>%
+  ggplot(aes(x = percent_change,
+             y = factor(period, levels = desired_order),  # Use factor with desired order
+             fill = period)) +
+  geom_density_ridges(alpha = 0.7,
+                      quantile_lines = TRUE,
+                      quantile_fun = function(x, ...) median(x), 
+                      scale = 2, size = 0.7) +
+  geom_density_ridges(alpha = 0.7,
+                      quantile_lines = TRUE,
+                      quantile_fun = function(x, ...) mean(x), 
+                      scale = 2, size = 0.7) +
+  geom_text(data = mean_dfL %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+            aes(x = mean_percent_change,
+                y = factor(period, levels = desired_order),  # Use factor with desired order
+                label = as.character(round(mean_percent_change, digits = 0))),
+            color = "black",
+            size = 4,
+            vjust = 2) +
+  geom_text(data = mean_dfL %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+            aes(x = -200,
+                y = factor(period, levels = desired_order),  # Use factor with desired order
+                label = paste("n = ", number_percent_change, sep = "")),
+            color = "black",
+            size = 4,
+            vjust = 2) + 
+  ylab("") +
+  xlab("% change in surface chlorophyll-a")+
+  labs(title = "Paul") +
+  scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE")) +  # Specify fill colors for groups
+  theme_classic()+
+  theme(axis.text=element_text(size=14),
+        axis.title=element_text(size=18,face="bold"))+
+  annotate("text",  x=Inf, y = Inf, label = paste("Days after heatwave: ", daysAfter, sep = ""), vjust=1, hjust=1)
+
+
+
+
+
+
+big_plot <- Alldist + plot_layout(guides = 'collect')
+small_plots <- Rdist | Tdist | Ldist
+
+small_plots/big_plot
+
+
+
+
 
 
 #==============================================================================#
