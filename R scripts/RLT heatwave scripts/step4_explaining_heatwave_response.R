@@ -87,6 +87,9 @@ dredge(global.model)
 
 
 
-#### Gather stats on the lakes as a whole during this time period
 
-# read in the color data
+
+##### Exlpanatory variables analysis updated 2024_03_17
+
+heatwaves.exp = read.csv("./formatted data/explanatory variables heatwaves/heatwaves with percent zoop color nutrients.csv")
+

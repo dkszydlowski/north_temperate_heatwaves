@@ -256,8 +256,8 @@ wc.18 = read_xls("./formatted data/Routines 2018 2019/LimnoData_2018.xls", sheet
 wc.19 = read_xlsx("./formatted data/Routines 2018 2019/LimnoData_2019.xlsx", sheet = "Color")
 
 # rename columns to match my standard format
-wc.18 = wc.18 %>% rename(lake = Lake, date = `Date`, year = Year, doy = DoY, PML.g440 = `PML_g440_m-1`)
-wc.19 = wc.19 %>% rename(lake = Lake, date = `Sample Date`, year = Year, doy = DoY, PML.g440 = `PML_g440_m-1`)
+wc.18 = wc.18 %>% dplyr::rename(lake = Lake, date = `Date`, year = Year, doy = DoY, PML.g440 = `PML_g440_m-1`)
+wc.19 = wc.19 %>% dplyr::rename(lake = Lake, date = `Sample Date`, year = Year, doy = DoY, PML.g440 = `PML_g440_m-1`)
 
 # select columns and filter out NA values
 wc.18 = wc.18 %>% select(lake, date, year, doy, PML, PML.g440) %>% filter(!is.na(lake)) %>% filter(!is.na(PML))
@@ -275,7 +275,7 @@ ggplot(data = wc.18.19, aes(x = doy, y = PML.g440, color = as.factor(year)))+
 
 # 2008-2016 cascade color
 # rename columns to match my standard format
-casc.color = casc.color %>% rename(lake = lakeid, year = year4, doy = daynum, date = sampledate)
+casc.color = casc.color %>% dplyr::rename(lake = lakeid, year = year4, doy = daynum, date = sampledate)
 
 # filter to just PML color and years 2008-2016
 casc.color = casc.color %>% 
@@ -328,21 +328,21 @@ mean.chl = chl %>% group_by(lake) %>% summarize(mean.chl = mean(manual_chl, na.r
 
 
 ### Plot slopes rank ####
-slopes.rank = slopes %>% mutate(rank = rank(percent_change))
-
-ggplot(slopes.rank, aes(x = rank, y = percent_change, fill = period))+
-  geom_point(alpha = 0.5, pch = 21)+
-  facet_wrap(~lake)+
-  scale_fill_manual(values = c("black", "white"))+
-  geom_hline(yintercept = 0, linetype = "dashed")
-
-ggplot(slopes.rank, aes(x = period, y = percent_change, fill = lake))+
-  geom_boxplot(size = 0.8)+
-  facet_wrap(~lake)+
-  scale_fill_manual(values = c("black", "white"))+
-  geom_hline(yintercept = 0, linetype = "dashed")+
-  scale_fill_manual(values = c("R"=  "#4AB5C4", "L" = "#ADDAE3", "T"=  "#BAAD8D"))
-  
+# slopes.rank = slopes %>% mutate(rank = rank(percent_change))
+# 
+# ggplot(slopes.rank, aes(x = rank, y = percent_change, fill = period))+
+#   geom_point(alpha = 0.5, pch = 21)+
+#   facet_wrap(~lake)+
+#   scale_fill_manual(values = c("black", "white"))+
+#   geom_hline(yintercept = 0, linetype = "dashed")
+# 
+# ggplot(slopes.rank, aes(x = period, y = percent_change, fill = lake))+
+#   geom_boxplot(size = 0.8)+
+#   facet_wrap(~lake)+
+#   scale_fill_manual(values = c("black", "white"))+
+#   geom_hline(yintercept = 0, linetype = "dashed")+
+#   scale_fill_manual(values = c("R"=  "#4AB5C4", "L" = "#ADDAE3", "T"=  "#BAAD8D"))
+#   
 
 
 
@@ -631,16 +631,75 @@ ggplot(casc.weekly.zoops, aes(x = daynum, y = biomass, color = lakeid))+
 
 ###### combine all of the different Cascade datasets ########
 
-casc.weekly.zoops
-casc.color
+casc.weekly.zoops = casc.weekly.zoops %>% dplyr::rename(lake = lakeid, year = year4, doy = daynum,
+                                                        date = sampledate)
+
+casc.weekly.zoops = casc.weekly.zoops %>% mutate(lake = as.character(lake))
+casc.color = casc.color %>% mutate(lake = as.character(lake))
+
+casc.color.zoops = casc.color %>% full_join(casc.weekly.zoops, by = c("lake", "date", "year", "doy"))
 
 
+nut.load = read.csv("./formatted data/explanatory variables heatwaves.csv")
 
+# make a date column in nut.load
+nut.load = nut.load %>% mutate(date = as.Date(paste(year, doy), format = "%Y %j"))
 
+casc.color.nut.zoops = casc.color.zoops %>% full_join(nut.load, by = c("lake", "date", "year", "doy"))
+
+write.csv(casc.color.nut.zoops, "./formatted data/explanatory variables heatwaves/color nutrient additions and zooplankton.csv", row.names = FALSE)
 
 
 
 ## function which combines heatwaves output with the explanatory variables ##
+heatwaves.exp = read.csv("./formatted data/explanatory variables heatwaves/heatwaves with percent.csv")
+
+heatwaves.exp = heatwaves.exp %>% mutate(doy = yday(date_start))
+
+#heatwaves.exp = heatwaves.exp %>% group_by(lake, year) %>% join_by(casc.color.nut.zoops, date_start > date)
+
+
+# create new columns of heatwaves.exp for PML.g440, biomass, cumulative.load, daily.load
+heatwaves.exp = heatwaves.exp %>% mutate(PML.g440 = NA, biomass = NA, cumulative.load = NA, daily.load = NA)
+i = 30
+for(i in 1:nrow(heatwaves.exp)){
+  
+  # save the start wave of current heatwave
+  targ.date = heatwaves.exp$date_start[i]
+  targ.doy = heatwaves.exp$doy[i]
+  print(targ.date)
+  
+  # save the lake of the current heatwave
+  targ.lake = heatwaves.exp$lake[i]
+  targ.year = heatwaves.exp$year[i]
+  
+  # filter the explanatory dataframe to match
+  # make sure doy is <= the heatwave day
+  cur.casc.exp = casc.color.nut.zoops %>% filter(lake == targ.lake, year == targ.year, doy <= targ.doy)
+  
+  cur.casc.exp.zoop = cur.casc.exp %>% filter(!is.na(biomass))
+  cur.casc.exp.color = cur.casc.exp %>% filter(!is.na(PML.g440))
+  cur.casc.exp.nut = cur.casc.exp %>% filter(!is.na(cumulative.load))
+  
+
+  j = which(abs(cur.casc.exp.zoop$doy - targ.doy) == min(abs(cur.casc.exp.zoop$doy - targ.doy)))
+  if(nrow(cur.casc.exp.zoop) > 0){ heatwaves.exp$biomass[i] = cur.casc.exp.zoop$biomass[j]}
+  
+  k = which(abs(cur.casc.exp.color$doy - targ.doy) == min(abs(cur.casc.exp.color$doy - targ.doy)))
+  if(nrow(cur.casc.exp.color) > 0){ heatwaves.exp$PML.g440[i] = cur.casc.exp.color$PML.g440[k]}
+  
+  l = which(abs(cur.casc.exp.nut$doy - targ.doy) == min(abs(cur.casc.exp.nut$doy - targ.doy)))
+  if(nrow(cur.casc.exp.nut) > 0){ heatwaves.exp$cumulative.load[i] = cur.casc.exp.nut$cumulative.load[l]
+                                  heatwaves.exp$daily.load[i] = cur.casc.exp.nut$daily.load[l]
+  }
+  
+}
+
+# there are certain cases when routines started after the heatwave
+# or when there were no daphnia in Tuesday Lake
+
+
+write.csv(heatwaves.exp, "./formatted data/explanatory variables heatwaves/heatwaves with percent zoop color nutrients.csv", row.names = FALSE)
 
 
 

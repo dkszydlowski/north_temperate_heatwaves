@@ -119,7 +119,6 @@ metadata_plot <- ggplot() +
 
 heatwaves = read.csv("./results/heatwave modeled outputs/heatwave events LRT.csv")
 
-
 # read in the manual chl data
 allData = read.csv("./formatted data/interpolated_manual_chl_for_slopes.csv")
 
@@ -811,7 +810,7 @@ print(ggarrange(hw.pload, hw.color, hw.doy.start, hw.length, nrow = 2, ncol = 2)
 dev.off()
 
 # make a PDF of all the raw plots with highlighted areas showing where slopes are calculated
-makePDFrawPlots(allSlopes, daysAfter, numSlopes, metadata_plot, runNumber)
+makePDFrawPlots(allSlopes, daysAfter, numSlopes, metadata_plot, runNumber, slopeLength)
 
 
 
@@ -859,12 +858,12 @@ Alldist <- allSlopes %>%
             vjust = 2) +
   ylab("") +
   xlab("% change in surface chlorophyll-a")+
-  labs(title = "Peter, Paul, Tuesday combined") +
-  scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE")) +  # Specify fill colors for groups
+  labs(title = "All lakes") +
+  scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "forestgreen", "all other days" = "#88CCEE")) +  # Specify fill colors for groups
   theme_classic()+
   theme(axis.text=element_text(size=14),
-        axis.title=element_text(size=18,face="bold"))+
-  annotate("text",  x=Inf, y = Inf, label = paste("Days after heatwave: ", daysAfter, sep = ""), vjust=1, hjust=1)
+        axis.title=element_text(size=14,face="bold"))+
+  theme(axis.text.y = element_blank())
 
 
 
@@ -971,11 +970,11 @@ Tdist <- allSlopes %>%
   ylab("") +
   xlab("% change in surface chlorophyll-a")+
   labs(title = "Tuesday") +
-  scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE")) +  # Specify fill colors for groups
+  scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "forestgreen", "all other days" = "#BAAD8D")) +  # Specify fill colors for groups
   theme_classic()+
   theme(axis.text=element_text(size=14),
-        axis.title=element_text(size=18,face="bold"))+
-  annotate("text",  x=Inf, y = Inf, label = paste("Days after heatwave: ", daysAfter, sep = ""), vjust=1, hjust=1)
+        axis.title=element_text(size=14,face="bold"))+
+  theme(axis.text.y = element_blank())
 
 
 #dev.off()
@@ -1017,11 +1016,11 @@ Rdist <- allSlopes %>%
   ylab("") +
   xlab("% change in surface chlorophyll-a")+
   labs(title = "Peter") +
-  scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE")) +  # Specify fill colors for groups
+  scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "forestgreen", "all other days" = "#4AB5C4")) +  # Specify fill colors for groups
   theme_classic()+
   theme(axis.text=element_text(size=14),
-        axis.title=element_text(size=18,face="bold"))+
-  annotate("text",  x=Inf, y = Inf, label = paste("Days after heatwave: ", daysAfter, sep = ""), vjust=1, hjust=1)
+        axis.title=element_text(size=14,face="bold"))+
+  theme(axis.text.y = element_blank())
 
 
 #dev.off()
@@ -1060,11 +1059,11 @@ Ldist <- allSlopes %>%
   ylab("") +
   xlab("% change in surface chlorophyll-a")+
   labs(title = "Paul") +
-  scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE")) +  # Specify fill colors for groups
+  scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "forestgreen", "all other days" = "#88CCEE")) +  # Specify fill colors for groups
   theme_classic()+
   theme(axis.text=element_text(size=14),
-        axis.title=element_text(size=18,face="bold"))+
-  annotate("text",  x=Inf, y = Inf, label = paste("Days after heatwave: ", daysAfter, sep = ""), vjust=1, hjust=1)
+        axis.title=element_text(size=14,face="bold"))+
+  theme(axis.text.y = element_blank())
 
 
 

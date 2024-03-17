@@ -30,6 +30,24 @@ climatology.all.real = rbind(climatology.R, climatology.L, climatology.T) %>% mu
 climatology.all = rbind(climatology.all, climatology.all.real)
 
 
+# climatology using routines for model training
+
+"./results/heatwave modeled outputs/paul heatwave outputs modeled SP 1m routines.rds"
+
+# Sparkling Lake modeled climatology with routines
+peterHW = readRDS(file = "./results/heatwave modeled outputs/peter heatwave outputs modeled SP 1m routines.rds")
+paulHW = readRDS(file = "./results/heatwave modeled outputs/paul heatwave outputs modeled SP 1m routines.rds")
+tuesdayHW = readRDS(file = "./results/heatwave modeled outputs/tuesday heatwave outputs modeled SP 1m routines.rds")
+
+climatology.R = peterHW$climatology %>% mutate(lake = "peter")
+climatology.L = paulHW$climatology %>% mutate(lake = "paul")
+climatology.T = tuesdayHW$climatology %>% mutate(lake = "tuesday")
+
+climatology.all.routines = rbind(climatology.R, climatology.L, climatology.T) %>% mutate(model = "Routines temp model")
+
+climatology.all = rbind(climatology.all, climatology.all.routines)
+
+png("./figures/modeled temperature/climatologies/all climatologies.png", height = 4, width = 11, units = "in", res = 300)
 
 
 
@@ -49,7 +67,7 @@ climatology.all.CB = rbind(climatology.R, climatology.L, climatology.T) %>% muta
 
 climatology.all = rbind(climatology.all, climatology.all.CB)
 
-png("./figures/modeled temperature/climatologies/all climatologies.png", height = 4, width = 11, units = "in", res = 300)
+png("./figures/modeled temperature/climatologies/all climatologies.png", height = 5, width = 9, units = "in", res = 300)
 
 ## Make a plot ##
 ggplot(climatology.all, aes(x = doy, y = seas, linetype = model, color = model))+
@@ -59,7 +77,11 @@ ggplot(climatology.all, aes(x = doy, y = seas, linetype = model, color = model))
   ylim(12, 25)+
   xlim(100, 280)+
   theme_classic()+
-  scale_color_manual(values = c("gray5", "coral2", "cornflowerblue"))
+  scale_color_manual(values = c("gray5", "coral2", "cornflowerblue", "yellow"))
 
 dev.off()
+
+
+
+
 

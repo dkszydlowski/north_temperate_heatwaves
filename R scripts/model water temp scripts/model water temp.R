@@ -151,7 +151,8 @@ casc.temp.0.5 = casc.temp %>% filter(depth == 0.5)
 
 ggplot(data = casc.temp.0, aes(x = date, y = temp, color = lake))+
   geom_point()+
-  facet_wrap(~lake)+
+  geom_line()
+  facet_wrap(~lake, ncol = 1, nrow = 3)+
   scale_color_manual(values = c("L" = "#ADDAE3", "R"=  "#4AB5C4", "T"=  "#BAAD8D"))+
   theme_bw()
 
@@ -1037,4 +1038,163 @@ cascade.sonde.temp.all = cascade.sonde.temp.all %>% mutate(lead.woodruff.temp.5 
 hourly.model = lmer(temp~sp.temp +woodruff.temp*lead.woodruff.temp.5 + doy + (1|lake), data = cascade.sonde.temp.all)
 summary(hourly.model)
 r.squaredGLMM(hourly.model)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+####### Model with routine temperature, sparkling lake, and woodruff airport
+cascade.sonde.temp.all = read.csv("./formatted data/Cascade hourly sonde data/Cascade hourly sonde data 2008-2015.csv")
+
+# Add in the woodruff hourly and Sparkling Lake hourly data
+woodruff = read.csv("./formatted data/LTER daily temperature/woodruff airport temperature LTER.csv")
+woodruff = woodruff %>% rename(year = year4, date = sampledate, doy = daynum) %>% 
+  select(year, date, doy, hour, avg_air_temp) %>% 
+  rename(woodruff.temp = avg_air_temp)
+
+sp.hourly = read.csv("./formatted data/LTER hourly temperature/Sparkling Lake hourly temperature.csv")
+
+# sp.hourly = sp.hourly %>% rename(date = sampledate, year = year4) %>% filter(depth == 0 | depth == 0.01)
+sp.hourly = sp.hourly %>% rename(date = sampledate, year = year4) %>% filter(depth == 1)
+
+sp.woodruff.hourly = left_join(woodruff, sp.hourly, by = c("year", "date", "hour")) %>% rename(sp.temp = wtemp)
+
+sp.woodruff.hourly.900 = sp.woodruff.hourly %>% filter(hour == 900)
+
+casc.temp = casc.temp %>% mutate(date = as.character(date))
+
+casc.temp.0 = casc.temp %>% filter(depth == 0)
+casc.temp.1 = casc.temp %>% filter(depth == 1)
+
+# add the sparkling and woodruff hourly data to the routine data
+casc.temp.sp.woodruff = casc.temp.1 %>% left_join(sp.woodruff.hourly.900, by = c("year", "date"))
+
+summary(lm(data = casc.temp.sp.woodruff %>% filter(lake == "R"), temp~woodruff.temp))
+summary(lm(data = casc.temp.sp.woodruff %>% filter(lake == "L"), temp~sp.temp))
+summary(lm(data = casc.temp.sp.woodruff %>% filter(lake == "T"), temp~sp.temp))
+
+# R^2 between routines at 1 m and Sparkling at 1 m is 0.908
+
+casc.temp.sp.woodruff = casc.temp.sp.woodruff %>% mutate(doy = yday(date))
+
+# R^2 between woodruff air and routines at 1 m is ~0.5
+test.routines = lmer(temp~sp.temp+ woodruff.temp +doy + (1|lake), data = casc.temp.sp.woodruff)
+summary(test.routines)
+r.squaredGLMM(test.routines)
+
+
+plot(test)
+
+qqModel = qqnorm(residuals(test))
+
+
+
+##### Use the model to predict temperature of RLT for every year Sparkling Lake data ######
+# SP.woodruff = SP.temp.1 %>% left_join(woodruff, by = c("date", "doy", "year"))
+
+# make columns of lake that can be input to the model
+SP.woodruffL = SP.woodruff %>% mutate(lake = "L")
+SP.woodruffR = SP.woodruff %>% mutate(lake = "R")
+SP.woodruffT = SP.woodruff %>% mutate(lake = "T")
+
+# combine into one for predicting temp
+SP.woodruff = rbind(SP.woodruffL, SP.woodruffR, SP.woodruffT)
+
+SP.woodruff = SP.woodruff %>% rename(sp.temp = SP.temp.1)
+
+SP.woodruff$modeled.temp = predict(test.routines, SP.woodruff)
+
+pdf("./figures/modeled temperature/modeled temperature daily SP 1 m routines.pdf", width = 12, height = 18)
+
+
+ggplot(SP.woodruff, aes(x = doy, y = modeled.temp, color = lake))+
+  geom_line(size = 0.9)+
+  #geom_line(aes(x = doy, y = sp.temp, color = "black"), size = 1)+
+  facet_wrap(~year)+
+  labs(y = "modeled temperature", x = "day of year")+
+  scale_color_manual(values = c("L" = "#ADDAE3", "R"=  "#4AB5C4", "T"=  "#BAAD8D"))  +
+  xlim(152, 259)+
+  ylim(15, 30)+
+  theme_classic()
+
+dev.off()
+
+# compare the predicted temperature to the actual temperature
+SP.woodruff.cascade = temp.sonde %>% left_join(SP.woodruff, by = c("year", "date", "doy", "lake"))
+
+SP.woodruff.cascade.real.data = SP.woodruff.cascade %>% filter(!is.na(mean_temp))
+
+# pivot longer for plotting
+#SP.woodruff.cascade.real.data = SP.woodruff.cascade.real.data %>% pivot_longer()
+
+
+SP.woodruff.cascade.real.data_long <- SP.woodruff.cascade.real.data %>%
+  pivot_longer(
+    cols = c("modeled.temp", "mean_temp"),
+    names_to = "temp.type",
+    values_to = "temperature"
+  )
+
+
+pdf("./figures/modeled temperature/modeled vs real temperature daily SP 1 m routines.pdf", width = 12, height = 12)
+
+ggplot(SP.woodruff.cascade.real.data_long, aes(x = doy, y = temperature, color = temp.type))+
+  geom_line(size = 1, alpha = 0.8)+
+  #geom_point()+
+  #geom_line(aes(x = doy, y = SP.temp.1, color = "black"), size = 1)+
+  facet_wrap(lake~year)+
+  labs( x = "day of year")+
+  # scale_color_manual(values = c("L" = "#ADDAE3", "R"=  "#4AB5C4", "T"=  "#BAAD8D"))  +
+  # strip.background = element_rect(fill = c(L = "#ADDAE3", R = "#4AB5C4", T = "#BAAD8D"), strip.text = element_text(color = "white"))+
+  xlim(152, 259)+
+  ylim(15, 30)+
+  theme_classic()
+
+
+dev.off()
+
+##### Calculate heatwaves from the modeled data #####
+SP.woodruff.subset = SP.woodruff %>% filter(year %in% c(189, 1990, 1991, 1992, 1993, 1994, 1995,
+                                                        1997, 1998, 1999, 2000, 2002, 2003, 2004, 2005,
+                                                        2007, 2009, 2010, 2011, 2013, 2014, 2019, 2020, 2021,
+                                                        2022)) %>% 
+  filter(doy > 120 & doy < 275)
+
+# format for heatwaveR
+modeled.heatwaveR.L = SP.woodruff.subset %>% filter(lake == "L") %>% mutate(t = date, temp = modeled.temp) %>% 
+  select(t, temp)
+
+modeled.heatwaveR.R = SP.woodruff.subset %>% filter(lake == "R") %>% mutate(t = date, temp = modeled.temp) %>% 
+  select(t, temp)
+
+modeled.heatwaveR.T = SP.woodruff.subset %>% filter(lake == "T") %>% mutate(t = date, temp = modeled.temp) %>% 
+  select(t, temp)
+
+# calculate climatology and thresholds
+modeled.climOutputL = ts2clm(modeled.heatwaveR.L, climatologyPeriod = c(min(modeled.heatwaveR.L$t), max(modeled.heatwaveR.L$t)))
+paulHW = detect_event(modeled.climOutputL)
+
+modeled.climOutputR = ts2clm(modeled.heatwaveR.R, climatologyPeriod = c(min(modeled.heatwaveR.R$t), max(modeled.heatwaveR.R$t)))
+peterHW = detect_event(modeled.climOutputR)
+
+modeled.climOutputT = ts2clm(modeled.heatwaveR.T, climatologyPeriod = c(min(modeled.heatwaveR.T$t), max(modeled.heatwaveR.T$t)))
+tuesdayHW = detect_event(modeled.climOutputT)
+
+
+
+
+# save SP outputs
+saveRDS(paulHW, file = "./results/heatwave modeled outputs/paul heatwave outputs modeled SP 1m routines.rds")
+saveRDS(peterHW, file = "./results/heatwave modeled outputs/peter heatwave outputs modeled SP 1m routines.rds")
+saveRDS(tuesdayHW, file = "./results/heatwave modeled outputs/tuesday heatwave outputs modeled SP 1m routines.rds")
 
