@@ -5,6 +5,11 @@ library(readxl)
 library(lme4)
 
 
+library(lme4)
+library(lmerTest)
+library(MuMIn)
+
+
 ### Old code with old values 
 exp = read_xlsx("./formatted data/explanatory_variables_heatwaves.xlsx")
 
@@ -89,7 +94,83 @@ dredge(global.model)
 
 
 
-##### Exlpanatory variables analysis updated 2024_03_17
+##### Explanatory variables analysis updated 2024_03_17
 
 heatwaves.exp = read.csv("./formatted data/explanatory variables heatwaves/heatwaves with percent zoop color nutrients.csv")
+
+
+ggplot(heatwaves.exp, aes(x = biomass, y = percentChange))+
+  geom_point()+
+  theme_classic()
+
+
+ggplot(heatwaves.exp, aes(x = PML.g440, y = percentChange, color = lake))+
+  geom_point()+
+  theme_classic()
+
+
+ggplot(heatwaves.exp  %>% filter(lake == "L"), aes(x = PML.g440, y = percentChange, color = lake))+
+  geom_point()+
+  theme_classic()
+
+
+
+ggplot(heatwaves.exp  %>% filter(lake == "L"), aes(x = PML.g440, y = biomass, color = lake))+
+  geom_point()+
+  theme_classic()
+
+ggplot(heatwaves.exp, aes(x = cumulative.load, y = percentChange, color = lake))+
+  geom_point()+
+  theme_classic()
+
+
+ggplot(heatwaves.exp, aes(x = daily.load, y = percentChange, color = lake))+
+  geom_point()+
+  theme_classic()
+
+
+ggplot(heatwaves.exp, aes(x = PML.g440, y = averageSlope, color = lake))+
+  geom_point()+
+  theme_classic()
+
+
+
+test = lmer(percentChange~PML.g440*cumulative.load*rate_onset+doy + (1|lake), data = heatwaves.exp)
+
+summary(test)
+r.squaredGLMM(test)
+
+
+
+heatwaves.exp.synchronous = heatwaves.exp %>%
+  mutate(event = seq(1, nrow(heatwaves.exp))) %>% 
+  filter((!event %in% c(5, 6, 29, 33)))
+
+
+heatwaves.exp.synchronous = heatwaves.exp %>% 
+  mutate(event.grouped = NA) %>% 
+  mutate(event.grouped = case_when(event == 1 | event == 16 ~ 1
+    
+  ))
+
+
+ggplot(heatwaves.exp.synchronous, aes(x = biomass, y = percentChange, color = lake))+
+  geom_point()+
+  theme_classic()
+
+
+ggplot(heatwaves.exp.synchronous, aes(x = PML.g440, y = percentChange, color = lake))+
+  geom_point()+
+  theme_classic()
+
+
+ggplot(heatwaves.exp.synchronous, aes(x = cumulative.load, y = percentChange, color = lake))+
+  geom_point()+
+  theme_classic()
+
+
+ggplot(heatwaves.exp.synchronous, aes(x = daily.load, y = percentChange, color = lake))+
+  geom_point()+
+  theme_classic()
+
 
