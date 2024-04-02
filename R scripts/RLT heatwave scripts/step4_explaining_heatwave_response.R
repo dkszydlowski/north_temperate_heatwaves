@@ -99,10 +99,39 @@ dredge(global.model)
 heatwaves.exp = read.csv("./formatted data/explanatory variables heatwaves/heatwaves with percent zoop color nutrients.csv")
 
 
-ggplot(heatwaves.exp, aes(x = biomass, y = percentChange))+
-  geom_point()+
-  theme_classic()
+a = ggplot(heatwaves.exp, aes(x = log10(biomass), y = percentChange, fill = lake))+
+  geom_point(size = 5, color = "black", shape = 21, stroke = 1, alpha = 0.7)+
+  labs(x = "log10(Daphnia biomass)", y = "% change in surface chlorophyll a")+
+  theme_classic()+
+  scale_fill_manual(values = c("L" = "steelblue2", "R" = "black", "T" = "white"))
 
+
+
+b = ggplot(heatwaves.exp, aes(x = (PML.g440), y = (percentChange), fill = lake))+
+  geom_point(size = 5, color = "black", shape = 21, stroke = 1, alpha = 0.7)+
+  labs(x = "surface water color - g440 (m-1)", y = "% change in surface chlorophyll-a")+
+  theme_classic()+
+  scale_fill_manual(values = c("L" = "steelblue2", "R" = "black", "T" = "white"))
+
+
+
+c = ggplot(heatwaves.exp, aes(x = (cumulative.load), y = (percentChange), fill = lake))+
+  geom_point(size = 5, color = "black", shape = 21, stroke = 1, alpha = 0.7)+
+  labs(x = "cumulative P (mg/m^2)", y = "% change in surface chlorophyll-a")+
+  theme_classic()+
+  scale_fill_manual(values = c("L" = "steelblue2", "R" = "black", "T" = "white"))
+
+
+
+d = ggplot(heatwaves.exp, aes(x = (daily.load), y = (percentChange), fill = lake))+
+  geom_point(size = 5, color = "black", shape = 21, stroke = 1, alpha = 0.7)+
+  labs(x = "daily P load (mg/m^2)", y = "% change in surface chlorophyll-a")+
+  theme_classic()+
+  scale_fill_manual(values = c("L" = "steelblue2", "R" = "black", "T" = "white"))
+
+png("./figures/manuscript 03_18_2024/explanatory plots.png", height = 8, width = 8, units = "in", res = 300)
+ggarrange(b, a, c, d, common.legend = TRUE)
+dev.off()
 
 ggplot(heatwaves.exp, aes(x = PML.g440, y = percentChange, color = lake))+
   geom_point()+
@@ -174,3 +203,24 @@ ggplot(heatwaves.exp.synchronous, aes(x = daily.load, y = percentChange, color =
   theme_classic()
 
 
+
+
+
+
+
+### Is the difference between L and R explained by color? Grazing? Nutrients?
+
+# bring in the dataframe that has the grouping
+
+grouping = read.csv("./results/heatwaves with grouping.csv")
+
+grouping = grouping %>% select(lake, year, date_start, date_end, event_group, start_date_avg)
+
+
+heatwaves.exp = heatwaves.exp %>% left_join(grouping, by = c("lake", "year", "date_start", "date_end"))
+
+heatwaves.exp.l.r = heatwaves.exp %>% filter(!is.na(event_group)) %>% 
+  filter(lake == "L" | lake == "R")
+
+
+avg.l.r. = heatwaves.exp.l.r %>% group_by(event_group) %>% dplyr::summarize(mean.percent = mean(percentChange, na.rm = TRUE), mean.color = mean(PML.g440, na.rm = TRUE))

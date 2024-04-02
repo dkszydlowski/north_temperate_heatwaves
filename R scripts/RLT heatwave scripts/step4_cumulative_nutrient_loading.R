@@ -81,19 +81,31 @@ nut.load = nut.load %>%
   dplyr::mutate(cumulative.load = cumsum(daily.load))
 
 nut.load.13.15 = nut.load %>% filter(year == 2013 | year == 2014 | year == 2015 | year == 2019)
+png("./figures/explanatory variables/cumulative nutrient loading.png", height = 6, width = 6, units = "in", res = 300)
 
 ggplot(nut.load.13.15 %>% filter(lake != "L"), aes(x = doy, y = cumulative.load, fill = lake))+
   geom_area()+
   geom_line(color = "black", size = 1)+
   facet_wrap(lake~year)+
-  theme_classic()
+  theme_classic()+
+  labs(x = "day of year")+
+  scale_fill_manual(values = c("R"=  "#4AB5C4", "L" = "#ADDAE3", "T"=  "#BAAD8D"))
+
+dev.off()
+
+
+
+png("./figures/explanatory variables/daily nutrient loading.png", height = 6, width = 6, units = "in", res = 300)
 
 ggplot(nut.load.13.15 %>% filter(lake != "L"), aes(x = doy, y = daily.load, fill = lake))+
   geom_area()+
   geom_line(color = "black", size = 1)+
   facet_wrap(lake~year)+
-  theme_classic()
-
+  theme_classic()+
+  labs(x = "day of year")+
+  scale_fill_manual(values = c("R"=  "#4AB5C4", "L" = "#ADDAE3", "T"=  "#BAAD8D"))
+  
+dev.off()
 
 # save the nutrient loading data to a file
 write.csv(nut.load, "./formatted data/explanatory variables heatwaves.csv", row.names = FALSE)

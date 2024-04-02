@@ -13,8 +13,8 @@
 if (!require(slider)) install.packages('slider')
 library(slider) 
 
-if (!require(plyr)) install.packages('plyr')
-library(plyr)
+if (!require(dplyr)) install.packages('plyr')
+library(dplyr)
 
 if (!require(tidyr)) install.packages('tidyr')
 library(tidyr)
@@ -261,7 +261,7 @@ hwSlopes <- function(heatwaveStart, heatwaveEnd,  targLake, data){
    annotate("text",  x=Inf, y = Inf, label = paste("Number of slopes averaged per event: ", numSlopes, sep = ""), vjust=2.5, hjust=1)
 
 
-write.csv(heatwaves, "./formatted data/explanatory variables heatwaves/heatwaves with percent.csv")
+#write.csv(heatwaves, "./formatted data/explanatory variables heatwaves/heatwaves with percent.csv")
 
 
 #==============================================================================#
@@ -1037,7 +1037,6 @@ dev.off()
 
 results = results %>% mutate(event_group = NA)
 
-
 # Convert date_start and date_end to Date class
 results$date_start <- as.Date(results$date_start)
 results$date_end <- as.Date(results$date_end)
@@ -1068,27 +1067,22 @@ k = k+1
 }
 
 
-
 results = results %>% select(-overlaps)
 
 results = results %>% mutate(event_group = as.factor(event_group))
 
-results <- results %>%
-  group_by(event_group) %>%
-  mutate(event_group_start = mean(date_start))
+testing = results %>% group_by(event_group) %>% 
+  dplyr::summarize(start_date_avg = mean(date_start))
 
-results <- results %>%
-  ungroup() %>% 
-  group_by(event_group) %>%
-  mutate(event_group_start = mean(as.numeric(date_start)))
+results = left_join(results, testing, by = "event_group") 
 
-grouped_start_dates <- results %>%
-  dplyr::group_by(event_group) %>%
-  summarize(event_group_start = mean(as.numeric(date_start)))
+# remove row with NA
+results = results %>% filter(percentChange != "NaN")
 
+write.csv(results, "./results/heatwaves with grouping.csv", row.names = FALSE)
 
-  ggplot(data = results, aes(x = as.factor(event_group_start), y = percentChange, fill = lake))+
-  geom_bar(stat = "identity", position = "dodge", alpha = 0.5, color = "black")+
+  ggplot(data = results, aes(x = as.factor(start_date_avg), y = percentChange, fill = lake))+
+  geom_bar(stat = "identity", position = "identity", alpha = 0.5, color = "black")+
   theme_classic()+  
   ylab("% change in surface chlorophyll-a")+
   xlab("start date of heatwave")+
@@ -1096,6 +1090,31 @@ grouped_start_dates <- results %>%
   scale_fill_manual(values = c("R"=  "#4AB5C4", "L" = "#ADDAE3", "T"=  "#BAAD8D"))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 #  facet_wrap(~event_group)
+  
+png("./figures/manuscript 03_18_2024/individual events.png", height = 4, width = 6, res = 300, units = "in")
+  
+  results %>% filter(!(event_group %in% c(5, 6, 7, 11))) %>% 
+  ggplot(aes(x = lake, y = percentChange, fill = lake)) +
+    geom_bar(stat = "identity", position = position_dodge(width = 0.9), alpha = 0.5, color = "black", width = 0.9) +
+    theme_classic() +  
+    ylab("% change in surface chlorophyll-a") +
+    xlab("") +
+    scale_fill_manual(values = c("R" = "#4AB5C4", "L" = "#ADDAE3", "T" = "#BAAD8D")) +
+    theme(axis.text.x = element_blank())+
+    facet_wrap(~start_date_avg)+
+    geom_hline(yintercept = 0)
+  
+  
+dev.off()
+  
+  ggplot(data = results, aes(x = as.factor(start_date_avg), y = percentChange, fill = lake)) +
+    geom_bar(stat = "identity", position = position_dodge(width = 1), alpha = 0.5, color = "black", width = 1 / max_group_width) +
+    theme_classic() +  
+    ylab("% change in surface chlorophyll-a") +
+    xlab("start date of heatwave") +
+    ggtitle("Average chl percent change by event") +
+    scale_fill_manual(values = c("R" = "#4AB5C4", "L" = "#ADDAE3", "T" = "#BAAD8D")) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
   ggplot(data = results, aes(x = as.character(date_start), y = percentChange, fill = lake))+

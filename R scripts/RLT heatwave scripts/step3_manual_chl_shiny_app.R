@@ -43,19 +43,19 @@ server <- function(input, output) {
     a =   ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = R.after.heatwave)) +
       geom_tile(color = "black") +
       scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
-      labs(title = "Peter after heatwave")+
+      labs(title = "Peter during and after heatwave")+
       theme_classic()
     
     b =   ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = L.after.heatwave)) +
       geom_tile(color = "black") +
       scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
-      labs(title = "Paul after heatwave")+
+      labs(title = "Paul during and after heatwave")+
       theme_classic()
     
     c =   ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = T.after.heatwave)) +
       geom_tile(color = "black") +
       scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
-      labs(title = "Tuesday after heatwave")+
+      labs(title = "Tuesday during and after heatwave")+
       theme_classic()
     
     

@@ -434,8 +434,14 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     labs(y = "Chlorophyll (μg/L)")+
     xlim(140, 250)
   
+  #png("./figures/methods figures/paul_2010_percent_change.png", height = 5, width = 8, units = "in", res = 300)
+  
+  #ggsave("filename.eps", device=cairo_ps)
+  
+  
   l10percent_change = ggplot(data = l10, aes( x = doy, y = percent_change))+
     geom_line(size = 1, color = "black")+
+    geom_point()+
     theme_classic()+
     xlim(138, 250)+
     labs(y = "% change in chlorophyll")+
@@ -447,7 +453,7 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     geom_vline(data=hw.l10, inherit.aes=FALSE, aes(xintercept = yday(date_end)), linetype = "dashed")+
     geom_rect(data=hw.l10, inherit.aes=FALSE, aes(xmin=(start_analysis), xmax=(end_analysis), ymin= - Inf,
                                                   ymax= Inf), color="transparent", 
-              fill="magenta", alpha=0.3)+
+              fill="grey", alpha=0.3)+
     theme(legend.position="none")+
     geom_vline(data=hw.l10, inherit.aes=FALSE, aes(xintercept = (start_analysis)), linetype = "dashed")+
     geom_vline(data=hw.l10, inherit.aes=FALSE, aes(xintercept = (end_analysis)), linetype = "dashed")+
@@ -1193,3 +1199,73 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
   
   
 }
+
+
+
+
+##### ASLO Figures ######
+png("./figures/ASLO figures/Paul 2013 hw with heatwaves.png", height = 4.5, width = 8, units = "in", res = 300)
+
+event_line_DKS("paul", 2013)+
+  labs(title = "Paul 2013")+
+  #theme(legend.position="none")+
+  xlim(140, 250)+
+  ylim(14, 32) +
+  geom_point()+
+  labs(x = "day of year")
+
+dev.off()
+
+paulHW = readRDS(file = "./results/heatwave modeled outputs/paul heatwave outputs modeled.rds")
+
+climatology.L = paulHW$climatology %>% mutate(lake = "paul")
+climatology.L$year = year(climatology.L$t)
+
+climatology.L.2013 = climatology.L %>% filter(year == 2013)
+
+#cur.climatology$thresh2 = cur.climatology$thresh * 2
+
+#cur.climatology = cur.HW$climatology %>% filter(year(t) == year)
+
+### Plot with thresholds no heatwaves ###
+year = 2013
+
+png("./figures/ASLO figures/Paul 2013 hw without heatwaves.png", height = 4.5, width = 8, units = "in", res = 300)
+
+ggplot(climatology.L.2013, aes(x = doy, y = temp)) +
+        geom_line(aes(x = doy, y = temp, color = "Temperature"), size = 0.8) +
+        geom_point() +
+        geom_line(aes(x = doy, y = seas, color = "Climatology", linetype = "solid"), size = 0.7) +
+        geom_line(aes(x = doy, y = thresh, color = "Threshold", linetype = "solid"), size = 0.7) +
+        # geom_line(aes(x = doy, y = thresh2, color = "2x Threshold", linetype = "solid")) +
+        theme_classic() +
+        labs(title = paste("Paul", year, sep = " "), y = "Temperature [°C]", x = "day of year") +
+        ylim(14, 32) +
+  xlim(140, 250)+
+        scale_color_manual(values = c("black", "black", "forestgreen", "black"), 
+                           guide = guide_legend(title = NULL, override.aes = list(linetype = "solid")))+
+        guides(linetype = "none")
+
+dev.off()
+
+
+
+
+
+png("./figures/ASLO figures/Paul 2013 hw only temperature.png", height = 4.5, width = 8, units = "in", res = 300)
+
+ggplot(climatology.L.2013, aes(x = doy, y = temp)) +
+  geom_line(aes(x = doy, y = temp, color = "Temperature"), size = 0.8) +
+  geom_point() +
+ # geom_line(aes(x = doy, y = seas, color = "Climatology", linetype = "solid"), size = 0.7) +
+#  geom_line(aes(x = doy, y = thresh, color = "Threshold", linetype = "solid"), size = 0.7) +
+  # geom_line(aes(x = doy, y = thresh2, color = "2x Threshold", linetype = "solid")) +
+  theme_classic() +
+  labs(title = paste("Paul", year, sep = " "), y = "Temperature [°C]", x = "day of year") +
+  ylim(14, 32) +
+  xlim(140, 250)+
+  scale_color_manual(values = c("black", "black", "forestgreen", "black"), 
+                     guide = guide_legend(title = NULL, override.aes = list(linetype = "solid")))+
+  guides(linetype = "none")
+
+dev.off()

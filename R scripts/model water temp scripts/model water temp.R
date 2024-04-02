@@ -597,7 +597,7 @@ SP.temp.1 = SP.temp.1 %>% left_join()
 temp.sonde = read.csv("./formatted data/allSonde_interpolated.csv")
 
 temp.sonde = temp.sonde %>% select(lake, year, date, doyCat, mean_temp) %>% 
-  rename(doy = doyCat)
+  dplyr::rename(doy = doyCat)
 
 temp.sonde = temp.sonde %>% mutate(date = as.Date(date))
 
@@ -611,19 +611,19 @@ SP.temp = read.csv("./formatted data/LTER daily temperature/Sparkling Lake daily
 #   mutate(date = as.Date(date))
 
 SP.temp.1 = SP.temp %>% filter(depth == 1) %>%
-  rename(year = year4, date = sampledate, doy = daynum) %>% select(-depth, -flag_wtemp) %>%
-  rename(SP.temp.1 = wtemp) %>%
+  dplyr::rename(year = year4, date = sampledate, doy = daynum) %>% select(-depth, -flag_wtemp) %>%
+  dplyr::rename(SP.temp.1 = wtemp) %>%
   mutate(date = as.Date(date))
 
 
 # Woodruff airport temperature
 woodruff = read.csv("./formatted data/LTER daily temperature/woodruff airport temperature LTER.csv")
 
-woodruff = woodruff %>% rename(year = year4, date = sampledate, doy = daynum)
+woodruff = woodruff %>% dplyr::rename(year = year4, date = sampledate, doy = daynum)
 
 # make a daily woodruff dataframe
 woodruff = woodruff %>% group_by(year, date, doy) %>% 
-  summarize(woodruff.temp = mean(avg_air_temp, na.rm = TRUE)) %>% 
+  dplyr::summarize(woodruff.temp = mean(avg_air_temp, na.rm = TRUE)) %>% 
   mutate(date = as.Date(date))
 
 
@@ -660,7 +660,6 @@ plot(test)
 
 qqModel = qqnorm(residuals(test))
 
-ggarrange(qqModel)
 
 # model with just sparkling lake temperature and air temperature
 # summary(lm(sonde.SP.woodruff$mean_temp~sonde.SP.woodruff$SP.temp.1))
@@ -671,6 +670,14 @@ ggarrange(qqModel)
 sonde.SP.woodruff.testing$modeled = predict(test, sonde.SP.woodruff.testing)
 
 plot(data = sonde.SP.woodruff.testing, modeled~mean_temp)
+
+ggplot(data = sonde.SP.woodruff.testing, aes(x = mean_temp, y = modeled, fill = lake))+
+  geom_point(size = 2, pch = 21)+
+  labs(x = "measured temperature (°C)", y = "modeled temperature (°C)")+
+  theme_classic()+
+  scale_fill_manual(values = c("L" = "steelblue2", "R" = "black", "T" = "white"))
+
+
 summary(lm(data = sonde.SP.woodruff.testing, modeled~mean_temp))
 
 ##### Use the model to predict temperature of RLT for every year of Sparkling data ######
@@ -686,14 +693,14 @@ SP.woodruff = rbind(SP.woodruffL, SP.woodruffR, SP.woodruffT)
 
 SP.woodruff$modeled.temp = predict(test, SP.woodruff)
 
-pdf("./figures/modeled temperature/modeled temperature daily sp 1 m.pdf", width = 12, height = 18)
-
+#pdf("./figures/modeled temperature/modeled temperature daily sp 1 m.pdf", width = 12, height = 18)
+png("./figures/modeled temperature/modeled temperature daily sp 1 m.png", width = 8, height = 11, units = "in", res = 300)
 
 ggplot(SP.woodruff, aes(x = doy, y = modeled.temp, color = lake))+
    geom_line(size = 0.9)+
   #geom_line(aes(x = doy, y = SP.temp.1, color = "black"), size = 1)+
   facet_wrap(~year)+
-  labs(y = "modeled temperature", x = "day of year")+
+  labs(y = "modeled temperature (°C)", x = "day of year")+
   scale_color_manual(values = c("L" = "#ADDAE3", "R"=  "#4AB5C4", "T"=  "#BAAD8D"))  +
   xlim(152, 259)+
   ylim(15, 30)+
@@ -718,7 +725,9 @@ SP.woodruff.cascade.real.data_long <- SP.woodruff.cascade.real.data %>%
   )
 
 
-pdf("./figures/modeled temperature/modeled vs real temperature daily sp 1 m.pdf", width = 12, height = 12)
+#pdf("./figures/modeled temperature/modeled vs real temperature daily sp 1 m.pdf", width = 12, height = 12)
+png("./figures/modeled temperature/modeled vs real temperature daily sp 1 m.png", width = 7, height = 8, units = "in", res = 300)
+
 
 ggplot(SP.woodruff.cascade.real.data_long, aes(x = doy, y = temperature, color = temp.type))+
   geom_line(size = 1, alpha = 0.8)+
