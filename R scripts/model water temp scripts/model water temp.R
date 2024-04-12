@@ -708,6 +708,25 @@ ggplot(SP.woodruff, aes(x = doy, y = modeled.temp, color = lake))+
 
 dev.off()
 
+
+
+### make ASLO plot of modeled temp ####
+
+png("./figures/ASLO figures/modeled temp.png", height = 4, width = 8, res = 300, units = "in")
+
+SP.woodruff %>% filter(!(year %in% c("2015", "2018", "2001"))) %>% 
+ggplot( aes(x = doy, y = modeled.temp, color = lake))+
+  geom_line(size = 0.9, alpha = 0.8)+
+  #geom_line(aes(x = doy, y = SP.temp.1, color = "black"), size = 1)+
+  facet_wrap(~year)+
+  labs(y = "modeled temperature (°C)", x = "day of year")+
+  scale_color_manual(values = c("L" = "#ADDAE3", "R"=  "#4AB5C4", "T"=  "#BAAD8D"))  +
+  xlim(152, 250)+
+  ylim(15, 30)+
+  theme_classic()
+
+dev.off()
+
 # compare the predicted temperature to the actual temperature
 SP.woodruff.cascade = temp.sonde %>% left_join(SP.woodruff, by = c("year", "date", "doy", "lake"))
 

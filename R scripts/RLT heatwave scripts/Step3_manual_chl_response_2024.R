@@ -841,6 +841,7 @@ allSlopes = allSlopes %>% mutate(period = as.factor(period))
 
 allSlopes = allSlopes %>% mutate(period = relevel(period, ref = "all other days"))
 
+# color for the paper was mediumseagreen, color for slides is red4
 
 Alldist <- allSlopes %>%
   filter(period != "exclude after heatwave", daysAfter == get("daysAfter", envir=globalenv())) %>%
@@ -873,7 +874,7 @@ Alldist <- allSlopes %>%
   ylab("") +
   xlab("")+
   #labs(title = "All lakes") +
-  scale_fill_manual(values = c("during heatwave" = "mediumseagreen", "all other days" = "#88CCEE")) +  # Specify fill colors for groups
+  scale_fill_manual(values = c("during heatwave" = "red4", "all other days" = "#88CCEE")) +  # Specify fill colors for groups
   theme_classic()+
   theme(axis.text=element_text(size=12),
         axis.title=element_text(size=12))+
@@ -917,7 +918,7 @@ Tdist <- allSlopes %>%
   ylab("") +
   xlab("% change in surface \n chlorophyll-a")+
   labs(title = "Tuesday") +
-  scale_fill_manual(values = c("during heatwave" = "mediumseagreen", "all other days" = "#88CCEE")) +  # Specify fill colors for groups
+  scale_fill_manual(values = c("during heatwave" = "red3", "all other days" = "#88CCEE")) +  # Specify fill colors for groups
   theme_classic()+
   theme(axis.text=element_text(size=12),
         axis.title=element_text(size=12))+
@@ -964,7 +965,7 @@ Rdist <- allSlopes %>%
   ylab("") +
   xlab("% change in surface \n chlorophyll-a")+
   labs(title = "Peter") +
-  scale_fill_manual(values = c("during heatwave" = "mediumseagreen", "all other days" = "#88CCEE")) +  # Specify fill colors for groups
+  scale_fill_manual(values = c("during heatwave" = "red3", "all other days" = "#88CCEE")) +  # Specify fill colors for groups
   theme_classic()+
   theme(axis.text=element_text(size=12),
         axis.title=element_text(size=12))+
@@ -1010,7 +1011,7 @@ Ldist <- allSlopes %>%
   ylab("") +
   xlab("% change in surface \n chlorophyll-a")+
   labs(title = "Paul") +
-  scale_fill_manual(values = c("during heatwave" = "mediumseagreen", "all other days" = "#88CCEE")) +  # Specify fill colors for groups
+  scale_fill_manual(values = c("during heatwave" = "red3", "all other days" = "#88CCEE")) +  # Specify fill colors for groups
   theme_classic()+
   theme(axis.text=element_text(size=12),
         axis.title=element_text(size=12))+
@@ -1030,8 +1031,9 @@ big_plot/small_plots
 
 dev.off()
 
-
-
+png("./figures/ASLO figures/distributions red.png", height = 3.87, width = 8.25, units = "in", res = 300 )
+ggarrange(Ldist, Rdist, Tdist, nrow = 1, ncol = 3)
+dev.off()
 
 # save individual heatwave response
 
