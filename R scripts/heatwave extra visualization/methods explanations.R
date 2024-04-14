@@ -26,7 +26,7 @@ l13 = slopes %>%  filter(year == 2013, lake == "L")
   xlim(180, 215)+
     geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
                                                   ymax= Inf), color="transparent", 
-              fill="orange", alpha=0.3)+
+              fill="red3", alpha=0.3)+
     theme(legend.position="none")+
     geom_vline(data=hw.l13, inherit.aes=FALSE, aes(xintercept = yday(date_start)), linetype = "dashed")+
     geom_vline(data=hw.l13, inherit.aes=FALSE, aes(xintercept = yday(date_end)), linetype = "dashed")
@@ -46,7 +46,7 @@ chl_plot = ggplot(data = l13, aes(x = doy, y = manual_chl))+
   xlim(180, 215)+
   geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
                                                 ymax= Inf), color="transparent", 
-            fill="orange", alpha=0.4)+
+            fill="red3", alpha=0.4)+
   theme(legend.position="none")+
   geom_vline(data=hw.l13, inherit.aes=FALSE, aes(xintercept = yday(date_start)), linetype = "dashed")+
   geom_vline(data=hw.l13, inherit.aes=FALSE, aes(xintercept = yday(date_end)), linetype = "dashed")+
@@ -64,7 +64,7 @@ chl_percent_change = ggplot(data = l13, aes( x = doy, y = percent_change))+
   labs(y = "% change in chlorophyll")+
   geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
                                                 ymax= Inf), color="transparent", 
-            fill="orange", alpha=0.3)+
+            fill="red3", alpha=0.3)+
   theme(legend.position="none")+
   geom_vline(data=hw.l13, inherit.aes=FALSE, aes(xintercept = yday(date_start)), linetype = "dashed")+
   geom_vline(data=hw.l13, inherit.aes=FALSE, aes(xintercept = yday(date_end)), linetype = "dashed")+

@@ -161,9 +161,6 @@ ggplot(climatology.T, aes(doy, year, height = temp/10-1.1, group = year, fill = 
 
 
 
-
-
-
 # create dummy data so that T plots the same years as L and R
 dummy_data <- data.frame(
   doy = 150:220,  # Range from 150 to 220
@@ -207,6 +204,17 @@ ggplot(climatology.T, aes(x = doy, y = year, height = temp/20)) +
 # R = #4AB5C4
 
 
+
+
+
+ggplot(climatology.T, aes(doy, year, height = temp/10-1.1, group = year, fill = factor(event_no))) +
+  geom_ridgeline_gradient(size =0.7) +
+  theme_minimal()+
+  theme(panel.grid = element_blank())+
+  labs(x = "day of year", y = "")+
+  scale_fill_manual(values = my_colors.T) +  # Use custom color scale
+  theme(legend.position = 'none')+
+  geom_ridgeline(aes(x = doy, y = year, height = thresh/10 - 1.1), fill = NA, color = "black", linetype = "dashed", size =0.7)
 
 
 

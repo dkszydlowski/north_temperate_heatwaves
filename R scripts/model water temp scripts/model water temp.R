@@ -677,6 +677,18 @@ ggplot(data = sonde.SP.woodruff.testing, aes(x = mean_temp, y = modeled, fill = 
   theme_classic()+
   scale_fill_manual(values = c("L" = "steelblue2", "R" = "black", "T" = "white"))
 
+#### testing data vs. actual data for ASLO talk ####
+
+png("./figures/ASLO figures/modeled temp testing scatterplot.png", res = 300, height = 3.5, width = 6, units = "in")
+
+ggplot(data = sonde.SP.woodruff.testing, aes(x = mean_temp, y = modeled, fill = lake))+
+  geom_point(size = 3, pch = 21)+
+  labs(x = "measured temperature (°C)", y = "modeled temperature (°C)")+
+  theme_classic()+
+  scale_fill_manual(values = c("L" = "#ADDAE3", "R"=  "#4AB5C4", "T"=  "#BAAD8D"))  +
+  theme(legend.position = "none")
+
+dev.off()
 
 summary(lm(data = sonde.SP.woodruff.testing, modeled~mean_temp))
 
