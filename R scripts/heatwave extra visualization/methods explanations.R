@@ -27,6 +27,19 @@ hw.l13.plot = event_line_DKS("paul", 2013)+
   theme(legend.position = "none")
 
 
+# temperature plot
+
+temp_plot = ggplot(data = l13, aes( x = doy, y = mean_temp))+
+  geom_line( size = 1)+
+  theme_classic()+
+  ylim(18, 28.5)+
+  labs(y = "temperature (°C)", x = "")+
+  xlim(180, 215)+
+  theme(legend.position="none")+
+  geom_vline(data=hw.l13, inherit.aes=FALSE, aes(xintercept = yday(date_start)), linetype = "dashed")+
+  geom_vline(data=hw.l13, inherit.aes=FALSE, aes(xintercept = yday(date_end)), linetype = "dashed")+
+  geom_point()
+
 
 l13 = slopes %>%  filter(year == 2013, lake == "L")
 
@@ -42,7 +55,8 @@ l13 = slopes %>%  filter(year == 2013, lake == "L")
     #           fill="red3", alpha=0.3)+
     theme(legend.position="none")+
     geom_vline(data=hw.l13, inherit.aes=FALSE, aes(xintercept = yday(date_start)), linetype = "dashed")+
-    geom_vline(data=hw.l13, inherit.aes=FALSE, aes(xintercept = yday(date_end)), linetype = "dashed")
+    geom_vline(data=hw.l13, inherit.aes=FALSE, aes(xintercept = yday(date_end)), linetype = "dashed")+
+    geom_point()
 
   
   scaleFUN <- function(x) sprintf("%.2f", x)
@@ -94,8 +108,8 @@ chl_percent_change = ggplot(data = l13, aes( x = doy, y = percent_change))+
 ggarrange(hw.l13.plot, chl_plot, chl_slope, chl_percent_change, nrow = 4, ncol = 1)
 
 
-png("./figures/ASLO figures/slopes plot multi panel.png", height = 5, width = 8, res = 300, units = "in")
-ggarrange(hw.l13.plot, chl_plot, chl_slope, chl_percent_change, nrow = 4, ncol = 1)
+png("./figures/ASLO figures/slopes plot multi panel.png", height = 5, width = 6, res = 300, units = "in")
+ggarrange(temp_plot,  chl_plot, chl_slope, chl_percent_change, nrow = 4, ncol = 1)
 dev.off()
 
 

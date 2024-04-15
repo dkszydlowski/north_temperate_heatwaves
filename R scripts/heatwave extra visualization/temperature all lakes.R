@@ -131,14 +131,20 @@ R.ridge = ggplot(climatology.R, aes(doy, year, height = temp/10-1.1, group = yea
   labs(x = "day of year", y = "")+
   scale_fill_manual(values = my_colors.R) +  # Use custom color scale
   theme(legend.position = 'none')+
-  theme(panel.grid = element_blank())+
-  geom_ridgeline(aes(x = doy, y = year, height = thresh/10 - 1.1), fill = NA, color = "black", linetype = "dashed", size =0.7)
+  theme(panel.grid = element_blank(),
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 14))+
+  geom_ridgeline(aes(x = doy, y = year, height = thresh/10 - 1.1), fill = NA, color = "black", linetype = "dashed", size =0.7)+
+  scale_y_discrete(labels = NULL)  # Remove y-axis labels
+
   
   
 L.ridge = ggplot(climatology.L, aes(doy, year, height = temp/10-1.1, group = year, fill = factor(event_no))) +
   geom_ridgeline_gradient(size =0.7) +
   theme_minimal()+
-  theme(panel.grid = element_blank())+
+  theme(panel.grid = element_blank(),
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 14))+
   labs(x = "day of year", y = "")+
   scale_fill_manual(values = my_colors.L) +  # Use custom color scale
   theme(legend.position = 'none')+
@@ -146,19 +152,143 @@ L.ridge = ggplot(climatology.L, aes(doy, year, height = temp/10-1.1, group = yea
   labs(y = "")
 
 
-T.ridge = ggplot(climatology.T %>% filter(year == 2013 | year == 2014 | year == 2015), aes(doy, year, height = temp/10-1.1, group = year, fill = factor(event_no))) +
+T.ridge = ggplot(climatology.T %>% filter(year == 2013 | year == 2014 | year == 2015 | year == 2008), aes(doy, year, height = temp/10-1.1, group = year, fill = factor(event_no))) +
   geom_ridgeline_gradient(size =0.7) +
   theme_minimal()+
-  theme(panel.grid = element_blank())+
+  theme(panel.grid = element_blank(),
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 14))+
   labs(x = "day of year", y = "")+
   scale_fill_manual(values = my_colors.T) +  # Use custom color scale
   theme(legend.position = 'none')+
   geom_ridgeline(aes(x = doy, y = year, height = thresh/10 - 1.1), fill = NA, color = "black", linetype = "dashed", size =0.7)
 
+png("./figures/ASLO figures/LR all temp w hw.png", height = 6, width = 9, res = 300, units = "in")
+ggarrange(L.ridge, R.ridge, ncol = 2, nrow = 1)
+dev.off()
 
-ggarrange(R.ridge, L.ridge, T.ridge, ncol = 3, nrow = 1)
+
+### version with just the threshold ###
+R.ridge.blank = ggplot(climatology.R, aes(doy, year, height = temp/10-1.1, group = year)) +
+  geom_ridgeline_gradient(size =0.7, fill = "#4AB5C4") +
+  theme_minimal()+
+  theme(panel.grid = element_blank(),
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 14))+
+  labs(x = "day of year", y = "")+
+  #scale_fill_manual(values = "#ADDAE3") +  # Use custom color scale
+  theme(legend.position = 'none')+
+  geom_ridgeline(aes(x = doy, y = year, height = thresh/10 - 1.1), fill = NA, color = "black", linetype = "dashed", size =0.7)+
+  labs(y = "")+
+  scale_y_discrete(labels = NULL)  # Remove y-axis labels
 
 
+L.ridge.blank = ggplot(climatology.L, aes(doy, year, height = temp/10-1.1, group = year)) +
+  geom_ridgeline_gradient(size =0.7, fill = "#ADDAE3") +
+  theme_minimal()+
+  theme(panel.grid = element_blank(),
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 14))+
+  labs(x = "day of year", y = "")+
+  #scale_fill_manual(values = "#ADDAE3") +  # Use custom color scale
+  theme(legend.position = 'none')+
+  geom_ridgeline(aes(x = doy, y = year, height = thresh/10 - 1.1), fill = NA, color = "black", linetype = "dashed", size =0.7)+
+  labs(y = "")
+
+
+png("./figures/ASLO figures/LR all temp blank.png", height = 6, width = 9, res = 300, units = "in")
+ggarrange(L.ridge.blank, R.ridge.blank, ncol = 2, nrow = 1)
+dev.off()
+
+
+
+### version without hw or threshold ###
+R.ridge.blank = ggplot(climatology.R, aes(doy, year, height = temp/10-1.1, group = year)) +
+  geom_ridgeline_gradient(size =0.7, fill = "#4AB5C4") +
+  theme_minimal()+
+  theme(panel.grid = element_blank(),
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 14))+
+  labs(x = "day of year", y = "")+
+  #scale_fill_manual(values = "#ADDAE3") +  # Use custom color scale
+  theme(legend.position = 'none')+
+  # geom_ridgeline(aes(x = doy, y = year, height = thresh/10 - 1.1), fill = NA, color = "black", linetype = "dashed", size =0.7)+
+  labs(y = "")+
+  scale_y_discrete(labels = NULL)  # Remove y-axis labels
+
+
+L.ridge.blank = ggplot(climatology.L, aes(doy, year, height = temp/10-1.1, group = year)) +
+  geom_ridgeline_gradient(size =0.7, fill = "#ADDAE3") +
+  theme_minimal()+
+  theme(panel.grid = element_blank(),
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 14))+
+  labs(x = "day of year", y = "")+
+  #scale_fill_manual(values = "#ADDAE3") +  # Use custom color scale
+  theme(legend.position = 'none')+
+ # geom_ridgeline(aes(x = doy, y = year, height = thresh/10 - 1.1), fill = NA, color = "black", linetype = "dashed", size =0.7)+
+  labs(y = "")
+
+
+png("./figures/ASLO figures/LR all temp blank.png", height = 6, width = 9, res = 300, units = "in")
+ggarrange(L.ridge.blank, R.ridge.blank, ncol = 2, nrow = 1)
+dev.off()
+
+
+
+
+# Tuesday plot
+png("./figures/ASLO figures/Tuesday all temp hw.png", height = 2.98, width = 4.29, res = 300, units = "in")
+
+ggplot(climatology.T %>% filter(year == 2013 | year == 2014 | year == 2015 | year == 2008), aes(doy, year, height = temp/10-1.1, group = year, fill = factor(event_no))) +
+  geom_ridgeline_gradient(size =0.7) +
+  theme_minimal()+
+  theme(panel.grid = element_blank(),
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 14))+
+  labs(x = "day of year", y = "")+
+  scale_fill_manual(values = my_colors.T) +  # Use custom color scale
+  theme(legend.position = 'none')+
+  geom_ridgeline(aes(x = doy, y = year, height = thresh/10 - 1.1), fill = NA, color = "black", linetype = "dashed", size =0.7)+
+  scale_y_discrete(labels = NULL)
+
+dev.off()
+
+
+# Tuesday plot blank
+png("./figures/ASLO figures/Tuesday all temp blank.png", height = 2.98, width = 4.29, res = 300, units = "in")
+
+ggplot(climatology.T %>% filter(year == 2013 | year == 2014 | year == 2015 | year == 2008), aes(doy, year, height = temp/10-1.1, group = year)) +
+  geom_ridgeline_gradient(size =0.7, fill = "#BAAD8D") +
+  theme_minimal()+
+  theme(panel.grid = element_blank(),
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 14))+
+  labs(x = "day of year", y = "")+
+  scale_fill_manual(values = my_colors.T) +  # Use custom color scale
+  theme(legend.position = 'none')+
+ # geom_ridgeline(aes(x = doy, y = year, height = thresh/10 - 1.1), fill = NA, color = "black", linetype = "dashed", size =0.7)+
+  scale_y_discrete(labels = NULL)
+
+dev.off()
+
+
+# Tuesday plot blank with threshold
+png("./figures/ASLO figures/Tuesday all temp thresh.png", height = 2.98, width = 4.29, res = 300, units = "in")
+
+ggplot(climatology.T %>% filter(year == 2013 | year == 2014 | year == 2015 | year == 2008), aes(doy, year, height = temp/10-1.1, group = year)) +
+  geom_ridgeline_gradient(size =0.7, fill = "#BAAD8D") +
+  theme_minimal()+
+  theme(panel.grid = element_blank(),
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 14))+
+  labs(x = "day of year", y = "")+
+  scale_fill_manual(values = my_colors.T) +  # Use custom color scale
+  theme(legend.position = 'none')+
+  geom_ridgeline(aes(x = doy, y = year, height = thresh/10 - 1.1), fill = NA, color = "black", linetype = "dashed", size =0.7)+
+  scale_y_discrete(labels = NULL)
+
+dev.off()
 
 
 # create dummy data filled with NA so that T plots the same years as L and R
@@ -167,13 +297,13 @@ dummy_data <- data.frame(
   doy = 150:220,  # Range from 150 to 220
   t = as.Date(rep(as.Date(paste0(2008:2011, "-01-01")), each = 71)) + (150:220 - 1),
   temp = NA,
-  seas = NA,
-  thresh = NA,
+  seas = 0.1,
+  thresh = 0.1,
   threshCriterion = FALSE,
   durationCriterion = FALSE,
   event = FALSE,
-  event_no = NA,
-  lake = "",
+  event_no = 100,
+  lake = "tuesday",
   year = factor(rep(2008:2011, each = 71))  # Adjust the number of days per year accordingly
 )
 
@@ -181,13 +311,13 @@ dummy_data18_19 <- data.frame(
   doy = 150:220,  # Range from 150 to 220
   t = as.Date(rep(as.Date(paste0(2018:2019, "-01-01")), each = 71)) + (150:220 - 1),
   temp = NA,
-  seas = NA,
-  thresh = NA,
+  seas = 0.1,
+  thresh = 0.1,
   threshCriterion = FALSE,
   durationCriterion = FALSE,
   event = FALSE,
-  event_no = NA,
-  lake = "",
+  event_no = 100,
+  lake = "tuesday",
   year = factor(rep(2018:2019, each = 71))  # Adjust the number of days per year accordingly
 )
 
@@ -195,11 +325,15 @@ dummy_data18_19 <- data.frame(
 climatology.T <- rbind(dummy_data, climatology.T)
 climatology.T <- rbind(climatology.T, dummy_data18_19)
 
-ggplot(climatology.T, aes(x = doy, y = year, height = temp/20)) +
-  geom_ridgeline(fill = "#BAAD8D") +
-  geom_ridgeline(aes(x = doy, y = year, height = thresh/20), fill = NA)+
+climatology.T = climatology.T %>% mutate(event_no = replace(event_no, is.na(event_no), 100))
+
+ggplot(climatology.T, aes(x = doy, y = year, group = year, height = temp/20, fill = factor(event_no))) +
+  geom_ridgeline_gradient() +
+ # geom_ridgeline(aes(x = doy, y = year, height = thresh/20), fill = NA)+
 #  geom_line(aes(x = doy, y = thresh, color = year)) +  # Add individual lines
-  theme_classic()
+  theme_classic()+
+  scale_fill_manual(values = my_colors.T)   # Use custom color scale
+  
 
 # R = #4AB5C4
 
@@ -208,20 +342,24 @@ ggplot(climatology.T, aes(x = doy, y = year, height = temp/20)) +
 
 
 ggplot(climatology.T, aes(doy, year, height = temp/10-1.1, group = year, fill = factor(event_no))) +
-  geom_ridgeline_gradient(size =0.7) +
+
+#  geom_ridgeline_gradient(size =0.7) +
   theme_minimal()+
   theme(panel.grid = element_blank())+
   labs(x = "day of year", y = "")+
-  scale_fill_manual(values = my_colors.T) +  # Use custom color scale
+  #scale_fill_manual(values = my_colors.T) +  # Use custom color scale
   theme(legend.position = 'none')+
-  geom_ridgeline(aes(x = doy, y = year, height = thresh/10 - 1.1), fill = NA, color = "black", linetype = "dashed", size =0.7)
+  # geom_ridgeline(aes(x = doy, y = year, height = thresh/10 - 1.1), fill = NA, color = "black", linetype = "dashed", size =0.7)
 
 
 climatology.T = climatology.T %>% mutate(temp = replace(temp, is.na(temp), 0))
 climatology.T = climatology.T %>% mutate(event_no = replace(event_no, is.na(event_no), 100))
+climatology.T = climatology.T %>% mutate(thresh = replace(thresh, is.na(thresh), 0))
+climatology.T = climatology.T %>% mutate(seas = replace(seas, is.na(seas), 0))
 
+climatology.T = climatology.T %>% mutate(event_no = as.factor(event_no))
 
-ggplot(climatology.T, aes(doy, year, height = temp/10-1.1, group = year, fill = factor(event_no))) +
+ggplot(climatology.T, aes(doy, year, height = temp/10-1.1, group = year, fill = event_no)) +
   geom_ridgeline_gradient(size =0.7) +
   theme_minimal()+
   theme(panel.grid = element_blank())+
