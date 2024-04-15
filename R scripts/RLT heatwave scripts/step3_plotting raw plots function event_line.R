@@ -1269,3 +1269,29 @@ ggplot(climatology.L.2013, aes(x = doy, y = temp)) +
   guides(linetype = "none")
 
 dev.off()
+
+
+
+
+
+
+
+
+
+png("./figures/ASLO figures/Paul 2013 hw only temperature.png", height = 4.5, width = 8, units = "in", res = 300)
+
+ggplot(climatology.L.2013, aes(x = doy, y = temp)) +
+  geom_line(aes(x = doy, y = temp, color = "Temperature"), size = 0.8) +
+  geom_point() +
+  geom_line(aes(x = doy, y = seas, color = "Climatology", linetype = "solid"), size = 0.7) +
+  geom_line(aes(x = doy, y = thresh, color = "Threshold", linetype = "solid"), size = 0.7) +
+ # geom_line(aes(x = doy, y = thresh2, color = "2x Threshold", linetype = "solid")) +
+  theme_classic() +
+  labs(title = paste("Paul", year, sep = " "), y = "Temperature [°C]", x = "day of year") +
+  ylim(14, 32) +
+  xlim(140, 250)+
+  scale_color_manual(values = c("black", "black", "forestgreen", "black"), 
+                     guide = guide_legend(title = NULL, override.aes = list(linetype = "solid")))+
+  guides(linetype = "none")
+
+dev.off()

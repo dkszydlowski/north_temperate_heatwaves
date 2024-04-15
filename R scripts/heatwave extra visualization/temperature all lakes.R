@@ -5,6 +5,8 @@ library(heatwaveR)
 library(ggplot2)
 library(ggjoy)
 library(ggbraid)
+library(ggridges)
+
 
 allSonde = read.csv("./formatted data/CombinedData.csv")
 
@@ -38,11 +40,7 @@ ggplot(climatology.R, aes(x = doy, y = temp, color = as.factor(year)))+
   geom_line(alpha = 0.5)
 
 
-ggplot(climatology.R, aes(x = doy, y = temp, fill = as.factor(year))) +
-  geom_joy(scale = 0.5) +
-  theme_minimal()
 
-library(ggridges)
 
 
 
@@ -60,7 +58,7 @@ climatology.R$year <- as.factor(climatology.R$year)
 climatology.R = climatology.R %>% mutate(heatwave = temp > thresh)
 
 
-##### Plotting final plots ######
+##### attempt #1 of visualizing ######
 
 climatology.R = climatology.R %>% mutate(event_no = replace(event_no, is.na(event_no), 100))
 
@@ -108,25 +106,26 @@ ggplot(climatology.L, aes(x = doy, y = year, height = temp/10 -1.2)) +
   #geom_ridgeline(aes(x = doy, y = year, height = seas/10 - 1), fill = NA, color = "black")+
   theme_minimal()
 
+# old color is #FFC86
+# old color is #D86262
+
+my_colors.R = c("#D86262", "#D86262", "#D86262", "#D86262", "#D86262","#D86262", "#D86262", "#D86262", "#D86262", "#D86262",
+                "#D86262", "#D86262", "#D86262", "#D86262", "#D86262", "#4AB5C4")
 
 
-my_colors.R = c("#FFC866", "#FFC866", "#FFC866", "#FFC866", "#FFC866","#FFC866", "#FFC866", "#FFC866", "#FFC866", "#FFC866",
-                "#FFC866", "#FFC866", "#FFC866", "#FFC866", "#FFC866", "#4AB5C4")
+my_colors.L = c("#D86262", "#D86262", "#D86262","#D86262", "#D86262", "#D86262", "#D86262", "#D86262",
+                "#D86262", "#D86262", "#D86262", "#D86262", "#D86262", "#ADDAE3")
 
 
-my_colors.L = c("#FFC866", "#FFC866", "#FFC866","#FFC866", "#FFC866", "#FFC866", "#FFC866", "#FFC866",
-                "#FFC866", "#FFC866", "#FFC866", "#FFC866", "#FFC866", "#ADDAE3")
-
-
-my_colors.T = c( "#FFC866", "#FFC866",
-                "#FFC866", "#FFC866", "#FFC866", "#FFC866", "#BAAD8D")
+my_colors.T = c( "#D86262", "#D86262",
+                "#D86262", "#D86262", "#D86262", "#D86262", "#BAAD8D")
 
 climatology.L = climatology.L %>% mutate(event_no = replace(event_no, is.na(event_no), 100))
 climatology.T = climatology.T %>% mutate(event_no = replace(event_no, is.na(event_no), 100))
 
 
 #### FINALL
-ggplot(climatology.R, aes(doy, year, height = temp/10-1.1, group = year, fill = factor(event_no))) +
+R.ridge = ggplot(climatology.R, aes(doy, year, height = temp/10-1.1, group = year, fill = factor(event_no))) +
   geom_ridgeline_gradient(size =0.7) +
   theme_minimal()+
   labs(x = "day of year", y = "")+
@@ -136,17 +135,18 @@ ggplot(climatology.R, aes(doy, year, height = temp/10-1.1, group = year, fill = 
   geom_ridgeline(aes(x = doy, y = year, height = thresh/10 - 1.1), fill = NA, color = "black", linetype = "dashed", size =0.7)
   
   
-ggplot(climatology.L, aes(doy, year, height = temp/10-1.1, group = year, fill = factor(event_no))) +
+L.ridge = ggplot(climatology.L, aes(doy, year, height = temp/10-1.1, group = year, fill = factor(event_no))) +
   geom_ridgeline_gradient(size =0.7) +
   theme_minimal()+
   theme(panel.grid = element_blank())+
   labs(x = "day of year", y = "")+
   scale_fill_manual(values = my_colors.L) +  # Use custom color scale
   theme(legend.position = 'none')+
-  geom_ridgeline(aes(x = doy, y = year, height = thresh/10 - 1.1), fill = NA, color = "black", linetype = "dashed", size =0.7)
+  geom_ridgeline(aes(x = doy, y = year, height = thresh/10 - 1.1), fill = NA, color = "black", linetype = "dashed", size =0.7)+
+  labs(y = "")
 
 
-ggplot(climatology.T, aes(doy, year, height = temp/10-1.1, group = year, fill = factor(event_no))) +
+T.ridge = ggplot(climatology.T %>% filter(year == 2013 | year == 2014 | year == 2015), aes(doy, year, height = temp/10-1.1, group = year, fill = factor(event_no))) +
   geom_ridgeline_gradient(size =0.7) +
   theme_minimal()+
   theme(panel.grid = element_blank())+
@@ -156,15 +156,16 @@ ggplot(climatology.T, aes(doy, year, height = temp/10-1.1, group = year, fill = 
   geom_ridgeline(aes(x = doy, y = year, height = thresh/10 - 1.1), fill = NA, color = "black", linetype = "dashed", size =0.7)
 
 
+ggarrange(R.ridge, L.ridge, T.ridge, ncol = 3, nrow = 1)
 
 
 
 
+# create dummy data filled with NA so that T plots the same years as L and R
 
-# create dummy data so that T plots the same years as L and R
 dummy_data <- data.frame(
   doy = 150:220,  # Range from 150 to 220
-  t = as.Date(paste0(2008:2011, "-01-01")) + (150:220 - 1),
+  t = as.Date(rep(as.Date(paste0(2008:2011, "-01-01")), each = 71)) + (150:220 - 1),
   temp = NA,
   seas = NA,
   thresh = NA,
@@ -176,10 +177,9 @@ dummy_data <- data.frame(
   year = factor(rep(2008:2011, each = 71))  # Adjust the number of days per year accordingly
 )
 
-
 dummy_data18_19 <- data.frame(
   doy = 150:220,  # Range from 150 to 220
-  t = as.Date(paste0(2018:2019, "-01-01")) + (150:220 - 1),
+  t = as.Date(rep(as.Date(paste0(2018:2019, "-01-01")), each = 71)) + (150:220 - 1),
   temp = NA,
   seas = NA,
   thresh = NA,
@@ -217,9 +217,18 @@ ggplot(climatology.T, aes(doy, year, height = temp/10-1.1, group = year, fill = 
   geom_ridgeline(aes(x = doy, y = year, height = thresh/10 - 1.1), fill = NA, color = "black", linetype = "dashed", size =0.7)
 
 
+climatology.T = climatology.T %>% mutate(temp = replace(temp, is.na(temp), 0))
+climatology.T = climatology.T %>% mutate(event_no = replace(event_no, is.na(event_no), 100))
 
 
-
+ggplot(climatology.T, aes(doy, year, height = temp/10-1.1, group = year, fill = factor(event_no))) +
+  geom_ridgeline_gradient(size =0.7) +
+  theme_minimal()+
+  theme(panel.grid = element_blank())+
+  labs(x = "day of year", y = "")+
+  scale_fill_manual(values = my_colors.T) +  # Use custom color scale
+  theme(legend.position = 'none')+
+  geom_ridgeline(aes(x = doy, y = year, height = thresh/10 - 1.1), fill = NA, color = "black", linetype = "dashed", size =0.7)
 
 
 

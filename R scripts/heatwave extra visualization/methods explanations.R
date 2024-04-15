@@ -15,23 +15,37 @@ slopes = slopes %>% dplyr::rename(doy = doyCat)
 # choosing this heatwave because it is leading to a 50% increase in chlorophyll
 # in our reference lake
 
+
+#### heatwave plot #####
+hw.l13.plot = event_line_DKS("paul", 2013)+
+  labs(title = "Paul 2013")+
+  #theme(legend.position="none")+
+  xlim(180, 215)+
+  ylim(18, 28.5) +
+  #geom_point()+
+  labs(x = "")+
+  theme(legend.position = "none")
+
+
+
 l13 = slopes %>%  filter(year == 2013, lake == "L")
 
 
   chl_slope = ggplot(data = l13, aes( x = doy, y = chl_slope))+
   geom_line(color = "black", size = 1)+
   theme_classic()+
-  ylim(-0.5, 0.5)+
-  labs(y = "Chlorophyll slope (μg/L/day)")+
+  ylim(-0.4, 0.3)+
+  labs(y = "Chlorophyll slope (μg/L/day)", x = "")+
   xlim(180, 215)+
-    geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
-                                                  ymax= Inf), color="transparent", 
-              fill="red3", alpha=0.3)+
+    # geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+    #                                               ymax= Inf), color="transparent", 
+    #           fill="red3", alpha=0.3)+
     theme(legend.position="none")+
     geom_vline(data=hw.l13, inherit.aes=FALSE, aes(xintercept = yday(date_start)), linetype = "dashed")+
     geom_vline(data=hw.l13, inherit.aes=FALSE, aes(xintercept = yday(date_end)), linetype = "dashed")
 
   
+  scaleFUN <- function(x) sprintf("%.2f", x)
   
   
   
@@ -42,18 +56,19 @@ chl_plot = ggplot(data = l13, aes(x = doy, y = manual_chl))+
  # geom_line(aes(x = doy, y = chl_slope*2 + 2), size = 2)+
   geom_area(fill = "forestgreen", alpha = 0.5)+
   ylim(0, 5)+
-  labs(y = "Chlorophyll (μg/L)")+
+  labs(y = "Chlorophyll (μg/L)", x = "")+
   xlim(180, 215)+
-  geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
-                                                ymax= Inf), color="transparent", 
-            fill="red3", alpha=0.4)+
+  # geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+  #                                               ymax= Inf), color="transparent", 
+  #           fill="red3", alpha=0.4)+
   theme(legend.position="none")+
   geom_vline(data=hw.l13, inherit.aes=FALSE, aes(xintercept = yday(date_start)), linetype = "dashed")+
   geom_vline(data=hw.l13, inherit.aes=FALSE, aes(xintercept = yday(date_end)), linetype = "dashed")+
-  geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=(start_analysis), xmax=(end_analysis), ymin= - Inf,
-                                                ymax= Inf), color="transparent", 
-            fill="grey", alpha=0.4)+
-  theme(legend.position="none")
+  # geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=(start_analysis), xmax=(end_analysis), ymin= - Inf,
+  #                                               ymax= Inf), color="transparent", 
+  #           fill="grey", alpha=0.4)+
+  theme(legend.position="none")+
+  scale_y_continuous(labels=scaleFUN, limits = c(0, 4.5))
 
 
 chl_percent_change = ggplot(data = l13, aes( x = doy, y = percent_change))+
@@ -61,23 +76,45 @@ chl_percent_change = ggplot(data = l13, aes( x = doy, y = percent_change))+
   theme_classic()+
   geom_point()+
   xlim(180, 215)+
-  labs(y = "% change in chlorophyll")+
-  geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
-                                                ymax= Inf), color="transparent", 
-            fill="red3", alpha=0.3)+
+  labs(y = "% change in chlorophyll", x = "day of year")+
+  # geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+  #                                               ymax= Inf), color="transparent", 
+  #           fill="red3", alpha=0.3)+
   theme(legend.position="none")+
   geom_vline(data=hw.l13, inherit.aes=FALSE, aes(xintercept = yday(date_start)), linetype = "dashed")+
   geom_vline(data=hw.l13, inherit.aes=FALSE, aes(xintercept = yday(date_end)), linetype = "dashed")+
-  geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=(start_analysis), xmax=(end_analysis), ymin= - Inf,
-                                                ymax= Inf), color="transparent", 
-            fill="grey", alpha=0.3)+
+  # geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=(start_analysis), xmax=(end_analysis), ymin= - Inf,
+  #                                               ymax= Inf), color="transparent", 
+  #           fill="grey", alpha=0.3)+
   theme(legend.position="none")+
-  geom_vline(data=hw.l13, inherit.aes=FALSE, aes(xintercept = (start_analysis)), linetype = "dashed")+
-  geom_vline(data=hw.l13, inherit.aes=FALSE, aes(xintercept = (end_analysis)), linetype = "dashed")+
+  # geom_vline(data=hw.l13, inherit.aes=FALSE, aes(xintercept = (start_analysis)), linetype = "dashed")+
+  # geom_vline(data=hw.l13, inherit.aes=FALSE, aes(xintercept = (end_analysis)), linetype = "dashed")+
   ylim(-100, 200)
 
+ggarrange(hw.l13.plot, chl_plot, chl_slope, chl_percent_change, nrow = 4, ncol = 1)
 
-ggarrange(chl_plot, chl_slope, chl_percent_change, nrow = 3, ncol = 1)
+
+png("./figures/ASLO figures/slopes plot multi panel.png", height = 5, width = 8, res = 300, units = "in")
+ggarrange(hw.l13.plot, chl_plot, chl_slope, chl_percent_change, nrow = 4, ncol = 1)
+dev.off()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #### Multiple slopes overlaid
