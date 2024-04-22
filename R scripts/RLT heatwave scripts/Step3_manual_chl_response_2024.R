@@ -41,6 +41,8 @@ library(readxl)
 if (!require(ggpubr)) install.packages('ggpubr')
 library(ggpubr)
 
+library(DescTools)
+
 #==============================================================================#
 #### levers we can pull ####
 
@@ -206,6 +208,7 @@ hwSlopes <- function(heatwaveStart, heatwaveEnd,  targLake, data){
  heatwaves$percentChange = NA
  heatwaves$sdSlope = NA
  heatwaves$sdSlopePercent = NA
+ heatwaves$medianSlopePercent
 
  #Using a For Loop
  lengthHW = nrow(heatwaves)
@@ -223,6 +226,13 @@ hwSlopes <- function(heatwaveStart, heatwaveEnd,  targLake, data){
 
    # save the mean of the percent change to the heatwaves dataframe
    heatwaves$percentChange[i] = mean(slopes.subset$percent_change, na.rm = TRUE)
+   
+   # save the standard deviation of the percent changes to the heatwaves dataframe
+   heatwaves$sdSlopePercent[i] = sd(slopes.subset$percent_change, na.rm = TRUE)
+   
+   # save the median of the percent changes to the heatwaves dataframe
+   heatwaves$medianSlopePercent[i] = median(slopes.subset$percent_change, na.rm = TRUE)
+   
  }
 
  # save the static results
@@ -1095,9 +1105,29 @@ write.csv(results, "./results/heatwaves with grouping.csv", row.names = FALSE)
   
 png("./figures/manuscript 03_18_2024/individual events.png", height = 4, width = 6, res = 300, units = "in")
   
-  results %>% filter(!(event_group %in% c(5, 6, 7, 11))) %>% 
+
+results %>% filter(!(event_group %in% c(5, 6, 7, 11))) %>% 
   ggplot(aes(x = lake, y = percentChange, fill = lake)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.9), alpha = 0.5, color = "black", width = 0.9) +
+  theme_classic() +  
+  ylab("% change in surface chlorophyll-a") +
+  xlab("") +
+  scale_fill_manual(values = c("R" = "#4AB5C4", "L" = "#ADDAE3", "T" = "#BAAD8D")) +
+  theme(axis.text.x = element_blank())+
+  facet_wrap(~start_date_avg)+
+  geom_hline(yintercept = 0)
+
+dev.off()
+
+png("./figures/manuscript 03_18_2024/individual events standard error bars.png", height = 4, width = 6, res = 300, units = "in")
+
+# calculate SE of percent change
+results = results %>% mutate(SE = sdSlopePercent/sqrt(5))
+results = results %>% mutate(error.top = percentChange + SE, error.bottom = percentChange - SE)
+
+  ggplot(results, aes(x = lake, y = percentChange, fill = lake)) +
     geom_bar(stat = "identity", position = position_dodge(width = 0.9), alpha = 0.5, color = "black", width = 0.9) +
+    geom_errorbar( aes(x=lake, ymin= error.bottom, ymax=error.top), position = position_dodge(width = 0.1), alpha = 0.5, color = "black", width = 0) +
     theme_classic() +  
     ylab("% change in surface chlorophyll-a") +
     xlab("") +
@@ -1108,6 +1138,18 @@ png("./figures/manuscript 03_18_2024/individual events.png", height = 4, width =
   
   
 dev.off()
+
+# standard deviation
+ggplot(results, aes(x = lake, y = percentChange, fill = lake)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.9), alpha = 0.5, color = "black", width = 0.9) +
+  geom_errorbar( aes(x=lake, ymin= percentChange -sdSlopePercent, ymax= percentChange +sdSlopePercent), position = position_dodge(width = 0.1), alpha = 0.5, color = "black", width = 0) +
+  theme_classic() +  
+  ylab("% change in surface chlorophyll-a") +
+  xlab("") +
+  scale_fill_manual(values = c("R" = "#4AB5C4", "L" = "#ADDAE3", "T" = "#BAAD8D")) +
+  theme(axis.text.x = element_blank())+
+  facet_wrap(~start_date_avg)+
+  geom_hline(yintercept = 0)
   
   ggplot(data = results, aes(x = as.factor(start_date_avg), y = percentChange, fill = lake)) +
     geom_bar(stat = "identity", position = position_dodge(width = 1), alpha = 0.5, color = "black", width = 1 / max_group_width) +

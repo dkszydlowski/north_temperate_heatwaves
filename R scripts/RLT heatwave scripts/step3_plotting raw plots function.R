@@ -602,3 +602,53 @@ dev.off()
 
 
 }
+
+
+
+
+
+#### Make plots of just the 2013 chlorophyll for ASLO talk
+
+
+slopes = allSlopes %>% filter(daysAfter == 0)
+
+slopes.13 = slopes %>% filter(year == 2013)
+
+
+# make a date column
+slopes.13 <- slopes.13 %>%
+  mutate(date = as.Date(paste(year, doyCat), format = "%Y %j"))
+
+R13.chl = ggplot(slopes.13 %>% filter(lake == "R"), aes(x = date, y = mean_chl))+
+  geom_line()+
+  geom_line(color = "forestgreen", size = 1)+
+ # geom_point()+
+  theme_classic()+
+  ylim(0, 32)+
+  labs(x = "", y = "chlorophyll (ug/L)")+
+  geom_area(fill = "forestgreen", alpha = 0.5)
+  
+
+
+L13.chl = ggplot(slopes.13 %>% filter(lake == "L"), aes(x = date, y = mean_chl))+
+  geom_line()+
+  geom_line(color = "forestgreen", size = 1)+
+  # geom_point()+
+  theme_classic()+
+  ylim(0, 32)+
+  labs(x = "", y = "chlorophyll (ug/L)")+
+  geom_area(fill = "forestgreen", alpha = 0.5)
+
+
+T13.chl = ggplot(slopes.13 %>% filter(lake == "T"), aes(x = date, y = mean_chl))+
+  geom_line()+
+  geom_line(color = "forestgreen", size = 1)+
+  # geom_point()+
+  theme_classic()+
+  ylim(0, 32)+
+  labs(x = "date", y = "chlorophyll (ug/L)")+
+  geom_area(fill = "forestgreen", alpha = 0.5)
+
+png("./figures/ASLO figures/2013 chlorophyll.png", height = 6, width = 3.5, units = "in", res = 300)
+ggarrange(L13.chl, R13.chl, T13.chl, nrow = 3, ncol = 1)
+dev.off()
