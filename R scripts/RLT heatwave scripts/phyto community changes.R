@@ -1,6 +1,6 @@
 ### community changes in phytoplankton ater heatwaves
 
-
+library(tidyverse)
 library(vegan)
 
 # Package ID: knb-lter-ntl.353.5 Cataloging System:https://pasta.edirepository.org.
@@ -178,11 +178,12 @@ plot(phyto_nmds)
 phyto_nmds_scores <- as.data.frame(scores(phyto_nmds))
 phyto_nmds_scores <- cbind(phyto.wide[, c("lakeid", "year4", "daynum")], phyto_nmds_scores)
 
-ggplot(phyto_nmds_scores, aes(x = NMDS1, y = NMDS2, color = lakeid)) +
-  geom_point(size = 4) +
+ggplot(phyto_nmds_scores, aes(x = NMDS1, y = NMDS2, fill = lakeid)) +
+  geom_point(size = 4, pch = 21) +
   theme_minimal() +
-  labs(title = "NMDS of Phytoplankton Community Data",
+  labs(title = "NMDS of Phytoplankton Community Data 2013-2015",
        x = "NMDS1",
        y = "NMDS2") +
+  scale_fill_manual(values = c("R" = "#4AB5C4", "L" = "#ADDAE3", "T" = "#BAAD8D")) +
   theme(legend.position = "right")
 

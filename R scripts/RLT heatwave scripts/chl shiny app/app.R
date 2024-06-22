@@ -10,9 +10,9 @@ library(tidyverse)
 if (!require(ggpubr)) install.packages('ggpubr')
 library(ggpubr)
 
+
 #### Shiny app ####
 
-looped.results = read.csv("./results/sensitivity results/looped results.csv")
 
 # Define UI
 ui <- fluidPage(
@@ -27,68 +27,62 @@ ui <- fluidPage(
   )
 )
 
-
-
-
 # Define server logic
-server <- function(input, output) {
+server <- function(input, output, session) {
+  # Load the data
+  looped.results <- reactive({
+    read.csv("looped results.csv")
+  })
+  
   # Filter data based on slider input
   filtered_data <- reactive({
-    looped.results %>% filter(slopeLength == input$slope_length_slider)
+    req(looped.results())  # Ensure the data is loaded
+    looped.results() %>% filter(slopeLength == input$slope_length_slider)
   })
   
   # Create ggplot
   output$plot <- renderPlot({
+    req(filtered_data())  # Ensure the filtered data is available
     
-    a =   ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = R.after.heatwave)) +
+    a <- ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = R.after.heatwave)) +
       geom_tile(color = "black") +
       scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
-      labs(title = "Peter during and after heatwave")+
+      labs(title = "Peter during and after heatwave") +
       theme_classic()
     
-    b =   ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = L.after.heatwave)) +
+    b <- ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = L.after.heatwave)) +
       geom_tile(color = "black") +
       scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
-      labs(title = "Paul during and after heatwave")+
+      labs(title = "Paul during and after heatwave") +
       theme_classic()
     
-    c =   ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = T.after.heatwave)) +
+    c <- ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = T.after.heatwave)) +
       geom_tile(color = "black") +
       scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
-      labs(title = "Tuesday during and after heatwave")+
+      labs(title = "Tuesday during and after heatwave") +
       theme_classic()
     
-    
-    d =   ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = R.all.other.days)) +
+    d <- ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = R.all.other.days)) +
       geom_tile(color = "black") +
       scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
-      labs(title = "Peter all other days")+
+      labs(title = "Peter all other days") +
       theme_classic()
     
-    e =   ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = L.all.other.days)) +
+    e <- ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = L.all.other.days)) +
       geom_tile(color = "black") +
       scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
-      labs(title = "Paul all other days")+
+      labs(title = "Paul all other days") +
       theme_classic()
     
-    f =   ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = T.all.other.days)) +
+    f <- ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = T.all.other.days)) +
       geom_tile(color = "black") +
       scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
-      labs(title = "Tuesday all other days")+
+      labs(title = "Tuesday all other days") +
       theme_classic()
     
-    
-    
-    ggarrange(a, b, c, d, e, f, nrow = 3, ncol = 3)
-    
+    ggarrange(a, b, c, d, e, f, nrow = 3, ncol = 2)
   })
 }
 
 # Run the application
 shinyApp(ui, server)
-
-
-
-
-
-

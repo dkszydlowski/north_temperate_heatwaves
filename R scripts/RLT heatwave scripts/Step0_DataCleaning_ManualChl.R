@@ -1,5 +1,8 @@
 # data cleaning for the MANUAL chlorophyll data instead of the sonde data
 
+# produces the output write.csv(full_dataset, "./formatted data/full raw data manual and sonde chlorophyll.csv", row.names = FALSE)
+
+
 ##### 2008-2009 LR #####
 
 # Package ID: knb-lter-ntl.374.2 Cataloging System:https://pasta.edirepository.org.
@@ -169,7 +172,7 @@ LR_08_09 = LR_08_09 %>% select(year, lake, doyCat, mean_chl)
 ##### 2011-2019 LRT #####
 
 # Package ID: knb-lter-ntl.413.2 Cataloging System:https://pasta.edirepository.org.
-# Data set title: Cascade Project at North Temperate Lakes LTER â Daily Bloom Data for Whole Lake             Experiments 2011 - 2019.
+# Data set title: Cascade Project at North Temperate Lakes LTER - Daily Bloom Data for Whole Lake Experiments 2011 - 2019.
 # Data set creator:  Cal Buelo - University of Wisconsin 
 # Data set creator:  Michael Pace - University of Virginia 
 # Data set creator:  Stephen Carpenter - University of Wisconsin 

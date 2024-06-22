@@ -1,5 +1,9 @@
 # Initial Data Download and Cleaning for Heat Waves Project
 # This script downloads and cleans the SONDE chlorophyll and temperature data
+# sone chlorophyll data was not ultimately used in analysis, but sonde temperature data was
+
+# produces a dataframe called ""./formatted data/CombinedData.csv" that is the basis
+# for identifying heatwave events from temperature
 
 
 library("tidyverse")
@@ -344,6 +348,8 @@ sonde13_15_mean_L$normChl = na.approx(sonde13_15_mean_L$normChl)
 
 
 #####Cleaning Cascade Sonde Data 2018-2019#####
+
+# dataset sent by Cal Buelo
 sonde18_19 = read.csv("Cascade_LR_2018_2019_RaftData_MARSSfilledData_manualChl_dailyData_v2 (2).csv")
 sonde18_19 = sonde18_19 %>%
   filter(Year == 2018 | Year == 2019)

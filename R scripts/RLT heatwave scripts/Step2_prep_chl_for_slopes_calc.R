@@ -1,4 +1,9 @@
 # step 2- format the data so it is useable in the slopes calculations
+# interpolates any missing values in the chlorophyll
+
+# produces an interpolated dataset
+# write.csv(allData, "./formatted data/interpolated_manual_chl_for_slopes.csv", row.names = FALSE)
+
 
 #### read in packages ####
 if (!require(tidyverse)) install.packages('tidyverse')

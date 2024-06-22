@@ -1,4 +1,4 @@
-# modify the event_line source code so that it plots with the day of year instead of 
+# modify the event_line source code from heatwaveR so that it plots with the day of year instead of 
 # listing the months and year
 
 # call it event_line_doy

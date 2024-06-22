@@ -1,0 +1,10 @@
+name: chl_shiny_app
+title:
+username: pp5s02-daniel-szydlowski
+account: pp5s02-daniel-szydlowski
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 12216620
+bundleId: 8775957
+url: https://pp5s02-daniel-szydlowski.shinyapps.io/chl_shiny_app/
+version: 1

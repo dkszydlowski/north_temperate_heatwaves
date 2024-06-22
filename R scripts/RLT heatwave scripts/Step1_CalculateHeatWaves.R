@@ -1,12 +1,17 @@
 #####Calculate and Plot Heatwaves for Peter, Paul, and Tuesday Lakes#####
 
+## produces three outputs:
+# saveRDS(paulHW, file = "./results/heatwave modeled outputs/paul heatwave outputs actual data.rds")
+# saveRDS(peterHW, file = "./results/heatwave modeled outputs/peter heatwave outputs actual data.rds")
+# saveRDS(tuesdayHW, file = "./results/heatwave modeled outputs/tuesday heatwave outputs actual data.rds")
+
 library("tidyverse")
 library("ggridges")
 library("lubridate")
 library("zoo")
 library(heatwaveR)
 
-
+# CombinedData comes from "step0_DataCleaning.R", which combines all sonde data
 allSonde = read.csv("./formatted data/CombinedData.csv")
 allSonde$date = as.Date(allSonde$date)
 

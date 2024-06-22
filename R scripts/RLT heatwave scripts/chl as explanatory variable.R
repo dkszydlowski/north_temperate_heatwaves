@@ -35,12 +35,5 @@ for(i in 1:nrow(heatwave.char)){
 
 
 
-heatwave.char = heatwave.char %>% filter(precip > 0)
-
-
-ggplot(heatwave.char, aes(x = precip, y = percentChange, color = lake))+
-  geom_point(size = 2)
-
-
 ggplot(heatwave.char, aes(x = chl_avg_wk, y = percentChange, color = lake))+
   geom_point(size = 2)
