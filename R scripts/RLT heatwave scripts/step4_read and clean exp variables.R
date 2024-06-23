@@ -681,7 +681,7 @@ for(i in 1:nrow(heatwaves.exp)){
   
   # filter the explanatory dataframe to match
   # make sure doy is <= the heatwave day
-  cur.casc.exp = casc.color.nut.zoops %>% filter(lake == targ.lake, year == targ.year, doy <= targ.doy)
+  cur.casc.exp = casc.color.nut.zoops %>% filter(lake == targ.lake, year == targ.year, doy <= heatwaves.exp$date_end[i])
   
   cur.casc.exp.zoop = cur.casc.exp %>% filter(!is.na(biomass))
   cur.casc.exp.color = cur.casc.exp %>% filter(!is.na(PML.g440))
@@ -714,4 +714,11 @@ for(i in 1:nrow(heatwaves.exp)){
 write.csv(heatwaves.exp, "./formatted data/explanatory variables heatwaves/heatwaves with percent zoop color nutrients.csv", row.names = FALSE)
 
 
+
+ggplot(heatwaves.exp, aes(x = log10(biomass.during), y = percentChange, fill = lake))+
+  geom_point(size = 5, color = "black", shape = 21, stroke = 1, alpha = 0.9)+
+  labs(x = "log10(Daphnia biomass)", y = "")+
+  theme_classic()+
+  scale_fill_manual(values = c("R" = "#4AB5C4", "L" = "#ADDAE3", "T" = "#BAAD8D"))+
+  ylim(0, 250)
 

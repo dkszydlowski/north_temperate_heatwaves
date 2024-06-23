@@ -100,7 +100,7 @@ metadata_plot <- ggplot() +
 #### loop for the whole code to investigate across combinations ####
 
 # the dataframe looped results will contain the mean values for the specified combinations
-looped.results = data.frame(matrix(nrow = 3024, ncol = 15))
+looped.results = data.frame(matrix(nrow = 720, ncol = 15))
 names(looped.results) = c("slopeLength", "daysAfterStart", "numSlopes",
                           "all.all.other.days", "all.during.heatwave", "all.after.heatwave",
                           "R.all.other.days", "R.during.heatwave", "R.after.heatwave",
@@ -111,9 +111,9 @@ slopeLength = 3
 daysAfterStart = 0
 numSlopes = 3
 
-for(slopeLength in 3:14){
-  for(daysAfterStart in 0:20){
-    for(numSlopes in 3:14){
+for(slopeLength in 3:10){
+  for(daysAfterStart in 0:14){
+    for(numSlopes in 3:8){
 
       looped.results$slopeLength[L] = slopeLength
       looped.results$daysAfterStart[L] = daysAfterStart
@@ -1483,5 +1483,6 @@ ggplot(data = looped.results, aes(x = L.all.other.days, y = R.all.other.days))+
   geom_point()+
   geom_smooth(stat = "smooth")
 
-#write.csv(looped.results, "./results/sensitivity results/looped results.csv", row.names = FALSE)
+#write.csv(looped.results, "./results/sensitivity results/looped results START OF HW.csv", row.names = FALSE)
+write.csv(looped.results, "./R scripts/RLT heatwave scripts/chl shiny app/looped results START OF HW.csv", row.names = FALSE)
 

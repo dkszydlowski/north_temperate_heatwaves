@@ -29,7 +29,7 @@ for(i in 1:nrow(heatwave.char)){
   year.hw = year(cur.hw.date)
   doy = yday(cur.hw.date)
   
-  temp.precip = precip %>% filter(year == year.hw & (DoY <= doy & DoY >= doy -31))
+  temp.precip = precip %>% filter(year == year.hw & (DoY <= doy & DoY >= doy -7))
   print(sum(temp.precip$best))
   heatwave.char$precip[i] = sum(temp.precip$best)
   
@@ -40,6 +40,10 @@ for(i in 1:nrow(heatwave.char)){
 heatwave.char = heatwave.char %>% filter(precip > 0)
 
 
-ggplot(heatwave.char, aes(x = precip, y = percentChange, color = lake))+
-  geom_point(size = 2)
+ggplot(heatwave.char, aes(x = precip, y = percentChange, fill = lake))+
+  geom_point(size = 3, pch = 21)+
+  labs(x = "precipitation week before heatwave (mm)")+
+  scale_fill_manual(values = c("R" = "#4AB5C4", "L" = "#ADDAE3", "T" = "#BAAD8D"))+
+  theme_bw()
+  
 

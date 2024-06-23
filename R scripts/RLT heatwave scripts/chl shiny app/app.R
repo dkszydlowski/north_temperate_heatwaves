@@ -13,13 +13,14 @@ library(ggpubr)
 
 #### Shiny app ####
 
-
 # Define UI
 ui <- fluidPage(
-  titlePanel("Vary slope length"),
+  titlePanel("Phytoplankton response to heatwaves -- sensitivity test"),
   sidebarLayout(
     sidebarPanel(
-      sliderInput("slope_length_slider", "slopeLength:", min = 3, max = 14, value = 7, step = 1)
+      selectInput("file_select", "Select File:",
+                  choices = c("looped results.csv", "looped results START OF HW.csv")),
+      sliderInput("slope_length_slider", "slopeLength:", min = 3, max = 10, value = 7, step = 1)
     ),
     mainPanel(
       plotOutput("plot", height = "500px", width = "800px")
@@ -29,9 +30,10 @@ ui <- fluidPage(
 
 # Define server logic
 server <- function(input, output, session) {
-  # Load the data
+  # Load the data based on file selection
   looped.results <- reactive({
-    read.csv("looped results.csv")
+    req(input$file_select)  # Ensure the file selection is available
+    read.csv(input$file_select)
   })
   
   # Filter data based on slider input
@@ -44,43 +46,46 @@ server <- function(input, output, session) {
   output$plot <- renderPlot({
     req(filtered_data())  # Ensure the filtered data is available
     
-    a <- ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = R.after.heatwave)) +
+    x_var <- if (input$file_select == "looped results START OF HW.csv") "daysAfterStart" else "daysAfter"
+    
+    
+    a <- ggplot(data = filtered_data(), aes_string(x = x_var, y = "numSlopes", fill = "R.after.heatwave")) +
       geom_tile(color = "black") +
       scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
       labs(title = "Peter during and after heatwave") +
       theme_classic()
     
-    b <- ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = L.after.heatwave)) +
+    b <- ggplot(data = filtered_data(), aes_string(x = x_var, y = "numSlopes", fill = "L.after.heatwave")) +
       geom_tile(color = "black") +
       scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
       labs(title = "Paul during and after heatwave") +
       theme_classic()
     
-    c <- ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = T.after.heatwave)) +
+    c <- ggplot(data = filtered_data(), aes_string(x = x_var, y = "numSlopes", fill = "T.after.heatwave")) +
       geom_tile(color = "black") +
       scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
       labs(title = "Tuesday during and after heatwave") +
       theme_classic()
     
-    d <- ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = R.all.other.days)) +
+    d <- ggplot(data = filtered_data(), aes_string(x = x_var, y = "numSlopes", fill = "R.all.other.days")) +
       geom_tile(color = "black") +
       scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
       labs(title = "Peter all other days") +
       theme_classic()
     
-    e <- ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = L.all.other.days)) +
+    e <- ggplot(data = filtered_data(), aes_string(x = x_var, y = "numSlopes", fill = "L.all.other.days")) +
       geom_tile(color = "black") +
       scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
       labs(title = "Paul all other days") +
       theme_classic()
     
-    f <- ggplot(data = filtered_data(), aes(x = daysAfter, y = numSlopes, fill = T.all.other.days)) +
+    f <- ggplot(data = filtered_data(), aes_string(x = x_var, y = "numSlopes", fill = "T.all.other.days")) +
       geom_tile(color = "black") +
       scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
       labs(title = "Tuesday all other days") +
       theme_classic()
     
-    ggarrange(a, b, c, d, e, f, nrow = 3, ncol = 2)
+    ggarrange(a, d, b, e, c, f, nrow = 3, ncol = 2)
   })
 }
 
