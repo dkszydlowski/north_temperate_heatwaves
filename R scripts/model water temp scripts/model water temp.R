@@ -8,6 +8,16 @@ library(lme4)
 library(lmerTest)
 library(MuMIn)
 
+########## RESULTS FROM THIS SCRIPT ###############
+# R2 values for different models
+# PRISM air temp and Cascade routine surface temp: R2 = 0.657
+# PRISM air temp, Cascade routine surface temp, and water color: R2 = 0.74
+# PRISM air temp, Cascade daily sonde data, and 5 lag terms for water data: R2 = 0.83
+# woodruff air temp, hourly sonde data, with terms for hour, year, and doy: R2 = 0.51
+# Sparkling Lake, woodruff air, Cascade sonde hourly, with three lag terms: R2 = 0.93
+
+
+####### PRISM AIR VS ROUTINES WATER #########
 # read in the PRISM temperature data
 
 prism = read.csv("./formatted data/PRISM_tmin_tmean_tmax_tdmean_provisional_4km_19810101_20240101_46.2514_-89.4958.csv")
@@ -151,7 +161,7 @@ casc.temp.0.5 = casc.temp %>% filter(depth == 0.5)
 
 ggplot(data = casc.temp.0, aes(x = date, y = temp, color = lake))+
   geom_point()+
-  geom_line()
+  geom_line()+
   facet_wrap(~lake, ncol = 1, nrow = 3)+
   scale_color_manual(values = c("L" = "#ADDAE3", "R"=  "#4AB5C4", "T"=  "#BAAD8D"))+
   theme_bw()
@@ -182,7 +192,7 @@ r.squaredGLMM(test)
 
 
 
-
+##### WATER COLOR AS ANOTHER PREDICTOR? ##########
 
 #### bring in the carbon ####
 # Package ID: knb-lter-ntl.350.7 Cataloging System:https://pasta.edirepository.org.
@@ -329,8 +339,6 @@ r.squaredGLMM(test)
 test = lmer(temp~tmean+doy+doc + (1|lake), data = all.cascade.0)
 summary(test)
 r.squaredGLMM(test)
-
-
 
 
 
@@ -679,18 +687,38 @@ ggplot(data = sonde.SP.woodruff.testing, aes(x = mean_temp, y = modeled, fill = 
 
 #### testing data vs. actual data for ASLO talk ####
 
-png("./figures/ASLO figures/modeled temp testing scatterplot.png", res = 300, height = 3.5, width = 6, units = "in")
+#png("./figures/ASLO figures/modeled temp testing scatterplot.#png", res = 300, height = 3.5, width = 6, units = "in")
 
 ggplot(data = sonde.SP.woodruff.testing, aes(x = mean_temp, y = modeled, fill = lake))+
   geom_point(size = 3, pch = 21)+
   labs(x = "measured temperature (°C)", y = "modeled temperature (°C)")+
   theme_classic()+
   scale_fill_manual(values = c("L" = "#ADDAE3", "R"=  "#4AB5C4", "T"=  "#BAAD8D"))  +
-  theme(legend.position = "none")
+  theme(legend.position = "none")+
+  geom_abline (slope=1, linetype = "dashed")
 
-dev.off()
 
 summary(lm(data = sonde.SP.woodruff.testing, modeled~mean_temp))
+
+
+# plot just the 90th percentile of temps
+quant.90 = quantile(sonde.SP.woodruff.testing$mean_temp, 0.9)
+
+ggplot(data = sonde.SP.woodruff.testing %>% filter(mean_temp >= quant.90), aes(x = mean_temp, y = modeled, fill = lake))+
+  geom_point(size = 3, pch = 21)+
+  labs(x = "measured temperature (°C)", y = "modeled temperature (°C)")+
+  theme_classic()+
+  #geom_smooth(method = "lm", se = FALSE, color = "black", fill = "")+
+  scale_fill_manual(values = c("L" = "#ADDAE3", "R"=  "#4AB5C4", "T"=  "#BAAD8D"))  +
+  theme(legend.position = "none")+
+  geom_abline (slope=1, linetype = "dashed")
+  
+
+summary(lm(data = sonde.SP.woodruff.testing %>% filter(mean_temp >= quant.90), modeled~mean_temp))
+
+
+#dev.off()
+
 
 ##### Use the model to predict temperature of RLT for every year of Sparkling data ######
 SP.woodruff = SP.temp.1 %>% left_join(woodruff, by = c("date", "doy", "year"))
@@ -705,8 +733,8 @@ SP.woodruff = rbind(SP.woodruffL, SP.woodruffR, SP.woodruffT)
 
 SP.woodruff$modeled.temp = predict(test, SP.woodruff)
 
-#pdf("./figures/modeled temperature/modeled temperature daily sp 1 m.pdf", width = 12, height = 18)
-png("./figures/modeled temperature/modeled temperature daily sp 1 m.png", width = 8, height = 11, units = "in", res = 300)
+##pdf("./figures/modeled temperature/modeled temperature daily sp 1 m.#pdf", width = 12, height = 18)
+#png("./figures/modeled temperature/modeled temperature daily sp 1 m.#png", width = 8, height = 11, units = "in", res = 300)
 
 ggplot(SP.woodruff, aes(x = doy, y = modeled.temp, color = lake))+
    geom_line(size = 0.9)+
@@ -718,13 +746,13 @@ ggplot(SP.woodruff, aes(x = doy, y = modeled.temp, color = lake))+
   ylim(15, 30)+
   theme_classic()
 
-dev.off()
+#dev.off()
 
 
 
 ### make ASLO plot of modeled temp ####
 
-png("./figures/ASLO figures/modeled temp.png", height = 4, width = 8, res = 300, units = "in")
+#png("./figures/ASLO figures/modeled temp.#png", height = 4, width = 8, res = 300, units = "in")
 
 SP.woodruff %>% filter(!(year %in% c("2015", "2018", "2001"))) %>% 
 ggplot( aes(x = doy, y = modeled.temp, color = lake))+
@@ -737,7 +765,7 @@ ggplot( aes(x = doy, y = modeled.temp, color = lake))+
   ylim(15, 30)+
   theme_classic()
 
-dev.off()
+#dev.off()
 
 # compare the predicted temperature to the actual temperature
 SP.woodruff.cascade = temp.sonde %>% left_join(SP.woodruff, by = c("year", "date", "doy", "lake"))
@@ -756,8 +784,8 @@ SP.woodruff.cascade.real.data_long <- SP.woodruff.cascade.real.data %>%
   )
 
 
-#pdf("./figures/modeled temperature/modeled vs real temperature daily sp 1 m.pdf", width = 12, height = 12)
-png("./figures/modeled temperature/modeled vs real temperature daily sp 1 m.png", width = 7, height = 8, units = "in", res = 300)
+##pdf("./figures/modeled temperature/modeled vs real temperature daily sp 1 m.#pdf", width = 12, height = 12)
+#png("./figures/modeled temperature/modeled vs real temperature daily sp 1 m.#png", width = 7, height = 8, units = "in", res = 300)
 
 
 ggplot(SP.woodruff.cascade.real.data_long, aes(x = doy, y = temperature, color = temp.type))+
@@ -773,7 +801,7 @@ ggplot(SP.woodruff.cascade.real.data_long, aes(x = doy, y = temperature, color =
   theme_classic()
 
 
-dev.off()
+#dev.off()
 
 ##### Calculate heatwaves from the modeled data #####
 SP.woodruff.subset = SP.woodruff %>% filter(year %in% c(1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
@@ -955,7 +983,7 @@ CB.woodruff = rbind(CB.woodruffL, CB.woodruffR, CB.woodruffT)
 
 CB.woodruff$modeled.temp = predict(test.CB, CB.woodruff)
 
-pdf("./figures/modeled temperature/modeled temperature daily CB 1 m.pdf", width = 12, height = 18)
+#pdf("./figures/modeled temperature/modeled temperature daily CB 1 m.#pdf", width = 12, height = 18)
 
 
 ggplot(CB.woodruff, aes(x = doy, y = modeled.temp, color = lake))+
@@ -968,7 +996,7 @@ ggplot(CB.woodruff, aes(x = doy, y = modeled.temp, color = lake))+
   ylim(15, 30)+
   theme_classic()
 
-dev.off()
+#dev.off()
 
 # compare the predicted temperature to the actual temperature
 CB.woodruff.cascade = temp.sonde %>% left_join(CB.woodruff, by = c("year", "date", "doy", "lake"))
@@ -987,7 +1015,7 @@ CB.woodruff.cascade.real.data_long <- CB.woodruff.cascade.real.data %>%
   )
 
 
-pdf("./figures/modeled temperature/modeled vs real temperature daily CB 1 m.pdf", width = 12, height = 12)
+#pdf("./figures/modeled temperature/modeled vs real temperature daily CB 1 m.#pdf", width = 12, height = 12)
 
 ggplot(CB.woodruff.cascade.real.data_long, aes(x = doy, y = temperature, color = temp.type))+
   geom_line(size = 1, alpha = 0.8)+
@@ -1002,7 +1030,7 @@ ggplot(CB.woodruff.cascade.real.data_long, aes(x = doy, y = temperature, color =
   theme_classic()
 
 
-dev.off()
+#dev.off()
 
 ##### Calculate heatwaves from the modeled data #####
 CB.woodruff.subset = CB.woodruff %>% filter(year %in% c(2008, 2009, 2010, 2013, 2014, 2019)) %>% 
@@ -1154,7 +1182,7 @@ SP.woodruff = SP.woodruff %>% rename(sp.temp = SP.temp.1)
 
 SP.woodruff$modeled.temp = predict(test.routines, SP.woodruff)
 
-pdf("./figures/modeled temperature/modeled temperature daily SP 1 m routines.pdf", width = 12, height = 18)
+#pdf("./figures/modeled temperature/modeled temperature daily SP 1 m routines.#pdf", width = 12, height = 18)
 
 
 ggplot(SP.woodruff, aes(x = doy, y = modeled.temp, color = lake))+
@@ -1167,7 +1195,7 @@ ggplot(SP.woodruff, aes(x = doy, y = modeled.temp, color = lake))+
   ylim(15, 30)+
   theme_classic()
 
-dev.off()
+#dev.off()
 
 # compare the predicted temperature to the actual temperature
 SP.woodruff.cascade = temp.sonde %>% left_join(SP.woodruff, by = c("year", "date", "doy", "lake"))
@@ -1186,7 +1214,7 @@ SP.woodruff.cascade.real.data_long <- SP.woodruff.cascade.real.data %>%
   )
 
 
-pdf("./figures/modeled temperature/modeled vs real temperature daily SP 1 m routines.pdf", width = 12, height = 12)
+#pdf("./figures/modeled temperature/modeled vs real temperature daily SP 1 m routines.#pdf", width = 12, height = 12)
 
 ggplot(SP.woodruff.cascade.real.data_long, aes(x = doy, y = temperature, color = temp.type))+
   geom_line(size = 1, alpha = 0.8)+
@@ -1201,7 +1229,7 @@ ggplot(SP.woodruff.cascade.real.data_long, aes(x = doy, y = temperature, color =
   theme_classic()
 
 
-dev.off()
+#dev.off()
 
 ##### Calculate heatwaves from the modeled data #####
 SP.woodruff.subset = SP.woodruff %>% filter(year %in% c(189, 1990, 1991, 1992, 1993, 1994, 1995,

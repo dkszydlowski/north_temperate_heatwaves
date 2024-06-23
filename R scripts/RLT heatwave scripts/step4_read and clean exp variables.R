@@ -1,5 +1,8 @@
 #### Read in the explanatory variables from Cascade to be matched with the heatwaves dataframe #####
 
+library(readxl)
+
+
 # Package ID: knb-lter-ntl.351.4 Cataloging System:https://pasta.edirepository.org.
 # Data set title: Cascade Project at North Temperate Lakes LTER Core Data Nutrients 1991 - 2016.
 # Data set creator:  Stephen Carpenter - University of Wisconsin 
@@ -647,7 +650,7 @@ nut.load = nut.load %>% mutate(date = as.Date(paste(year, doy), format = "%Y %j"
 
 casc.color.nut.zoops = casc.color.zoops %>% full_join(nut.load, by = c("lake", "date", "year", "doy"))
 
-write.csv(casc.color.nut.zoops, "./formatted data/explanatory variables heatwaves/color nutrient additions and zooplankton.csv", row.names = FALSE)
+#write.csv(casc.color.nut.zoops, "./formatted data/explanatory variables heatwaves/color nutrient additions and zooplankton.csv", row.names = FALSE)
 
 
 
@@ -660,11 +663,14 @@ heatwaves.exp = heatwaves.exp %>% mutate(doy = yday(date_start))
 
 
 # create new columns of heatwaves.exp for PML.g440, biomass, cumulative.load, daily.load
-heatwaves.exp = heatwaves.exp %>% mutate(PML.g440 = NA, biomass = NA, cumulative.load = NA, daily.load = NA)
-i = 30
+heatwaves.exp = heatwaves.exp %>% mutate(PML.g440 = NA, biomass = NA, biomass.during = NA, cumulative.load = NA, daily.load = NA)
+i = 1
+
+casc.color.nut.zoops = casc.color.nut.zoops %>% distinct()
+
 for(i in 1:nrow(heatwaves.exp)){
   
-  # save the start wave of current heatwave
+  # save the start date of current heatwave
   targ.date = heatwaves.exp$date_start[i]
   targ.doy = heatwaves.exp$doy[i]
   print(targ.date)
@@ -681,9 +687,15 @@ for(i in 1:nrow(heatwaves.exp)){
   cur.casc.exp.color = cur.casc.exp %>% filter(!is.na(PML.g440))
   cur.casc.exp.nut = cur.casc.exp %>% filter(!is.na(cumulative.load))
   
-
+  # either before or during heatwave
   j = which(abs(cur.casc.exp.zoop$doy - targ.doy) == min(abs(cur.casc.exp.zoop$doy - targ.doy)))
   if(nrow(cur.casc.exp.zoop) > 0){ heatwaves.exp$biomass[i] = cur.casc.exp.zoop$biomass[j]}
+  
+  if(nrow(cur.casc.exp.zoop) > 0){
+  cur.casc.exp.zoop = cur.casc.exp %>% filter(date >= targ.date & date <= heatwaves.exp$date_end[i])
+  biomass.during.hw = mean(cur.casc.exp.zoop$biomass, na.rm = TRUE)}
+  
+  if(nrow(cur.casc.exp.zoop) > 0){heatwaves.exp$biomass.during[i] = biomass.during.hw}
   
   k = which(abs(cur.casc.exp.color$doy - targ.doy) == min(abs(cur.casc.exp.color$doy - targ.doy)))
   if(nrow(cur.casc.exp.color) > 0){ heatwaves.exp$PML.g440[i] = cur.casc.exp.color$PML.g440[k]}

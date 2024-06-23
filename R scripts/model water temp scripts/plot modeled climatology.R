@@ -32,7 +32,7 @@ climatology.all = rbind(climatology.all, climatology.all.real)
 
 # climatology using routines for model training
 
-"./results/heatwave modeled outputs/paul heatwave outputs modeled SP 1m routines.rds"
+#"./results/heatwave modeled outputs/paul heatwave outputs modeled SP 1m routines.rds"
 
 # Sparkling Lake modeled climatology with routines
 peterHW = readRDS(file = "./results/heatwave modeled outputs/peter heatwave outputs modeled SP 1m routines.rds")
@@ -54,7 +54,7 @@ png("./figures/modeled temperature/climatologies/all climatologies.png", height 
 
 # climatology from Crystal Bog data 
 
-# Sparkling Lake modeled climatology
+# Crystal Bog modeled climatology
 peterHW = readRDS(file = "./results/heatwave modeled outputs/peter heatwave outputs modeled CB 1m.rds")
 paulHW = readRDS(file = "./results/heatwave modeled outputs/paul heatwave outputs modeled CB 1m.rds")
 tuesdayHW = readRDS(file = "./results/heatwave modeled outputs/tuesday heatwave outputs modeled CB 1m.rds")
