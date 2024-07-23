@@ -17,6 +17,8 @@ heatwave.char = read.csv("./formatted data/explanatory variables heatwaves/heatw
 
 
 heatwave.char$chl_avg_wk = NA
+heatwave.char$chl_sd_wk = NA
+
 
 i = 1
 for(i in 1:nrow(heatwave.char)){
@@ -30,12 +32,14 @@ for(i in 1:nrow(heatwave.char)){
   cur.chl = cur.chl %>% filter(year == year.hw & (doyCat <= doy & doyCat >= doy -6))
   print(mean(cur.chl$manual_chl))
   heatwave.char$chl_avg_wk[i] = mean(cur.chl$manual_chl)
+  heatwave.char$chl_sd_wk[i] = sd(cur.chl$manual_chl)
+  
   
 }
 
 
 
-ggplot(heatwave.char, aes(x = chl_avg_wk, y = percentChange, color = lake))+
+ggplot(heatwave.char, aes(x = log10(chl_sd_wk), y = percentChange, color = lake))+
   geom_point(size = 3)+
   labs(x = "Chlorophyll the week before the heatwave (ug/L)", y = "percent change in chl")+
   scale_color_manual(values = c("R" = "#4AB5C4", "L" = "#ADDAE3", "T" = "#BAAD8D"))+

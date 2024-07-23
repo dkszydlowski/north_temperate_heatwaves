@@ -46,4 +46,4 @@ ggplot(heatwave.char, aes(x = precip, y = percentChange, fill = lake))+
   scale_fill_manual(values = c("R" = "#4AB5C4", "L" = "#ADDAE3", "T" = "#BAAD8D"))+
   theme_bw()
   
-
+View(allSonde)
