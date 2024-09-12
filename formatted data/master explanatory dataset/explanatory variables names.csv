@@ -1,0 +1,44 @@
+code name,predictor,include,table
+intensity_mean_abs,absolute mean intensity,TRUE,heatwave
+intensity_max_abs,absolute max intensity,TRUE,heatwave
+doy,day of year,TRUE,
+daphnia.length.after,daphnia length following heatwave,TRUE,
+stability.before,stability before the heatwave,TRUE,
+zoop.days.before,,FALSE,
+intensity_mean,mean intensity,TRUE,heatwave
+intensity_var_abs,absolute intensity variabiliy,TRUE,heatwave
+rate_onset,onset rate of heatwave,TRUE,heatwave
+stability.during,Schmidt stability during the heatwave,TRUE,
+intensity_max,peak intensity,TRUE,heatwave
+PML.g440,color (g440),TRUE,
+pchange.daphnia.length,percent change in Daphnia length,TRUE,
+intensity_var,intensity variability,TRUE,heatwave
+intensity_cumulative,cumulative intensity,TRUE,heatwave
+cumulative.load,cumulative phosphorus added,TRUE,
+intensity_var_relThresh,intensity variability relative to threshold,TRUE,heatwave
+rate_decline,decline rate of heatwave,TRUE,heatwave
+stability.after,Schmidt stability following heatwave,TRUE,
+daphnia.biomass.after,Daphnia biomass following the heatwave,TRUE,
+duration,heatwave duration,TRUE,heatwave
+intensity_mean_relThresh,mean intensity relative to threshold,TRUE,heatwave
+intensity_max_relThresh,max intensity relative to threshold,TRUE,heatwave
+intensity_cumulative_relThresh,cumulative intensity relative to threshold,TRUE,heatwave
+biomass,Daphnia biomass before and during heatwave,FALSE,
+biomass.during,Daphnia biomass during heatwave,FALSE,
+daily.load,daily phosphorus loading rate,TRUE,
+daphnia.biomass.before,Daphnia biomass before the heatwave,TRUE,
+daphnia.biomass.during,Daphnia biomass during the heatwave,TRUE,
+total.biomass.after,total biomass of zooplankton following heatwave,TRUE,
+manual.chl.before,average chlorophyll week before heatwave,TRUE,
+manual.chl.during,average chlorophyll during heatwave,TRUE,
+daphnia.length.during,average length of Daphnia during heatwave,TRUE,
+pchange.total.zoop,percent change in total zoop biomass,TRUE,
+abschange.daphnia.zoop.during.to.after,absolute change in Daphnia following heatwave,TRUE,
+intensity_cumulative_abs,absolute cumulative intensity,TRUE,heatwave
+precip,total precip week before heatwave,TRUE,
+total.biomass.before,total zooplankton biomass week before heatwave,TRUE,
+total.biomass.during,total zooplankton biomass during heatwave,TRUE,
+daphnia.length.before,average length of Daphnia week before heatwave,TRUE,
+abschange.total.zoop,absolute change in total zoop biomass,TRUE,
+abschange.daphnia.zoop,absolute change in total Daphnia biomass,TRUE,
+pchange.total.zoop.during.to.after,percent change in total zoop biomass after heatwave,TRUE,

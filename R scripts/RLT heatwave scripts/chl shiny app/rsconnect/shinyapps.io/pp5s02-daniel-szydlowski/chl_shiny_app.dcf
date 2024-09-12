@@ -5,6 +5,6 @@ account: pp5s02-daniel-szydlowski
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 12216620
-bundleId: 8778452
+bundleId: 9190204
 url: https://pp5s02-daniel-szydlowski.shinyapps.io/chl_shiny_app/
 version: 1

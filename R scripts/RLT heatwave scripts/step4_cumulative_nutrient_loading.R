@@ -71,6 +71,9 @@ nut.load <- nut.load %>%
     TRUE ~ daily.load
   ))
 
+
+
+
 nut.load = nut.load %>% mutate(year = as.factor(year))
 
 # calculate the cumulative loading

@@ -278,11 +278,13 @@ manual_chl = manual_chl %>%
 # save the manual chlorophyll data
 write.csv(manual_chl, "./formatted data/manual_chlorophyll.csv", row.names = FALSE)
 
-## Finally, combine the manual chlorophyll with the temperature data to make a combined dataframe
+## Finally, combine the manual chlorophyll with the sonde data to make a combined dataframe
 
 all = read.csv("./formatted data/CombinedData.csv")
 
 manual_chl = manual_chl %>% rename(manual_chl = mean_chl)
 full_dataset = full_join(manual_chl, all, by = c("lake", "year", "doyCat"))
+
+full_dataset = full_dataset %>% distinct()
 
 write.csv(full_dataset, "./formatted data/full raw data manual and sonde chlorophyll.csv", row.names = FALSE)

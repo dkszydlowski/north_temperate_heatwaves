@@ -1481,7 +1481,7 @@ ggplot(data = looped.results, aes(x = T.during.heatwave, y = R.during.heatwave))
 
 ggplot(data = looped.results, aes(x = L.all.other.days, y = R.all.other.days))+
   geom_point()+
-  geom_smooth(stat = "smooth")
+  geom_smooth(stat = "smooth", method = "lm")
 
 #write.csv(looped.results, "./results/sensitivity results/looped results.csv", row.names = FALSE)
 

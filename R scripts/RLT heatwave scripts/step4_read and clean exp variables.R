@@ -2,7 +2,6 @@
 
 library(readxl)
 
-
 # Package ID: knb-lter-ntl.351.4 Cataloging System:https://pasta.edirepository.org.
 # Data set title: Cascade Project at North Temperate Lakes LTER Core Data Nutrients 1991 - 2016.
 # Data set creator:  Stephen Carpenter - University of Wisconsin 
@@ -91,25 +90,8 @@ str(dt1)
 attach(dt1)                            
 # The analyses below are basic descriptions of the variables. After testing, they should be replaced.                 
 
-summary(lakeid)
-summary(lakename)
-summary(year4)
-summary(daynum)
-summary(sampledate)
-summary(depth_id)
-summary(depth)
-summary(tn_ug)
-summary(tp_ug)
-summary(nh34)
-summary(no23)
-summary(po4)
-summary(comments) 
 # Get more details on character variables
 
-summary(as.factor(dt1$lakeid)) 
-summary(as.factor(dt1$lakename)) 
-summary(as.factor(dt1$depth_id)) 
-summary(as.factor(dt1$comments))
 detach(dt1)               
 
 casc.nut = dt1
@@ -122,6 +104,9 @@ ggplot(casc.nut, aes(x = daynum, y = tn_ug, color = lakename))+
   facet_wrap(~year4)
 
 
+
+
+#write.csv(casc.nut, "./formatted data/explanatory variables heatwaves/nutrients 2008 to 2016.csv")
 
 
 
@@ -415,23 +400,23 @@ monthly.values = monthly.values %>% left_join(monthly.color.L, by = c("year", "m
 # 
 
 
-monthly.values %>%
-  group_by(year, month) %>%
-  summarise(n = n(), .groups = "drop") %>%
-  filter(n > 1L)
-
-monthly.values <- monthly.values %>%
-  pivot_wider(
-    id_cols = year,
-    names_from = month,
-    values_from = mean.color,
-    names_prefix = "xm"
-  )
-
-monthly.values = monthly.values %>% mutate(replace(., is.na(.), -666))
-
-write.csv(monthly.values, "./formatted data/teleconnections data/Paul_color_monthly.csv", row.names = FALSE)
-
+# monthly.values %>%
+#   group_by(year, month) %>%
+#   summarise(n = n(), .groups = "drop") %>%
+#   filter(n > 1L)
+# 
+# monthly.values <- monthly.values %>%
+#   pivot_wider(
+#     id_cols = year,
+#     names_from = month,
+#     values_from = mean.color,
+#     names_prefix = "xm"
+#   )
+# 
+# monthly.values = monthly.values %>% mutate(replace(., is.na(.), -666))
+# 
+# write.csv(monthly.values, "./formatted data/teleconnections data/Paul_color_monthly.csv", row.names = FALSE)
+# 
 
 
 
@@ -655,7 +640,7 @@ casc.color.nut.zoops = casc.color.zoops %>% full_join(nut.load, by = c("lake", "
 
 
 ## function which combines heatwaves output with the explanatory variables ##
-heatwaves.exp = read.csv("./formatted data/explanatory variables heatwaves/heatwaves with percent.csv")
+heatwaves.exp = read.csv("./formatted data/master explanatory dataset/heatwaves explained var1.csv")
 
 heatwaves.exp = heatwaves.exp %>% mutate(doy = yday(date_start))
 
@@ -711,8 +696,11 @@ for(i in 1:nrow(heatwaves.exp)){
 # or when there were no daphnia in Tuesday Lake
 
 
-write.csv(heatwaves.exp, "./formatted data/explanatory variables heatwaves/heatwaves with percent zoop color nutrients.csv", row.names = FALSE)
+#write.csv(heatwaves.exp, "./formatted data/explanatory variables heatwaves/heatwaves with percent zoop color nutrients.csv", row.names = FALSE)
+write.csv(heatwaves.exp, "./formatted data/master explanatory dataset/heatwaves explained var2.csv", row.names = FALSE)
 
+
+#"./formatted data/master explanatory dataset/heatwaves explained var1.csv"
 
 
 ggplot(heatwaves.exp, aes(x = log10(biomass.during), y = percentChange, fill = lake))+
@@ -721,4 +709,8 @@ ggplot(heatwaves.exp, aes(x = log10(biomass.during), y = percentChange, fill = l
   theme_classic()+
   scale_fill_manual(values = c("R" = "#4AB5C4", "L" = "#ADDAE3", "T" = "#BAAD8D"))+
   ylim(0, 250)
+
+
+
+
 

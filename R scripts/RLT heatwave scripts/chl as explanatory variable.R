@@ -39,7 +39,7 @@ for(i in 1:nrow(heatwave.char)){
 
 
 
-ggplot(heatwave.char, aes(x = log10(chl_sd_wk), y = percentChange, color = lake))+
+ggplot(heatwave.char, aes(x = log10(chl_sd_wk/chl_avg_wk), y = percentChange, color = lake))+
   geom_point(size = 3)+
   labs(x = "Chlorophyll the week before the heatwave (ug/L)", y = "percent change in chl")+
   scale_color_manual(values = c("R" = "#4AB5C4", "L" = "#ADDAE3", "T" = "#BAAD8D"))+

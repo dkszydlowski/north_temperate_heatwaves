@@ -3,42 +3,10 @@
 
 library(readxl)
 library(lme4)
-
-
+library(ggpubr)
 library(lme4)
 library(lmerTest)
 library(MuMIn)
-
-
-### Old code with old values 
-exp = read_xlsx("./formatted data/explanatory_variables_heatwaves.xlsx")
-
-exp$percent_change = as.numeric(exp$percent_change)
-
-
-ggplot(data = exp, aes(x = p_loading_mg_m2, y = abs(percent_change)))+
-  geom_point(size = 3, color = "steelblue2")+
-  theme_classic()
-
-
-ggplot(data = exp, aes(x = color_m_1, y = abs(percent_change)))+
-  geom_point(size = 3, color = "steelblue2")+
-  theme_classic()
-
-
-# plot of the percent change in chlorophyll seasonally
-
-exp = exp %>% mutate(doy.start = yday(start_date))
-
-png("./figures/seasonality/seasonality_of_percent_change.png", width = 4, height = 4, units = "in", res = 600)
-
-ggplot(data = exp, aes(x = doy.start, y = abs(percent_change), fill = lake))+
-  geom_point(size = 3, color = "black", shape = 21, stroke = 1, alpha = 0.7)+
-  theme_classic()+
-  labs(y = "percent change in surface chlorophyll", x = "day of year of heatwave")+
-  scale_fill_manual(values = c("L" = "steelblue2", "R" = "black", "T" = "white"))
-
-dev.off()
 
 
 
@@ -90,50 +58,61 @@ dredge(global.model)
 
 
 
-
-
-
-
 ##### Explanatory variables analysis updated 2024_03_17
 
 heatwaves.exp = read.csv("./formatted data/explanatory variables heatwaves/heatwaves with percent zoop color nutrients.csv")
 
 
 a = ggplot(heatwaves.exp, aes(x = log10(biomass), y = percentChange, fill = lake))+
-  geom_point(size = 5, color = "black", shape = 21, stroke = 1, alpha = 0.9)+
-  labs(x = "log10(Daphnia biomass)", y = "")+
+  geom_point(size = 5, color = "black", shape = 21, stroke = 1, alpha = 0.95)+
+  labs(x = expression("log10(Daphnia dry biomass g/m"^2*")"), y = "")+
   theme_classic()+
-  scale_fill_manual(values = c("R" = "#4AB5C4", "L" = "#ADDAE3", "T" = "#BAAD8D"))+
-  ylim(0, 250)
-
-
+  scale_fill_manual(values = c("R" = "#60BFCC", "L" = "#D9EEF3", "T" = "#544C34"),
+                    labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday"))+
+  theme(legend.text = element_text(size = 16),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12)) + 
+  guides(fill = guide_legend(title = NULL), fill = guide_legend(title = NULL))+
+  guides(fill = guide_legend(override.aes = list(shape = 22), title = NULL)) 
 
 b = ggplot(heatwaves.exp, aes(x = (PML.g440), y = (percentChange), fill = lake))+
-  geom_point(size = 5, color = "black", shape = 21, stroke = 1, alpha = 0.9)+
-  labs(x = "surface water color - g440 (m-1)", y = "% change in chlorophyll-a")+
+  geom_point(size = 5, color = "black", shape = 21, stroke = 1, alpha = 0.95)+
+  labs(x = expression("surface water color - g440 (m"^-1*")"), y = "% change in chlorophyll-a")+
   theme_classic()+
-  scale_fill_manual(values = c("R" = "#4AB5C4", "L" = "#ADDAE3", "T" = "#BAAD8D"))+
-  ylim(0, 250)
-
-
+  scale_fill_manual(values = c("R" = "#60BFCC", "L" = "#D9EEF3", "T" = "#544C34"),
+                    labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday"))+
+  theme(legend.text = element_text(size = 16),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12)) + 
+  guides(fill = guide_legend(title = NULL), fill = guide_legend(title = NULL))+
+  guides(fill = guide_legend(override.aes = list(shape = 22), title = NULL)) 
 
 c = ggplot(heatwaves.exp, aes(x = (cumulative.load), y = (percentChange), fill = lake))+
-  geom_point(size = 5, color = "black", shape = 21, stroke = 1, alpha = 0.9)+
-  labs(x = "cumulative P (mg/m^2)", y = "% change in chlorophyll-a")+
+  geom_point(size = 5, color = "black", shape = 21, stroke = 1, alpha = 0.95)+
+  labs(x = expression("cumulative P added (mg/m"^2*")"), y = "% change in chlorophyll-a")+
   theme_classic()+
-  scale_fill_manual(values = c("R" = "#4AB5C4", "L" = "#ADDAE3", "T" = "#BAAD8D"))+
-  ylim(0, 250)
-
+  scale_fill_manual(values = c("R" = "#60BFCC", "L" = "#D9EEF3", "T" = "#544C34"),
+                    labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday"))+
+  theme(legend.text = element_text(size = 16),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12)) + 
+  guides(fill = guide_legend(title = NULL), fill = guide_legend(title = NULL))+
+  guides(fill = guide_legend(override.aes = list(shape = 22), title = NULL)) 
 
 
 d = ggplot(heatwaves.exp, aes(x = (daily.load), y = (percentChange), fill = lake))+
-  geom_point(size = 5, color = "black", shape = 21, stroke = 1, alpha = 0.9)+
-  labs(x = "daily P load (mg/m^2)", y = "")+
+  geom_point(size = 5, color = "black", shape = 21, stroke = 1, alpha = 0.95)+
+  labs(x = expression("daily P load (mg/m"^2*")"), y = "")+
   theme_classic()+
-  scale_fill_manual(values = c("R" = "#4AB5C4", "L" = "#ADDAE3", "T" = "#BAAD8D"))+
-  ylim(0, 250)
+  scale_fill_manual(values = c("R" = "#60BFCC", "L" = "#D9EEF3", "T" = "#544C34"),
+                    labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday"))+
+  theme(legend.text = element_text(size = 16),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12)) + 
+  guides(fill = guide_legend(title = NULL), fill = guide_legend(title = NULL))+
+  guides(fill = guide_legend(override.aes = list(shape = 22), title = NULL)) 
 
-png("./figures/ASLO figures/explanatory plots.png", height = 5, width = 8, units = "in", res = 300)
+png("./figures/manuscript draft 2024-11-11/explanatory plots.png", height = 6, width = 8, units = "in", res = 300)
 ggarrange(b, a, c, d, common.legend = TRUE)
 dev.off()
 
@@ -268,3 +247,42 @@ heatwaves.exp.l.r = heatwaves.exp %>% filter(!is.na(event_group)) %>%
 
 
 avg.l.r. = heatwaves.exp.l.r %>% group_by(event_group) %>% dplyr::summarize(mean.percent = mean(percentChange, na.rm = TRUE), mean.color = mean(PML.g440, na.rm = TRUE))
+
+
+
+
+
+
+
+
+# 
+# ### Old code with old values 
+# exp = read_xlsx("./formatted data/explanatory_variables_heatwaves.xlsx")
+# 
+# exp$percent_change = as.numeric(exp$percent_change)
+# 
+# 
+# ggplot(data = exp, aes(x = p_loading_mg_m2, y = abs(percent_change)))+
+#   geom_point(size = 3, color = "steelblue2")+
+#   theme_classic()
+# 
+# 
+# ggplot(data = exp, aes(x = color_m_1, y = abs(percent_change)))+
+#   geom_point(size = 3, color = "steelblue2")+
+#   theme_classic()
+# 
+# 
+# # plot of the percent change in chlorophyll seasonally
+# 
+# exp = exp %>% mutate(doy.start = yday(start_date))
+# 
+# png("./figures/seasonality/seasonality_of_percent_change.png", width = 4, height = 4, units = "in", res = 600)
+# 
+# ggplot(data = exp, aes(x = doy.start, y = abs(percent_change), fill = lake))+
+#   geom_point(size = 3, color = "black", shape = 21, stroke = 1, alpha = 0.7)+
+#   theme_classic()+
+#   labs(y = "percent change in surface chlorophyll", x = "day of year of heatwave")+
+#   scale_fill_manual(values = c("L" = "steelblue2", "R" = "black", "T" = "white"))
+# 
+# dev.off()
+# 

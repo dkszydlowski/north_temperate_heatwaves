@@ -199,6 +199,7 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
     theme(legend.position="none")+
     xlim(140, 250)
   
+  
   t14temp = event_line_DKS("tuesday", 2014)+
     labs(title = "Tuesday 2014")+
     theme(legend.position="none")+
@@ -1190,7 +1191,7 @@ makePDFrawPlots <- function(allSlopes, daysAfter, numSlopes, metadata_plot, runN
   #   geom_line(color = "steelblue", size = 1)+
   #   theme_classic()+
   #   labs(title = "Peter 2019")+
-  #   annotate('rect', xmin = as.Date(215), xmax = as.Date(219), ymin = -Inf, ymax = Inf,
+  #   annotate('rect', xmin = as.Date(210), xmax = as.Date(219), ymin = -Inf, ymax = Inf,
   #            fill = 'red', alpha = 0.5)
   
   print(ggarrange(nrow = 4, ncol = 2, r19temp, l19temp, r19chl, l19chl, r19slope, l19slope, r19percent_change, l19percent_change))
@@ -1295,3 +1296,1097 @@ ggplot(climatology.L.2013, aes(x = doy, y = temp)) +
   guides(linetype = "none")
 
 dev.off()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+###### METHODS EXAMPLE 2013 MANUSCRIPT UPDATED #######
+
+heatwaves = read.csv("./formatted data/explanatory variables heatwaves/heatwaves with percent zoop color nutrients.csv")
+
+# select just the columns we want
+heatwaves = heatwaves %>% select(lake, year, date_start, date_end, event_no)
+
+# calculate where the analysis is going to actually happen, including slopes picked and 
+# the number of slopes included
+
+heatwaves = heatwaves %>% mutate(start_analysis = yday(date_end)+ daysAfter - slopeLength)
+heatwaves = heatwaves %>% mutate(end_analysis = yday(date_end) + daysAfter + numSlopes -1)
+
+# create separate dataframes for each heatwave
+hw.l13 = heatwaves %>% filter(lake == "L" & year == 2013)
+hw.r13 = heatwaves %>% filter(lake == "R" & year == 2013)
+hw.t13 = heatwaves %>% filter(lake == "T" & year == 2013)
+
+## THIS DEPENDS ON THE MOST RECENT VERSION OF ALLSLOPES
+slopes = allSlopes %>% filter(daysAfter == 2 & lake == "T" | daysAfter == 3 & lake == "R" | daysAfter == 3 & lake == "L")
+slopes = slopes %>% dplyr::rename(doy = doyCat)
+
+#scale_fill_manual(values = c("R" = "#60BFCC", "L" = "#D9EEF3", "T" = "#544C34")
+                  
+
+##### 2013 ####
+t13 = slopes %>%  filter(year == 2013, lake == "T")
+l13 = slopes %>%  filter(year == 2013, lake == "L")
+r13 = slopes %>%  filter(year == 2013, lake == "R")
+
+# make a couple version of the datasets merged
+merged_data <- merge(hw.r13, r13, by = "doy")
+
+
+# make temp plots
+t13temp = event_line_DKS2("tuesday", 2013)+
+  labs(title = "Tuesday 2013", y = "", x = "")+
+  theme(legend.position="none")+
+  xlim(190, 210)+
+  geom_rect(data=hw.t13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  geom_point()+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+
+
+l13temp = event_line_DKS2("paul", 2013)+
+  labs(title = "Paul 2013", x = "")+
+  theme(legend.position="none")+
+  xlim(190, 210)+
+  geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  geom_point()+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+
+r13temp = event_line_DKS2("peter", 2013)+
+  labs(title = "Peter 2013", y = "", x = "")+
+  theme(legend.position="none")+
+  xlim(190, 210)+
+  geom_rect(data=hw.r13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  geom_point()+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+
+# Tuesday
+t13slope = ggplot(data = t13, aes( x = doy, y = chl_slope))+
+  geom_line(color = "black", size = 0.8)+
+  theme_classic()+
+  geom_point(size = 1)+
+  ylim(-1, 1.8)+
+  labs(y = "", x = "")+
+  xlim(190, 210)+
+  # annotate("point", x = 192, y = 	1.028482, fill = "#544C34", size = 4, shape = 21)+
+  annotate("point", x = 204, y = 	0.8988908, fill = "#544C34", size = 5, shape = 21)+
+  geom_rect(data=hw.t13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+  # geom_rect(data=hw.t13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+  #                                               ymax= Inf), color="transparent", 
+  #           fill="orange", alpha=0.3)
+
+
+t13chl = ggplot(data = t13, aes(x = doy, y = manual_chl))+
+  geom_line(color = "forestgreen", size = 0.8)+
+  theme_classic()+
+  geom_point(size = 1)+
+  xlim(190, 210)+
+  ylim(1, 25)+
+  labs(y = "", x = "")+
+  geom_rect(data=hw.t13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  geom_rect(data=hw.t13, inherit.aes=FALSE, aes(xmin=yday(date_end)-5, xmax=yday(date_end)+2, ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="#544C34", alpha=0.7)+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+
+
+
+# Ensure `date_start` and `date_end` in `hw.t13` are in Date format
+hw.t13$date_start <- as.Date(hw.t13$date_start)
+hw.t13$date_end <- as.Date(hw.t13$date_end)
+
+
+# Define the rectangle x-range for the linear regression fit
+rect_xmin <- 197
+rect_xmax <- 205
+
+# Filter data points within the rectangle's range
+t13_rect_data <- t13 %>%
+  filter(doy >= rect_xmin & doy <= rect_xmax)
+
+# Plot with the regression line
+t13chl = ggplot(data = t13, aes(x = doy, y = manual_chl))+
+  theme_classic()+
+  labs(y = "", x = "")+
+  xlim(190, 210)+
+  ylim(1, 25)+
+  geom_rect(data=hw.t13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  geom_rect(data=hw.t13, inherit.aes=FALSE, aes(xmin=yday(date_end)-4, xmax=yday(date_end)+3, ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="#544C34", alpha=0.35)+
+  geom_point(size = 1.2)+
+  geom_line(color = "forestgreen", size = 1)+
+  geom_smooth(data = t13_rect_data, aes(x = doy, y = manual_chl), method = "lm", color = "black", linetype = "solid", se = FALSE, linewidth = 1)+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+
+
+
+
+
+t13percent_change = ggplot(data = t13, aes( x = doy, y = percent_change))+
+  geom_line(size = 0.8, color = "black")+
+  theme_classic()+
+  geom_point(size = 1)+
+  xlim(190, 210)+
+  labs(y = "", x = "day of year")+
+  # geom_rect(data=hw.t13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+  #                                               ymax= Inf), color="transparent", 
+  #           fill="orange", alpha=0.3)+
+  theme(legend.position="none")+
+  # geom_vline(data=hw.t13, inherit.aes=FALSE, aes(xintercept = yday(date_start)), linetype = "dashed")+
+  # geom_vline(data=hw.t13, inherit.aes=FALSE, aes(xintercept = yday(date_end)), linetype = "dashed")+
+  # geom_rect(data=hw.t13, inherit.aes=FALSE, aes(xmin=(start_analysis), xmax=(end_analysis), ymin= - Inf,
+  #                                               ymax= Inf), color="transparent", 
+  #           fill="magenta", alpha=0.3)+
+  theme(legend.position="none")+
+  # geom_vline(data=hw.t13, inherit.aes=FALSE, aes(xintercept = (start_analysis)), linetype = "dashed")+
+  # geom_vline(data=hw.t13, inherit.aes=FALSE, aes(xintercept = (end_analysis)), linetype = "dashed")+
+  ylim(-100, 250)+
+  # annotate("point", x = 192, y = 	189.91973, fill = "#544C34", size = 4, shape = 21)+
+  annotate("point", x = 204, y = 	110.7496, fill = "#544C34", size = 5, shape = 21)+
+  geom_rect(data=hw.t13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+
+
+# t13temp = ggplot(data = t13, aes(x = doy, y = mean_temp))+
+#   geom_line(color = "steelblue", size = 1)+
+#   theme_classic()+
+#   labs(title = "Tuesday 2013")+
+#   annotate("rect", xmin = as.Date(186), xmax = as.Date(190), ymin = -Inf, ymax = Inf,
+#            fill = "red", alpha = 0.5)+
+#   annotate("rect", xmin = as.Date(196), xmax = as.Date(201), ymin = -Inf, ymax = Inf,
+#            fill = "red", alpha = 0.5)
+
+
+# Paul
+l13slope = ggplot(data = l13, aes( x = doy, y = chl_slope))+
+  geom_line(color = "black", size = 0.8)+
+  theme_classic()+
+  geom_point(size = 1)+
+  ylim(-1, 1.8)+
+  labs(y = "Chlorophyll slope (μg/L/day)", x = "")+
+  xlim(190, 210)+
+  annotate("point", x = 204, y = 	0.262535019, fill = "#D9EEF3", size = 5, shape = 21)+
+  geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 11))
+  # geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+  #                                               ymax= Inf), color="transparent", 
+  #           fill="orange", alpha=0.3)
+
+# l13chl = ggplot(data = l13, aes(x = doy, y = manual_chl))+
+#   geom_line(color = "forestgreen", size = 0.8)+
+#   theme_classic()+
+#   geom_point(size = 1)+
+#   labs(y = "Chlorophyll (μg/L)", x = "")+
+#   xlim(190, 210)+
+#   ylim(1, 4.5)+
+#   geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+#                                                 ymax= Inf), color="transparent", 
+#             fill="orange", alpha=0.3)+
+#   geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=yday(date_end)-4, xmax=yday(date_end)+3, ymin= - Inf,
+#                                                 ymax= 2.25), color="transparent", 
+#             fill="#D9EEF3", alpha=0.7)
+#   # annotate(data = hw.l13,  inherit.aes=FALSE, "segment", x = 204, xend = 210, y = 7, yend = 7, 
+#   #          arrow = arrow(length = unit(0.1, "cm")), color = "black")
+
+
+
+# Ensure `date_start` and `date_end` in `hw.l13` are in Date format
+hw.l13$date_start <- as.Date(hw.l13$date_start)
+hw.l13$date_end <- as.Date(hw.l13$date_end)
+
+# Define the rectangle x-range for the linear regression fit
+rect_xmin <- yday(min(hw.l13$date_end) - 4)
+rect_xmax <- 204
+
+# Filter data points within the rectangle's range
+l13_rect_data <- l13 %>%
+  filter(doy >= rect_xmin & doy <= rect_xmax)
+
+# Plot with the regression line
+l13chl = ggplot(data = l13, aes(x = doy, y = manual_chl))+
+  theme_classic()+
+  labs(y = "Chlorophyll (μg/L)", x = "")+
+  xlim(190, 210)+
+  ylim(1, 4.5)+
+  geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=yday(date_end)-4, xmax=yday(date_end)+3, ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="#D9EEF3", alpha=0.7)+
+  geom_point(size = 1.2)+
+  geom_line(color = "forestgreen", size = 1)+
+  geom_smooth(data = l13_rect_data, aes(x = doy, y = manual_chl), method = "lm", color = "black", linetype = "solid", se = FALSE)+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+
+
+
+
+l13percent_change = ggplot(data = l13, aes( x = doy, y = percent_change))+
+  geom_line(size = 0.8, color = "black")+
+  theme_classic()+
+  geom_point(size = 1)+
+  xlim(190, 210)+
+  labs(y = "% change in chlorophyll", x = "day of year")+
+  # geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+  #                                               ymax= Inf), color="transparent", 
+  #           fill="orange", alpha=0.3)+
+  theme(legend.position="none")+
+  # geom_vline(data=hw.l13, inherit.aes=FALSE, aes(xintercept = yday(date_start)), linetype = "dashed")+
+  # geom_vline(data=hw.l13, inherit.aes=FALSE, aes(xintercept = yday(date_end)), linetype = "dashed")+
+  # geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=(start_analysis), xmax=(end_analysis), ymin= - Inf,
+  #                                               ymax= Inf), color="transparent", 
+  #           fill="magenta", alpha=0.3)+
+  theme(legend.position="none")+
+  # geom_vline(data=hw.l13, inherit.aes=FALSE, aes(xintercept = (start_analysis)), linetype = "dashed")+
+  # geom_vline(data=hw.l13, inherit.aes=FALSE, aes(xintercept = (end_analysis)), linetype = "dashed")+
+  ylim(-100, 250)+
+  annotate("point", x = 204, y = 	 144.5193669, fill = "#D9EEF3", size = 5, shape = 21)+
+  geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+
+
+# l13temp = ggplot(data = l13, aes(x = doy, y = mean_temp))+
+#   geom_line(color = "steelblue", size = 1)+
+#   theme_classic()+
+#   labs(title = "Paul 2013")+
+#   annotate("rect", xmin = as.Date(196), xmax = as.Date(201), ymin = -Inf, ymax = Inf,
+#            fill = "red", alpha = 0.5)
+
+
+# Peter
+r13slope = ggplot(data = r13, aes( x = doy, y = chl_slope))+
+  geom_line(color = "black", size = 0.8)+
+  theme_classic()+
+  geom_point(size = 1)+
+  ylim(-1, 1.8)+
+  xlim(190, 210)+
+  labs(y = "", x = "")+
+  # geom_point(data=hw.r13, inherit.aes=FALSE, 
+  #            aes(x = yday(date_end), y = 1),  # Map x to yday(date_end) dynamically
+  #            color="#60BFCC", size=3)
+  annotate("point", x = 204, y = 	 0.033689674, fill = "#60BFCC", size = 5, shape = 21)+
+  geom_rect(data=hw.r13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+
+
+  # xlim(140, 225)+  geom_rect(data=hw.r13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+  #                                                                ymax= Inf), color="transparent", 
+  #                            fill="orange", alpha=0.3)
+
+# r13chl = ggplot(data = r13, aes(x = doy, y = manual_chl))+
+#   geom_line(color = "forestgreen", size = 0.8)+
+#   geom_point(size = 1)+
+#   theme_classic()+
+#   labs(y = "", x = "")+
+#   xlim(190, 210)+
+#   ylim(1, 5.5)+
+#   geom_rect(data=hw.r13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+#                                                                 ymax= Inf), color="transparent", 
+#                             fill="orange", alpha=0.3)+
+#   geom_rect(data=hw.r13, inherit.aes=FALSE, aes(xmin=yday(date_end)-4, xmax=yday(date_end)+3, ymin= - Inf,
+#                                                 ymax= 2.75), color="transparent", 
+#             fill="#60BFCC", alpha=0.7)
+# 
+
+
+# Ensure `date_start` and `date_end` in `hw.r13` are in Date format
+hw.r13$date_start <- as.Date(hw.r13$date_start)
+hw.r13$date_end <- as.Date(hw.r13$date_end)
+
+
+# Define the rectangle x-range for the linear regression fit
+rect_xmin <- yday(min(hw.r13$date_end) - 4)
+rect_xmax <- 204
+
+# Filter data points within the rectangle's range
+r13_rect_data <- r13 %>%
+  filter(doy >= rect_xmin & doy <= rect_xmax)
+
+# Plot with the regression line
+r13chl = ggplot(data = r13, aes(x = doy, y = manual_chl))+
+  theme_classic()+
+  labs(y = "", x = "")+
+  xlim(190, 210)+
+  ylim(1, 5.5)+
+  geom_rect(data=hw.r13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  geom_rect(data=hw.r13, inherit.aes=FALSE, aes(xmin=yday(date_end)-4, xmax=yday(date_end)+3, ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="#60BFCC", alpha=0.7)+
+  geom_point(size = 1.2)+
+  geom_line(color = "forestgreen", size = 1)+
+  geom_smooth(data = r13_rect_data, aes(x = doy, y = manual_chl), method = "lm", color = "black", linetype = "solid", se = FALSE, linewidth = 1)+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+  
+  
+
+
+
+r13percent_change = ggplot(data = r13, aes( x = doy, y = percent_change))+
+  geom_line(size = 0.8, color = "black")+
+  theme_classic()+
+  geom_point(size = 1)+
+  xlim(190, 210)+
+  labs(y = "", x = "day of year")+
+  # geom_rect(data=hw.r13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+  #                                               ymax= Inf), color="transparent", 
+  #           fill="orange", alpha=0.3)+
+  theme(legend.position="none")+
+  # geom_vline(data=hw.r13, inherit.aes=FALSE, aes(xintercept = yday(date_start)), linetype = "dashed")+
+  # geom_vline(data=hw.r13, inherit.aes=FALSE, aes(xintercept = yday(date_end)), linetype = "dashed")+
+  # geom_rect(data=hw.r13, inherit.aes=FALSE, aes(xmin=(start_analysis), xmax=(end_analysis), ymin= - Inf,
+  #                                               ymax= Inf), color="transparent", 
+  #           fill="magenta", alpha=0.3)+
+  theme(legend.position="none")+
+  # geom_vline(data=hw.r13, inherit.aes=FALSE, aes(xintercept = (start_analysis)), linetype = "dashed")+
+  # geom_vline(data=hw.r13, inherit.aes=FALSE, aes(xintercept = (end_analysis)), linetype = "dashed")+
+  ylim(-100, 250)+
+  annotate("point", x = 204, y = 	 7.701665, fill = "#60BFCC", size = 5, shape = 21)+
+  geom_rect(data=hw.r13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+
+
+# r13temp = ggplot(data = r13, aes(x = doy, y = mean_temp))+
+#   geom_line(color = "steelblue", size = 1)+
+#   theme_classic()+
+#   labs(title = "Peter 2013")+
+#   annotate("rect", xmin = as.Date(196), xmax = as.Date(201), ymin = -Inf, ymax = Inf,
+#            fill = "red", alpha = 0.5)
+
+
+png("./figures/manuscript draft 2024-11-11/methods figure 2024-11-11.png", height = 8, width = 8, units = "in", res = 300)
+print(ggarrange(nrow = 4, ncol = 3, l13temp, r13temp, t13temp, l13chl, r13chl,  t13chl, l13slope, r13slope, t13slope, l13percent_change, r13percent_change,  t13percent_change))
+dev.off()
+
+
+
+
+
+
+
+
+
+###### 2013 supplemental figure ##########
+t13 = slopes %>%  filter(year == 2013, lake == "T")
+l13 = slopes %>%  filter(year == 2013, lake == "L")
+r13 = slopes %>%  filter(year == 2013, lake == "R")
+
+# make a couple version of the datasets merged
+#merged_data <- merge(hw.r13, r13, by = "doy")
+
+
+# make temp plots
+t13temp = event_line_DKS2("tuesday", 2013)+
+  labs(title = "Tuesday 2013", y = "", x = "")+
+  theme(legend.position="none")+
+  xlim(147, 244)+
+  geom_rect(data=hw.t13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  #geom_point()+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+
+
+l13temp = event_line_DKS2("paul", 2013)+
+  labs(title = "Paul 2013", x = "")+
+  theme(legend.position="none")+
+  xlim(147, 244)+
+  geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  #geom_point()+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+
+r13temp = event_line_DKS2("peter", 2013)+
+  labs(title = "Peter 2013", y = "", x = "")+
+  theme(legend.position="none")+
+  xlim(147, 244)+
+  geom_rect(data=hw.r13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+ # geom_point()+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+
+# Tuesday
+t13slope = ggplot(data = t13, aes( x = doy, y = chl_slope))+
+  geom_line(color = "black", size = 0.8)+
+  theme_classic()+
+  geom_point(size = 1)+
+  #ylim(-1, 1.8)+
+  labs(y = "", x = "")+
+  xlim(147, 244)+
+  annotate("point", x = 192, y = 	1.028482, fill = "#544C34", size = 4, shape = 21)+
+  annotate("point", x = 204, y = 	0.8988908, fill = "#544C34", size = 4, shape = 21)+
+  geom_rect(data=hw.t13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+# geom_rect(data=hw.t13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+#                                               ymax= Inf), color="transparent", 
+#           fill="orange", alpha=0.3)
+
+
+t13chl = ggplot(data = t13, aes(x = doy, y = manual_chl))+
+  geom_line(color = "forestgreen", size = 0.8)+
+  theme_classic()+
+  geom_point(size = 1)+
+  xlim(147, 244)+
+  #ylim(1, 25)+
+  labs(y = "", x = "")+
+  geom_rect(data=hw.t13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  geom_rect(data=hw.t13, inherit.aes=FALSE, aes(xmin=yday(date_end)-5, xmax=yday(date_end)+2, ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="#544C34", alpha=0.7)+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+
+
+
+# Ensure `date_start` and `date_end` in `hw.t13` are in Date format
+hw.t13$date_start <- as.Date(hw.t13$date_start)
+hw.t13$date_end <- as.Date(hw.t13$date_end)
+
+
+# Define the rectangle x-range for the linear regression fit
+rect_xmin <- 197
+rect_xmax <- 205
+
+# Filter data points within the rectangle's range
+t13_rect_data <- t13 %>%
+  filter(doy >= rect_xmin & doy <= rect_xmax)
+
+# Define the rectangle x-range for the linear regression fit
+rect_xmin2 <- 185
+rect_xmax2 <- 193
+
+# Filter data points within the rectangle's range
+t13_rect_data2 <- t13 %>%
+  filter(doy >= rect_xmin2 & doy <= rect_xmax2)
+
+# Plot with the regression line
+t13chl = ggplot(data = t13, aes(x = doy, y = manual_chl))+
+  theme_classic()+
+  labs(y = "", x = "")+
+  xlim(147, 244)+
+  #ylim(1, 25)+
+  geom_rect(data=hw.t13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  geom_rect(data=hw.t13, inherit.aes=FALSE, aes(xmin=yday(date_end)-4, xmax=yday(date_end)+3, ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="#544C34", alpha=0.35)+
+  geom_point(size = 1.2)+
+  geom_line(color = "forestgreen", size = 1)+
+  geom_smooth(data = t13_rect_data, aes(x = doy, y = manual_chl), method = "lm", color = "black", linetype = "solid", se = FALSE, linewidth = 1)+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))+
+  geom_smooth(data = t13_rect_data2, aes(x = doy, y = manual_chl), method = "lm", color = "black", linetype = "solid", se = FALSE, linewidth = 1)+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+
+
+
+
+
+t13percent_change = ggplot(data = t13, aes( x = doy, y = percent_change))+
+  geom_line(size = 0.8, color = "black")+
+  theme_classic()+
+  geom_point(size = 1)+
+  xlim(147, 244)+
+  labs(y = "", x = "day of year")+
+  # geom_rect(data=hw.t13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+  #                                               ymax= Inf), color="transparent", 
+  #           fill="orange", alpha=0.3)+
+  theme(legend.position="none")+
+  # geom_vline(data=hw.t13, inherit.aes=FALSE, aes(xintercept = yday(date_start)), linetype = "dashed")+
+  # geom_vline(data=hw.t13, inherit.aes=FALSE, aes(xintercept = yday(date_end)), linetype = "dashed")+
+  # geom_rect(data=hw.t13, inherit.aes=FALSE, aes(xmin=(start_analysis), xmax=(end_analysis), ymin= - Inf,
+  #                                               ymax= Inf), color="transparent", 
+  #           fill="magenta", alpha=0.3)+
+  theme(legend.position="none")+
+  # geom_vline(data=hw.t13, inherit.aes=FALSE, aes(xintercept = (start_analysis)), linetype = "dashed")+
+  # geom_vline(data=hw.t13, inherit.aes=FALSE, aes(xintercept = (end_analysis)), linetype = "dashed")+
+  #ylim(-100, 250)+
+  annotate("point", x = 192, y = 	189.91973, fill = "#544C34", size = 4, shape = 21)+
+  annotate("point", x = 204, y = 	110.7496, fill = "#544C34", size = 4, shape = 21)+
+  geom_rect(data=hw.t13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+
+
+# t13temp = ggplot(data = t13, aes(x = doy, y = mean_temp))+
+#   geom_line(color = "steelblue", size = 1)+
+#   theme_classic()+
+#   labs(title = "Tuesday 2013")+
+#   annotate("rect", xmin = as.Date(186), xmax = as.Date(190), ymin = -Inf, ymax = Inf,
+#            fill = "red", alpha = 0.5)+
+#   annotate("rect", xmin = as.Date(196), xmax = as.Date(201), ymin = -Inf, ymax = Inf,
+#            fill = "red", alpha = 0.5)
+
+
+# Paul
+l13slope = ggplot(data = l13, aes( x = doy, y = chl_slope))+
+  geom_line(color = "black", size = 0.8)+
+  theme_classic()+
+  geom_point(size = 1)+
+  #ylim(-1, 1.8)+
+  labs(y = "Chlorophyll slope (μg/L/day)", x = "")+
+  xlim(147, 244)+
+  annotate("point", x = 204, y = 	0.262535019, fill = "#D9EEF3", size = 4, shape = 21)+
+  geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 11))
+# geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+#                                               ymax= Inf), color="transparent", 
+#           fill="orange", alpha=0.3)
+
+# l13chl = ggplot(data = l13, aes(x = doy, y = manual_chl))+
+#   geom_line(color = "forestgreen", size = 0.8)+
+#   theme_classic()+
+#   geom_point(size = 1)+
+#   labs(y = "Chlorophyll (μg/L)", x = "")+
+#   xlim(147, 244)+
+#   ylim(1, 4.5)+
+#   geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+#                                                 ymax= Inf), color="transparent", 
+#             fill="orange", alpha=0.3)+
+#   geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=yday(date_end)-4, xmax=yday(date_end)+3, ymin= - Inf,
+#                                                 ymax= 2.25), color="transparent", 
+#             fill="#D9EEF3", alpha=0.7)
+#   # annotate(data = hw.l13,  inherit.aes=FALSE, "segment", x = 204, xend = 210, y = 7, yend = 7, 
+#   #          arrow = arrow(length = unit(0.1, "cm")), color = "black")
+
+
+
+# Ensure `date_start` and `date_end` in `hw.l13` are in Date format
+hw.l13$date_start <- as.Date(hw.l13$date_start)
+hw.l13$date_end <- as.Date(hw.l13$date_end)
+
+# Define the rectangle x-range for the linear regression fit
+rect_xmin <- yday(min(hw.l13$date_end) - 4)
+rect_xmax <- 204
+
+# Filter data points within the rectangle's range
+l13_rect_data <- l13 %>%
+  filter(doy >= rect_xmin & doy <= rect_xmax)
+
+# Plot with the regression line
+l13chl = ggplot(data = l13, aes(x = doy, y = manual_chl))+
+  theme_classic()+
+  labs(y = "Chlorophyll (μg/L)", x = "")+
+  xlim(147, 244)+
+  #ylim(1, 4.5)+
+  geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=yday(date_end)-4, xmax=yday(date_end)+3, ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="#D9EEF3", alpha=0.7)+
+  geom_point(size = 1.2)+
+  geom_line(color = "forestgreen", size = 1)+
+  geom_smooth(data = l13_rect_data, aes(x = doy, y = manual_chl), method = "lm", color = "black", linetype = "solid", se = FALSE)+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+
+
+
+
+l13percent_change = ggplot(data = l13, aes( x = doy, y = percent_change))+
+  geom_line(size = 0.8, color = "black")+
+  theme_classic()+
+  geom_point(size = 1)+
+  xlim(147, 244)+
+  labs(y = "% change in chlorophyll", x = "day of year")+
+  # geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+  #                                               ymax= Inf), color="transparent", 
+  #           fill="orange", alpha=0.3)+
+  theme(legend.position="none")+
+  # geom_vline(data=hw.l13, inherit.aes=FALSE, aes(xintercept = yday(date_start)), linetype = "dashed")+
+  # geom_vline(data=hw.l13, inherit.aes=FALSE, aes(xintercept = yday(date_end)), linetype = "dashed")+
+  # geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=(start_analysis), xmax=(end_analysis), ymin= - Inf,
+  #                                               ymax= Inf), color="transparent", 
+  #           fill="magenta", alpha=0.3)+
+  theme(legend.position="none")+
+  # geom_vline(data=hw.l13, inherit.aes=FALSE, aes(xintercept = (start_analysis)), linetype = "dashed")+
+  # geom_vline(data=hw.l13, inherit.aes=FALSE, aes(xintercept = (end_analysis)), linetype = "dashed")+
+  #ylim(-100, 250)+
+  annotate("point", x = 204, y = 	 147.5193669, fill = "#D9EEF3", size = 4, shape = 21)+
+  geom_rect(data=hw.l13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+
+
+# l13temp = ggplot(data = l13, aes(x = doy, y = mean_temp))+
+#   geom_line(color = "steelblue", size = 1)+
+#   theme_classic()+
+#   labs(title = "Paul 2013")+
+#   annotate("rect", xmin = as.Date(196), xmax = as.Date(201), ymin = -Inf, ymax = Inf,
+#            fill = "red", alpha = 0.5)
+
+
+# Peter
+r13slope = ggplot(data = r13, aes( x = doy, y = chl_slope))+
+  geom_line(color = "black", size = 0.8)+
+  theme_classic()+
+  geom_point(size = 1)+
+  #ylim(-1, 1.8)+
+  xlim(147, 244)+
+  labs(y = "", x = "")+
+  # geom_point(data=hw.r13, inherit.aes=FALSE, 
+  #            aes(x = yday(date_end), y = 1),  # Map x to yday(date_end) dynamically
+  #            color="#60BFCC", size=3)
+  annotate("point", x = 204, y = 	 0.033689674, fill = "#60BFCC", size = 4, shape = 21)+
+  geom_rect(data=hw.r13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+
+
+# xlim(140, 225)+  geom_rect(data=hw.r13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+#                                                                ymax= Inf), color="transparent", 
+#                            fill="orange", alpha=0.3)
+
+# r13chl = ggplot(data = r13, aes(x = doy, y = manual_chl))+
+#   geom_line(color = "forestgreen", size = 0.8)+
+#   geom_point(size = 1)+
+#   theme_classic()+
+#   labs(y = "", x = "")+
+#   xlim(147, 244)+
+#   ylim(1, 5.5)+
+#   geom_rect(data=hw.r13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+#                                                                 ymax= Inf), color="transparent", 
+#                             fill="orange", alpha=0.3)+
+#   geom_rect(data=hw.r13, inherit.aes=FALSE, aes(xmin=yday(date_end)-4, xmax=yday(date_end)+3, ymin= - Inf,
+#                                                 ymax= 2.75), color="transparent", 
+#             fill="#60BFCC", alpha=0.7)
+# 
+
+
+# Ensure `date_start` and `date_end` in `hw.r13` are in Date format
+hw.r13$date_start <- as.Date(hw.r13$date_start)
+hw.r13$date_end <- as.Date(hw.r13$date_end)
+
+
+# Define the rectangle x-range for the linear regression fit
+rect_xmin <- yday(min(hw.r13$date_end) - 4)
+rect_xmax <- 204
+
+# Filter data points within the rectangle's range
+r13_rect_data <- r13 %>%
+  filter(doy >= rect_xmin & doy <= rect_xmax)
+
+# Plot with the regression line
+r13chl = ggplot(data = r13, aes(x = doy, y = manual_chl))+
+  theme_classic()+
+  labs(y = "", x = "")+
+  xlim(147, 244)+
+  #ylim(1, 5.5)+
+  geom_rect(data=hw.r13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  geom_rect(data=hw.r13, inherit.aes=FALSE, aes(xmin=yday(date_end)-4, xmax=yday(date_end)+3, ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="#60BFCC", alpha=0.7)+
+  geom_point(size = 1.2)+
+  geom_line(color = "forestgreen", size = 1)+
+  geom_smooth(data = r13_rect_data, aes(x = doy, y = manual_chl), method = "lm", color = "black", linetype = "solid", se = FALSE, linewidth = 1)+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+
+
+
+
+
+r13percent_change = ggplot(data = r13, aes( x = doy, y = percent_change))+
+  geom_line(size = 0.8, color = "black")+
+  theme_classic()+
+  geom_point(size = 1)+
+  xlim(147, 244)+
+  labs(y = "", x = "day of year")+
+  # geom_rect(data=hw.r13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+  #                                               ymax= Inf), color="transparent", 
+  #           fill="orange", alpha=0.3)+
+  theme(legend.position="none")+
+  # geom_vline(data=hw.r13, inherit.aes=FALSE, aes(xintercept = yday(date_start)), linetype = "dashed")+
+  # geom_vline(data=hw.r13, inherit.aes=FALSE, aes(xintercept = yday(date_end)), linetype = "dashed")+
+  # geom_rect(data=hw.r13, inherit.aes=FALSE, aes(xmin=(start_analysis), xmax=(end_analysis), ymin= - Inf,
+  #                                               ymax= Inf), color="transparent", 
+  #           fill="magenta", alpha=0.3)+
+  theme(legend.position="none")+
+  # geom_vline(data=hw.r13, inherit.aes=FALSE, aes(xintercept = (start_analysis)), linetype = "dashed")+
+  # geom_vline(data=hw.r13, inherit.aes=FALSE, aes(xintercept = (end_analysis)), linetype = "dashed")+
+ # ylim(-100, 250)+
+  annotate("point", x = 204, y = 	 7.701665, fill = "#60BFCC", size = 4, shape = 21)+
+  geom_rect(data=hw.r13, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+
+
+# r13temp = ggplot(data = r13, aes(x = doy, y = mean_temp))+
+#   geom_line(color = "steelblue", size = 1)+
+#   theme_classic()+
+#   labs(title = "Peter 2013")+
+#   annotate("rect", xmin = as.Date(196), xmax = as.Date(201), ymin = -Inf, ymax = Inf,
+#            fill = "red", alpha = 0.5)
+
+
+png("./figures/manuscript draft 2024-11-11/methods figure 2024-11-11 S4 2013.png", height = 8, width = 11, units = "in", res = 300)
+print(ggarrange(nrow = 4, ncol = 3, l13temp, r13temp, t13temp, l13chl, r13chl,  t13chl, l13slope, r13slope, t13slope, l13percent_change, r13percent_change,  t13percent_change))
+dev.off()
+
+
+
+
+
+
+
+
+###### 2010 supplemental figure ##########
+
+# create separate dataframes for each heatwave
+hw.l10 = heatwaves %>% filter(lake == "L" & year == 2010)
+hw.r10 = heatwaves %>% filter(lake == "R" & year == 2010)
+
+## THIS DEPENDS ON THE MOST RECENT VERSION OF ALLSLOPES
+slopes = allSlopes %>% filter(daysAfter == 2 & lake == "T" | daysAfter == 3 & lake == "R" | daysAfter == 3 & lake == "L")
+slopes = slopes %>% dplyr::rename(doy = doyCat)
+
+
+l10 = slopes %>%  filter(year == 2010, lake == "L")
+r10 = slopes %>%  filter(year == 2010, lake == "R")
+
+# make a couple version of the datasets merged
+#merged_data <- merge(hw.r10, r10, by = "doy")
+
+
+# make temp plots
+
+l10temp = event_line_DKS2("paul", 2010)+
+  labs(title = "Paul 2010", x = "")+
+  theme(legend.position="none")+
+  geom_rect(data=hw.l10, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  #geom_point()+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+
+r10temp = event_line_DKS2("peter", 2010)+
+  labs(title = "Peter 2010", y = "", x = "")+
+  theme(legend.position="none")+
+  geom_rect(data=hw.r10, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  # geom_point()+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+
+# Paul
+l10slope = ggplot(data = l10, aes( x = doy, y = chl_slope))+
+  geom_line(color = "black", size = 0.8)+
+  theme_classic()+
+  geom_point(size = 1)+
+  #ylim(-1, 1.8)+
+  labs(y = "Chlorophyll slope (μg/L/day)", x = "")+
+  annotate("point", x = 157, y = 	0.186260595, fill = "#D9EEF3", size = 4, shape = 21)+
+  annotate("point", x = 230, y = 	0.256153333, fill = "#D9EEF3", size = 4, shape = 21)+
+  geom_rect(data=hw.l10, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 11))
+# geom_rect(data=hw.l10, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+#                                               ymax= Inf), color="transparent", 
+#           fill="orange", alpha=0.3)
+
+# l10chl = ggplot(data = l10, aes(x = doy, y = manual_chl))+
+#   geom_line(color = "forestgreen", size = 0.8)+
+#   theme_classic()+
+#   geom_point(size = 1)+
+#   labs(y = "Chlorophyll (μg/L)", x = "")+
+#   xlim(147, 244)+
+#   ylim(1, 4.5)+
+#   geom_rect(data=hw.l10, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+#                                                 ymax= Inf), color="transparent", 
+#             fill="orange", alpha=0.3)+
+#   geom_rect(data=hw.l10, inherit.aes=FALSE, aes(xmin=yday(date_end)-4, xmax=yday(date_end)+3, ymin= - Inf,
+#                                                 ymax= 2.25), color="transparent", 
+#             fill="#D9EEF3", alpha=0.7)
+#   # annotate(data = hw.l10,  inherit.aes=FALSE, "segment", x = 204, xend = 210, y = 7, yend = 7, 
+#   #          arrow = arrow(length = unit(0.1, "cm")), color = "black")
+
+
+
+# Ensure `date_start` and `date_end` in `hw.l10` are in Date format
+hw.l10$date_start <- as.Date(hw.l10$date_start)
+hw.l10$date_end <- as.Date(hw.l10$date_end)
+
+# Define the rectangle x-range for the linear regression fit
+rect_xmin <- 149
+rect_xmax <- 157
+
+# Filter data points within the rectangle's range
+l10_rect_data <- l10 %>%
+  filter(doy >= rect_xmin & doy <= rect_xmax)
+
+
+rect_xmin2 <- 222
+rect_xmax2 <- 230
+
+# Filter data points within the rectangle's range
+l10_rect_data2 <- l10 %>%
+  filter(doy >= rect_xmin2 & doy <= rect_xmax2)
+
+# Plot with the regression line
+l10chl = ggplot(data = l10, aes(x = doy, y = manual_chl))+
+  theme_classic()+
+  labs(y = "Chlorophyll (μg/L)", x = "")+
+  #ylim(1, 4.5)+
+  geom_rect(data=hw.l10, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  geom_rect(data=hw.l10, inherit.aes=FALSE, aes(xmin=yday(date_end)-4, xmax=yday(date_end)+3, ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="#D9EEF3", alpha=0.7)+
+  geom_point(size = 1.2)+
+  geom_line(color = "forestgreen", size = 1)+
+  geom_smooth(data = l10_rect_data, aes(x = doy, y = manual_chl), method = "lm", color = "black", linetype = "solid", se = FALSE)+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))+
+  geom_smooth(data = l10_rect_data2, aes(x = doy, y = manual_chl), method = "lm", color = "black", linetype = "solid", se = FALSE)
+  
+
+
+
+
+l10percent_change = ggplot(data = l10, aes( x = doy, y = percent_change))+
+  geom_line(size = 0.8, color = "black")+
+  theme_classic()+
+  geom_point(size = 1)+
+  labs(y = "% change in chlorophyll", x = "day of year")+
+  # geom_rect(data=hw.l10, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+  #                                               ymax= Inf), color="transparent", 
+  #           fill="orange", alpha=0.3)+
+  theme(legend.position="none")+
+  # geom_vline(data=hw.l10, inherit.aes=FALSE, aes(xintercept = yday(date_start)), linetype = "dashed")+
+  # geom_vline(data=hw.l10, inherit.aes=FALSE, aes(xintercept = yday(date_end)), linetype = "dashed")+
+  # geom_rect(data=hw.l10, inherit.aes=FALSE, aes(xmin=(start_analysis), xmax=(end_analysis), ymin= - Inf,
+  #                                               ymax= Inf), color="transparent", 
+  #           fill="magenta", alpha=0.3)+
+  theme(legend.position="none")+
+  # geom_vline(data=hw.l10, inherit.aes=FALSE, aes(xintercept = (start_analysis)), linetype = "dashed")+
+  # geom_vline(data=hw.l10, inherit.aes=FALSE, aes(xintercept = (end_analysis)), linetype = "dashed")+
+  #ylim(-100, 250)+
+  annotate("point", x = 157, y = 	 46.0169716, fill = "#D9EEF3", size = 4, shape = 21)+
+  annotate("point", x = 230, y = 	  47.9676662, fill = "#D9EEF3", size = 4, shape = 21)+
+  geom_rect(data=hw.l10, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+
+
+# l10temp = ggplot(data = l10, aes(x = doy, y = mean_temp))+
+#   geom_line(color = "steelblue", size = 1)+
+#   theme_classic()+
+#   labs(title = "Paul 2010")+
+#   annotate("rect", xmin = as.Date(196), xmax = as.Date(201), ymin = -Inf, ymax = Inf,
+#            fill = "red", alpha = 0.5)
+
+
+# Peter
+r10slope = ggplot(data = r10, aes( x = doy, y = chl_slope))+
+  geom_line(color = "black", size = 0.8)+
+  theme_classic()+
+  geom_point(size = 1)+
+  #ylim(-1, 1.8)+
+  labs(y = "", x = "")+
+  # geom_point(data=hw.r10, inherit.aes=FALSE, 
+  #            aes(x = yday(date_end), y = 1),  # Map x to yday(date_end) dynamically
+  #            color="#60BFCC", size=3)
+  annotate("point", x = 230, y = 	 0.116787857, fill = "#60BFCC", size = 4, shape = 21)+
+  annotate("point", x = 157, y = 	 0.51458250, fill = "#60BFCC", size = 4, shape = 21)+
+  geom_rect(data=hw.r10, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+
+
+# xlim(140, 225)+  geom_rect(data=hw.r10, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+#                                                                ymax= Inf), color="transparent", 
+#                            fill="orange", alpha=0.3)
+
+# r10chl = ggplot(data = r10, aes(x = doy, y = manual_chl))+
+#   geom_line(color = "forestgreen", size = 0.8)+
+#   geom_point(size = 1)+
+#   theme_classic()+
+#   labs(y = "", x = "")+
+#   xlim(147, 244)+
+#   ylim(1, 5.5)+
+#   geom_rect(data=hw.r10, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+#                                                                 ymax= Inf), color="transparent", 
+#                             fill="orange", alpha=0.3)+
+#   geom_rect(data=hw.r10, inherit.aes=FALSE, aes(xmin=yday(date_end)-4, xmax=yday(date_end)+3, ymin= - Inf,
+#                                                 ymax= 2.75), color="transparent", 
+#             fill="#60BFCC", alpha=0.7)
+# 
+
+
+# Ensure `date_start` and `date_end` in `hw.r10` are in Date format
+hw.r10$date_start <- as.Date(hw.r10$date_start)
+hw.r10$date_end <- as.Date(hw.r10$date_end)
+
+
+# Define the rectangle x-range for the linear regression fit
+rect_xmin <- 149
+rect_xmax <- 157
+
+# Filter data points within the rectangle's range
+r10_rect_data <- r10 %>%
+  filter(doy >= rect_xmin & doy <= rect_xmax)
+
+# Define the rectangle x-range for the linear regression fit
+rect_xmin2 <- 222
+rect_xmax2 <- 230
+
+# Filter data points within the rectangle's range
+r10_rect_data2 <- r10 %>%
+  filter(doy >= rect_xmin2 & doy <= rect_xmax2)
+
+# Plot with the regression line
+r10chl = ggplot(data = r10, aes(x = doy, y = manual_chl))+
+  theme_classic()+
+  labs(y = "", x = "")+
+  #ylim(1, 5.5)+
+  geom_rect(data=hw.r10, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  geom_rect(data=hw.r10, inherit.aes=FALSE, aes(xmin=yday(date_end)-4, xmax=yday(date_end)+3, ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="#60BFCC", alpha=0.7)+
+  geom_point(size = 1.2)+
+  geom_line(color = "forestgreen", size = 1)+
+  geom_smooth(data = r10_rect_data, aes(x = doy, y = manual_chl), method = "lm", color = "black", linetype = "solid", se = FALSE, linewidth = 1)+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))+
+  geom_smooth(data = r10_rect_data2, aes(x = doy, y = manual_chl), method = "lm", color = "black", linetype = "solid", se = FALSE, linewidth = 1)
+  
+
+
+
+
+
+r10percent_change = ggplot(data = r10, aes( x = doy, y = percent_change))+
+  geom_line(size = 0.8, color = "black")+
+  theme_classic()+
+  geom_point(size = 1)+
+  labs(y = "", x = "day of year")+
+  # geom_rect(data=hw.r10, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+  #                                               ymax= Inf), color="transparent", 
+  #           fill="orange", alpha=0.3)+
+  theme(legend.position="none")+
+  # geom_vline(data=hw.r10, inherit.aes=FALSE, aes(xintercept = yday(date_start)), linetype = "dashed")+
+  # geom_vline(data=hw.r10, inherit.aes=FALSE, aes(xintercept = yday(date_end)), linetype = "dashed")+
+  # geom_rect(data=hw.r10, inherit.aes=FALSE, aes(xmin=(start_analysis), xmax=(end_analysis), ymin= - Inf,
+  #                                               ymax= Inf), color="transparent", 
+  #           fill="magenta", alpha=0.3)+
+  theme(legend.position="none")+
+  # geom_vline(data=hw.r10, inherit.aes=FALSE, aes(xintercept = (start_analysis)), linetype = "dashed")+
+  # geom_vline(data=hw.r10, inherit.aes=FALSE, aes(xintercept = (end_analysis)), linetype = "dashed")+
+  # ylim(-100, 250)+
+  annotate("point", x = 230, y = 	 20.93080193, fill = "#60BFCC", size = 4, shape = 21)+
+  annotate("point", x = 157, y = 	 150.67364037, fill = "#60BFCC", size = 4, shape = 21)+
+  geom_rect(data=hw.r10, inherit.aes=FALSE, aes(xmin=yday(date_start), xmax=yday(date_end), ymin= - Inf,
+                                                ymax= Inf), color="transparent", 
+            fill="orange", alpha=0.3)+
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+
+
+# r10temp = ggplot(data = r10, aes(x = doy, y = mean_temp))+
+#   geom_line(color = "steelblue", size = 1)+
+#   theme_classic()+
+#   labs(title = "Peter 2010")+
+#   annotate("rect", xmin = as.Date(196), xmax = as.Date(201), ymin = -Inf, ymax = Inf,
+#            fill = "red", alpha = 0.5)
+
+
+png("./figures/manuscript draft 2024-11-11/methods figure 2024-11-11 S4 2010.png", height = 8, width = 7.5, units = "in", res = 300)
+print(ggarrange(nrow = 4, ncol = 2, l10temp, r10temp, l10chl, r10chl, l10slope, r10slope, l10percent_change, r10percent_change))
+dev.off()
+
+
+
+
+
+## Tuesday days after is 2
+## Peter and Paul is 3

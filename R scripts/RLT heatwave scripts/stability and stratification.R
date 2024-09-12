@@ -92,7 +92,10 @@ ggplot(schmidt.daily, aes(x = doy, y = schmidt.stability, color = lake))+
 
 
 ## function which combines heatwaves output with the explanatory variables ##
-heatwaves.exp = read.csv("./formatted data/explanatory variables heatwaves/heatwaves with percent.csv")
+#heatwaves.exp = read.csv("./formatted data/explanatory variables heatwaves/heatwaves with percent.csv")
+
+heatwaves.exp = read.csv("./formatted data/master explanatory dataset/heatwaves explained var2.csv")
+
 
 heatwaves.exp = heatwaves.exp %>% mutate(doy = yday(date_start))
 
@@ -192,3 +195,9 @@ ggplot(stab.forbox, aes(x = time, y = as.numeric(stability), fill = lake))+
   theme_classic()+
   scale_fill_manual(values = c("R" = "#4AB5C4", "L" = "#ADDAE3", "T" = "#BAAD8D"))+
   labs(y = "schmidt stability (J/m2)", x = "timeframe")
+
+
+
+### save the dataframe with stability
+write.csv(heatwaves.exp, "./formatted data/master explanatory dataset/heatwaves explained var3.csv", row.names = FALSE)
+
