@@ -9,6 +9,8 @@
 if (!require(tidyverse)) install.packages('tidyverse')
 library(tidyverse) 
 
+library(zoo)
+
 
 #### Read in and interpolate data ####
 # read in the sonde data from step 1
@@ -22,7 +24,13 @@ allData$mean_chl = allData$manual_chl
 # so that I can interpolate and run the code
 
 allData$lake_year = paste(allData$lake, allData$year, sep = "_")
-i = 1
+
+# create a lake_year object
+lake_years = unique(allData$lake_year)
+
+# sort the lake years to put them in order
+lake_years = sort(lake_years)
+
 for(i in 1:length(lake_years)){
   temp = allData %>% filter(lake_year == lake_years[i])
   temp = temp %>% dplyr::arrange(doyCat)

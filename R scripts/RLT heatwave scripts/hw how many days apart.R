@@ -1,5 +1,7 @@
 ##### calculate timing of heatwaves relative to each other
 
+library(tidyverse)
+
 heatwaves = read.csv("./results/heatwave modeled outputs/heatwave events LRT.csv")
 
 heatwaves$days.apart = NA

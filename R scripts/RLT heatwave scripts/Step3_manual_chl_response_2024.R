@@ -293,7 +293,7 @@ slopes$period = "all other days"
 # one column, "exclude after heatwaves," are slopes within 40 days after a heatwave
 # that are not in the current rolling window
 
-numSlopes = 7
+numSlopes = 8
 
 for(daysAfterLoop in -20:40){
   
@@ -311,9 +311,9 @@ for(daysAfterLoop in -20:40){
     # sequence of dates during the heatwave
     dates = seq(start, end, 1)
     
-   # numSlopes = length(dates)
+   #numSlopes = length(dates)
     
-    print(dates)
+    #print(dates)
     
     # excludes dates that are part of rolling window but not currently considered in after heatwave
     # dates that are within 40 days after a heatwave but not in our window for analysis as
@@ -340,11 +340,11 @@ for(daysAfterLoop in -20:40){
   }
   
   # combine to the main dataframe
-  if(daysAfterLoop == -14){
+  if(daysAfterLoop == -16){
     slopes$event_no = heatwaves$event_no[i]
     allSlopes = slopes
   }
-  if(daysAfterLoop > -14){
+  if(daysAfterLoop > -16){
     slopes$event_no = heatwaves$event_no[i]
     allSlopes = rbind(allSlopes, slopes)
   }
@@ -597,7 +597,7 @@ mean.all  %>% filter(lake != "all") %>%
   labs(x = "days after heatwave")+
   theme_classic()+
   scale_color_manual(values = c("R"=  "#4AB5C4", "L" = "#ADDAE3", "T"=  "#BAAD8D", "all" = "grey"))+
-  xlim(-16, 21)+
+  xlim(-16, 20)+
   geom_hline(yintercept = 0, linetype = "dashed")
   
 

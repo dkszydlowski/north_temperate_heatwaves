@@ -1,10 +1,11 @@
 #####Calculate and Plot Heatwaves for Peter, Paul, and Tuesday Lakes#####
 
-## produces three outputs:
+## this script produces three outputs:
 # saveRDS(paulHW, file = "./results/heatwave modeled outputs/paul heatwave outputs actual data.rds")
 # saveRDS(peterHW, file = "./results/heatwave modeled outputs/peter heatwave outputs actual data.rds")
 # saveRDS(tuesdayHW, file = "./results/heatwave modeled outputs/tuesday heatwave outputs actual data.rds")
 
+# load in packages
 library("tidyverse")
 library("ggridges")
 library("lubridate")
@@ -12,6 +13,7 @@ library("zoo")
 library(heatwaveR)
 
 # CombinedData comes from "step0_DataCleaning.R", which combines all sonde data
+# we are just using temperature data from this set, which is from the hydrolabs
 allSonde = read.csv("./formatted data/CombinedData.csv")
 allSonde$date = as.Date(allSonde$date)
 
@@ -55,7 +57,7 @@ event_line(peterHW, metric = "intensity_max", start_date = "2018-06-01", end_dat
   xlim(as.Date("2018-05-01"), as.Date("2018-09-01"))
 
 # the Tuesday data throws an error because technically there aren't three years of data
-# just add a dummy day to bypass that error-- We have three summers of data
+# just add a dummy day that is NA to bypass that error-- We have three summers of data
 
 tuesdayHWinput[nrow(tuesdayHWinput)+1, ] = NA
 tuesdayHWinput[nrow(tuesdayHWinput), 1] = as.Date("2016-06-01")
@@ -89,7 +91,6 @@ heatwaves = heatwaves %>%
 
 # assess which lakes and years we currently have sonde temp data for
 allSonde = allSonde %>% mutate(lake.year = paste(lake, year, sep = "_"))
-
 
 
 ##### Save climatology from actual data #####
