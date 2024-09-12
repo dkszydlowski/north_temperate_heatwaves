@@ -321,3 +321,72 @@ server <- function(input, output, session) {
 shinyApp(ui, server)
 
 
+
+
+
+
+####### old version of the slopes code ########
+Slopes = 1
+daysAfterLoop = -14
+i = 1
+slopes$event_no = NA
+
+for(daysAfterLoop in -14:40){
+  
+  # add a column to slopes which indicates whether or not there is a heatwave
+  for(i in 1:nrow(heatwaves)){
+    
+    print(i)
+    start = heatwaves$date_start[i] # start date of the current heatwave
+    end = heatwaves$date_end[i] # end date of the current heatwave
+    
+    hw.lake = heatwaves$lake[i]
+    
+    # sequence of dates during the heatwave
+    dates = seq(start, end, 1)
+    
+    # excludes dates that are part of rolling window but not currently considered in after heatwave
+    # dates that are within 40 days after a heatwave but not in our window for analysis as
+    # after heatwave because of our current daysAfterLoop selection.
+    # This gets overwrritten in part by "after heatwave" for those dates that are included
+    # in analysis
+    datesExcluded = seq(end -14, end + 40, 1) 
+    
+    # dates to be analyzed after the heatwaves
+    # this creates a sequence of numbers, from the end of the heatwave plus whatever
+    # daysAfterLoop is set to, to that same value plus the numSlopes. So it sets a window daysAfterLooped
+    # X number of days after the heatwave
+    
+    datesAnalyzed = seq(end+daysAfterLoop, end + daysAfterLoop+numSlopes-1, 1)
+    
+    # fill the dataframe "period" column with the correct categorization
+    
+    # fill the dataframe "period" column with the correct categorization
+    slopes = slopes %>% mutate(period = replace(period, date %in% datesExcluded & lake == hw.lake & period != "after heatwave", "exclude after heatwave"))
+    slopes = slopes %>% mutate(period = replace(period, date %in% dates & lake == hw.lake, "during heatwave"))
+    slopes = slopes %>% mutate(period = replace(period, date %in% datesAnalyzed & lake == hw.lake, "after heatwave"))
+    
+    slopes$daysAfter = daysAfterLoop
+  }
+  
+  # combine to the main dataframe
+  if(daysAfterLoop == -14){
+    slopes$event_no = heatwaves$event_no[i]
+    allSlopes = slopes
+  }
+  if(daysAfterLoop > -14){
+    slopes$event_no = heatwaves$event_no[i]
+    allSlopes = rbind(allSlopes, slopes)
+  }
+  
+}
+
+allSlopes.after = allSlopes %>% filter(period == "after heatwave")
+
+
+# update so that we are not excluding other dates after the heatwave
+allSlopes = allSlopes %>% mutate(period = replace(period, period == "exclude after heatwave", "all other days")) %>%
+  mutate(period = replace(period, period == "during heatwave", "all other days"))
+
+
+

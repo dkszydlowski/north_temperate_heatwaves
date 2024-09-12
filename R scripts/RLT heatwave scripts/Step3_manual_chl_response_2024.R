@@ -54,7 +54,7 @@ slopeLength = 7 # length of the rolling window slope to be calculated
 # slope aggregation choices
 
 daysAfter = 0 # time lag of how many days after the heatwave we want to look
-numSlopes = 5 # the number of slopes we want to include in analysis
+numSlopes = 7 # the number of slopes we want to include in analysis
 
 exclude.after.heatwaves = FALSE # if TRUE, excludes slopes for days within 20 days 
 # of the heatwave that don't fall within our aggregating window
@@ -118,7 +118,6 @@ metadata_plot <- ggplot() +
 #### read in the data ####
 # read in the heatwaves data calculated in the previous step
 # heatwaves = read.csv("./formatted data/heatwavesdata.csv")
-
 heatwaves = read.csv("./results/heatwave modeled outputs/heatwave events LRT.csv")
 
 # read in the manual chl data
@@ -245,7 +244,6 @@ hwSlopes <- function(heatwaveStart, heatwaveEnd,  targLake, data){
  #### PLOT AVG SLOPES ####
  #results = read.csv("./results/heatwaves_with_average_slopes_MANUAL_CHL.csv")
 
-
  results = heatwaves
 
  #break up by lake by filtering data
@@ -295,49 +293,66 @@ slopes$period = "all other days"
 # one column, "exclude after heatwaves," are slopes within 40 days after a heatwave
 # that are not in the current rolling window
 
-for(daysAfterLoop in 0:20){
+numSlopes = 7
+
+for(daysAfterLoop in -20:40){
+  
+  slopes$period = "all other days"
   
   # add a column to slopes which indicates whether or not there is a heatwave
   for(i in 1:nrow(heatwaves)){
+    
     start = heatwaves$date_start[i] # start date of the current heatwave
     end = heatwaves$date_end[i] # end date of the current heatwave
     
+    # current lake of the heatwave
+    hw.lake = heatwaves$lake[i]
+    
     # sequence of dates during the heatwave
     dates = seq(start, end, 1)
+    
+   # numSlopes = length(dates)
+    
+    print(dates)
     
     # excludes dates that are part of rolling window but not currently considered in after heatwave
     # dates that are within 40 days after a heatwave but not in our window for analysis as
     # after heatwave because of our current daysAfterLoop selection.
     # This gets overwrritten in part by "after heatwave" for those dates that are included
     # in analysis
-    datesExcluded = seq(end -7, end + 40, 1) 
+    #datesExcluded = seq(end -14, end + 40, 1) 
     
     # dates to be analyzed after the heatwaves
     # this creates a sequence of numbers, from the end of the heatwave plus whatever
     # daysAfterLoop is set to, to that same value plus the numSlopes. So it sets a window daysAfterLooped
     # X number of days after the heatwave
     
-    datesAnalyzed = seq(end+daysAfterLoop, end + daysAfterLoop+numSlopes-1, 1)
+    datesAnalyzed = seq(end+daysAfterLoop,  end + daysAfterLoop+numSlopes-1, 1)
     
     # fill the dataframe "period" column with the correct categorization
 
     # fill the dataframe "period" column with the correct categorization
-    slopes = slopes %>% mutate(period = replace(period, date %in% datesExcluded, "exclude after heatwave"))
-    slopes = slopes %>% mutate(period = replace(period, date %in% dates, "during heatwave"))
-    slopes = slopes %>% mutate(period = replace(period, date %in% datesAnalyzed, "after heatwave"))
+    #slopes = slopes %>% mutate(period = replace(period, date %in% datesExcluded & lake == hw.lake, "exclude after heatwave"))
+    slopes = slopes %>% mutate(period = replace(period, date %in% datesAnalyzed & lake == hw.lake, "after heatwave"))
+    slopes = slopes %>% mutate(period = replace(period, date %in% dates & lake == hw.lake, "during heatwave"))
     
     slopes$daysAfter = daysAfterLoop
   }
   
   # combine to the main dataframe
-  if(daysAfterLoop == 0){
+  if(daysAfterLoop == -14){
+    slopes$event_no = heatwaves$event_no[i]
     allSlopes = slopes
   }
-  if(daysAfterLoop > 0){
+  if(daysAfterLoop > -14){
+    slopes$event_no = heatwaves$event_no[i]
     allSlopes = rbind(allSlopes, slopes)
   }
   
 }
+
+allSlopes.after = allSlopes %>% filter(period == "after heatwave")
+
 
 # update so that we are not excluding other dates after the heatwave
 allSlopes = allSlopes %>% mutate(period = replace(period, period == "exclude after heatwave", "all other days")) %>%
@@ -363,13 +378,13 @@ mean_df <- allSlopes %>%
 mean_df$mean_percent_change <- round(mean_df$mean_percent_change, 1)
 
 
-
+allSlopes = allSlopes %>% distinct()
 
 #==============================================================================#
 #### RESPONSE TIMING LINE PLOTS ####
 
 # calculate mean values of percent change for each lake by # of days after heatwave
-mean_df <- allSlopes %>% 
+mean_df <- allSlopes %>%  #filter(year %in% c(2008, 2009, 2010, 2011)) %>% 
   filter( period != "exclude after heatwave", !is.na(percent_change)) %>% 
   group_by(period, daysAfter) %>% 
   dplyr::summarise(mean_percent_change = mean(percent_change), 
@@ -378,7 +393,7 @@ mean_df <- allSlopes %>%
                    median_percent_change = median(percent_change)) 
 
 # Peter
-mean_dfR <- allSlopes %>% filter(lake == "R") %>% 
+mean_dfR <- allSlopes %>% filter(lake == "R") %>%  # filter(year %in% c(2008, 2009, 2010, 2011)) %>% 
   filter(period != "exclude after heatwave", !is.na(percent_change)) %>% 
   group_by(period, daysAfter) %>% 
   dplyr::summarise(mean_percent_change = mean(percent_change), 
@@ -386,7 +401,7 @@ mean_dfR <- allSlopes %>% filter(lake == "R") %>%
                    number_percent_change = n()) 
 
 # Paul
-mean_dfL <- allSlopes %>% filter(lake == "L") %>% 
+mean_dfL <- allSlopes %>% filter(lake == "L") %>%  #filter(year %in% c(2008, 2009, 2010, 2011)) %>% 
   filter( period != "exclude after heatwave", !is.na(percent_change)) %>% 
   group_by(period, daysAfter) %>% 
   dplyr::summarise(mean_percent_change = mean(percent_change), 
@@ -394,7 +409,7 @@ mean_dfL <- allSlopes %>% filter(lake == "L") %>%
                    number_percent_change = n()) 
 
 # Tuesday
-mean_dfT <- allSlopes %>% filter(lake == "T") %>% 
+mean_dfT <- allSlopes %>% filter(lake == "T") %>% # filter(year %in% c(2008, 2009, 2010, 2011)) %>% 
   filter( period != "exclude after heatwave", !is.na(percent_change)) %>% 
   group_by(period, daysAfter) %>% 
   dplyr::summarise(mean_percent_change = mean(percent_change), 
@@ -473,21 +488,27 @@ mean_dfT <- allSlopes %>% filter(lake == "T") %>%
 mean.all.by.lake = rbind(mean_dfR, mean_dfL)
 mean.all.by.lake = rbind(mean.all.by.lake, mean_dfT)
 
+# mean.all.other.days = mean_df %>% filter(period == )
+
 # Plot the response over time
-All.over.time <- mean_df %>% filter(daysAfter > 0) %>% 
+All.over.time <- mean_df %>% filter(period == "after heatwave") %>% 
   ggplot(aes( x= daysAfter, y = mean_percent_change, color = period))+
-  scale_color_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE"))+
-  scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE"))+
+ # scale_color_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "forestgreen", "all other days" = "#88CCEE"))+
+  geom_rect(aes(xmin = -16, xmax = 0, ymin = -Inf, ymax = Inf), 
+            fill = "red", alpha = 0.3) +
+  #scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE"))+
   geom_line(size = 1)+
   geom_point()+
   labs(title = "All lakes HW response over time")+
-  ylim(min(mean.all.by.lake$mean_percent_change)-10, max(mean.all.by.lake$mean_percent_change)+10)+
- # geom_ribbon(aes(ymin = mean_percent_change - sd_percent_change, ymax = mean_percent_change + sd_percent_change, fill = period), alpha = 0.1)+
+ # ylim(min(mean.all.by.lake$mean_percent_change), max(mean.all.by.lake$mean_percent_change)-30)+
+ #geom_ribbon(aes(ymin = mean_percent_change - sd_percent_change, ymax = mean_percent_change + sd_percent_change, fill = period), alpha = 0.1)+
   labs(x = "days after heatwave")+
-theme_classic()
+theme_classic()+
+  geom_hline(yintercept = 0, linetype = "dashed")
 
-R.over.time <- mean_dfR %>% filter(daysAfter > 0) %>% 
+R.over.time <- mean_dfR %>% 
   ggplot(aes( x= daysAfter, y = mean_percent_change, color = period))+
+  annotate("rect", xmin=-16, xmax=0, ymin=-Inf, ymax=Inf, alpha=0.2, fill="red") +
   geom_line(size = 1)+
   geom_point()+
   labs(x = "days after heatwave")+
@@ -496,18 +517,19 @@ R.over.time <- mean_dfR %>% filter(daysAfter > 0) %>%
   ylim(min(mean.all.by.lake$mean_percent_change)-10, max(mean.all.by.lake$mean_percent_change)+10)+
   theme_classic()
 
-L.over.time <- mean_dfL %>% filter(daysAfter > 0) %>% 
+L.over.time <- mean_dfL  %>% 
   ggplot(aes( x= daysAfter, y = mean_percent_change, color = period))+
+  annotate("rect", xmin=-16, xmax=0, ymin=-Inf, ymax=Inf, alpha=0.2, fill="red") +
   geom_line(size = 1)+
   geom_point()+
   labs(x = "days after heatwave")+
   labs(title = "Paul Lake HW response over time")+
-  ylim(min(mean.all.by.lake$mean_percent_change)-10, max(mean.all.by.lake$mean_percent_change)+10)+
+  #ylim(min(mean.all.by.lake$mean_percent_change)-10, max(mean.all.by.lake$mean_percent_change)-30)+
   scale_color_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE"))+
   theme_classic()
 
-T.over.time <- mean_dfT %>% filter(daysAfter > 0) %>% 
-  ggplot(aes( x= daysAfter, y = mean_percent_change, color = period))+
+T.over.time <- mean_dfT  %>% 
+  ggplot(aes( x= daysAfter - 16, y = mean_percent_change, color = period))+
   scale_color_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE"))+
   #scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE"))+
   geom_line(size = 1)+
@@ -518,6 +540,68 @@ T.over.time <- mean_dfT %>% filter(daysAfter > 0) %>%
   labs(x = "days after heatwave")+
   theme_classic()
 
+
+
+#=============================================================================#
+#### combined plot over time ####
+mean_dfT = mean_dfT %>% mutate(lake = "T")
+mean_dfR = mean_dfR %>% mutate(lake = "R")
+mean_dfL = mean_dfL %>% mutate(lake = "L")
+mean_df = mean_df %>% mutate(lake = "all")
+
+mean.all = rbind(mean_dfL, mean_dfR, mean_dfT, mean_df) %>% filter(period == "after heatwave")
+
+mean.all  %>% filter(lake != "all") %>% 
+  ggplot(aes( x= daysAfter, y = mean_percent_change, color = lake))+
+  #scale_color_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE"))+
+  #scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE"))+
+  annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  # annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  # annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  # annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  # annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  # annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  # annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  # annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  # annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  # annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  # annotate("rect", xmin=-6, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  # annotate("rect", xmin=-6, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  # annotate("rect", xmin=-7, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  # annotate("rect", xmin=-7, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  # annotate("rect", xmin=-7, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  annotate("rect", xmin=-7, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  annotate("rect", xmin=-7, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  annotate("rect", xmin=-7, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  annotate("rect", xmin=-7, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  # annotate("rect", xmin=-8, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  # annotate("rect", xmin=-8, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  # annotate("rect", xmin=-8, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  # annotate("rect", xmin=-8, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  # annotate("rect", xmin=-9, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  # annotate("rect", xmin=-9, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  annotate("rect", xmin=-10, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  annotate("rect", xmin=-10, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  annotate("rect", xmin=-10, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  annotate("rect", xmin=-10, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  annotate("rect", xmin=-13, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  annotate("rect", xmin=-13, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  annotate("rect", xmin=-15, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  annotate("rect", xmin=-16, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  geom_line(size = 1.5)+
+  geom_point(size = 2)+
+  labs(title = "HW response over time")+
+  ylim(min(mean.all.by.lake$mean_percent_change)-10, max(mean.all.by.lake$mean_percent_change)+10)+
+  #geom_ribbon(aes(ymin = mean_percent_change - sd_percent_change, ymax = mean_percent_change + sd_percent_change, fill = period), alpha = 0.1)+
+  labs(x = "days after heatwave")+
+  theme_classic()+
+  scale_color_manual(values = c("R"=  "#4AB5C4", "L" = "#ADDAE3", "T"=  "#BAAD8D", "all" = "grey"))+
+  xlim(-16, 21)+
+  geom_hline(yintercept = 0, linetype = "dashed")
+  
+
+#write.csv(mean.all, "./results/response over time/chl response over time 2008-2011.csv", row.names = FALSE)
 
 #==============================================================================#
 #### PLOTTING DISTRIBUTIONS ####
@@ -591,7 +675,6 @@ allSlopes %>%
 
 
 #"R" = "#4AB5C4", "L" = "#ADDAE3", "T"=  "#BAAD8D"
-  
   
   
 
@@ -1472,5 +1555,208 @@ ggplot(data = looped.results, aes(x = L.all.other.days, y = R.all.other.days))+
   geom_point()+
   geom_smooth(stat = "smooth")
 
+ggplot(data = looped.results, aes(x = L.all.other.days, y = R.all.other.days))+
+  geom_point()+
+  geom_smooth(stat = "smooth")
+
+
+ggplot(data = looped.results, aes(x = R.after.heatwave, y = L.after.heatwave))+
+  geom_point()+
+  geom_smooth(stat = "smooth")
+
+looped.results.actual = looped.results %>% filter(daysAfter == 0, numSlopes == 5 & slopeLength == 7)
+
+ggplot(data = looped.results.actual, aes(x = R.after.heatwave, y = L.after.heatwave))+
+  geom_point()+
+  geom_smooth(stat = "smooth")
+
+summary(lm(looped.results.actual$R.after.heatwave~looped.results.actual$L.after.heatwave))
+
 #write.csv(looped.results, "./results/sensitivity results/looped results.csv", row.names = FALSE)
 
+
+
+# are the slopes of chlorophyll between lakes correlated at all?
+
+ggplot(allSlopes, aes(x = doyCat, y = percent_change))+
+  geom_point()+
+  geom_line()+
+  facet_grid(lake~year)
+
+
+all.Slopes.wide = allSlopes %>% 
+  filter(daysAfterStart == 0) %>% 
+  filter(!is.na(percent_change)) %>% 
+  select(doyCat, lake_year, percent_change)
+
+all.Slopes.wide = all.Slopes.wide %>% 
+  group_by(doyCat) %>% 
+  pivot_wider(names_from = lake_year, values_from = percent_change)
+
+
+
+
+
+
+
+
+
+
+
+###### MOVING BOX OVER TIME #####
+
+# Install and load necessary packages
+# install.packages("ggplot2")
+# install.packages("gganimate")
+#library(ggplot2)
+library(gganimate)
+
+# Create a sample dataset
+data <- data.frame(x = 0:40)
+
+# Define the width of the box
+box_width <- 5
+
+# Create the plot
+p <- ggplot(data, aes(x = x)) +
+  geom_rect(aes(xmin = x - box_width / 2, xmax = x + box_width / 2, ymin = -Inf, ymax = Inf),
+            fill = "blue", alpha = 0.3) +
+  scale_x_continuous(limits = c(0, 40)) +
+  theme_minimal()
+
+# Animate the plot
+anim <- p +
+  transition_states(x, transition_length = 2, state_length = 1) +
+  ease_aes('linear')
+
+# Save the animation (optional)
+anim_save("moving_box.gif", animation = anim)
+
+
+
+
+
+
+library(ggplot2)
+library(gganimate)
+
+# Create a sample dataset
+data <- data.frame(x = 0:40, y = 0:40)
+
+# Define the width of the box
+box_width <- 5
+
+# Create the plot with clamped xmin and xmax
+p <- ggplot(data, aes(x = x, y = y)) +
+  geom_point()+
+  geom_rect(aes(xmin = pmax(x - box_width / 2, 0), 
+                xmax = pmin(x + box_width / 2, 40), ymin = -Inf, ymax = Inf),
+            fill = "blue", alpha = 0.3) +
+ # scale_x_continuous(limits = c(0, 40)) +
+  theme_minimal()
+
+# Animate the plot
+anim <- p +
+  transition_states(x, transition_length = 1, state_length = 0.5) +
+  ease_aes('linear')
+
+# Save the animation (optional)
+anim_save("moving_box.gif", animation = anim)
+
+
+
+
+
+
+library(ggplot2)
+library(gganimate)
+
+# Create a sample dataset
+data <- data.frame(x = -5:45, y = 0:40)
+
+# Define the width of the box
+box_width <- 5
+
+data = data %>% mutate(rect.min = x)
+data = data %>% mutate(rect.max = x+box_width)
+
+
+
+
+# Create the plot with clamped xmin and xmax
+p <- ggplot(data, aes(x = x, y = y)) +
+  geom_point() +
+  geom_rect(aes(xmin = rect.min, 
+                xmax = x + rect.max / 2, ymin = -Inf, ymax = Inf),
+            fill = "blue", alpha = 0.3) +
+  scale_x_continuous(limits = c(0, 50)) +
+  theme_bw()
+
+# Animate the plot using transition_reveal for smoother movement
+anim <- p +
+  transition_states(x, transition_length = 1, state_length = 0.5) +
+  ease_aes('linear')
+
+anim
+
+# Save the animation (optional)
+anim_save("moving_box_smooth.gif", animation = anim)
+
+
+
+anim <- p +
+  transition_reveal(along = x) +
+  ease_aes('linear')
+
+anim
+
+
+
+
+#### more points
+
+
+
+# Create a finer sample dataset for smoother movement
+data <- data.frame(x = seq(-5, 45, by = 0.1), y = seq(0, 40, length.out = 501))
+
+# Define the width of the box
+box_width <- 5
+
+data <- data %>% 
+  mutate(rect.min = x,
+         rect.max = x + box_width)
+
+# Create the plot with clamped xmin and xmax
+# Create the plot with clamped xmin and xmax
+p <- ggplot(data, aes(x = x, y = y)) +
+  geom_point() +
+  geom_rect(aes(xmin = rect.min, 
+                xmax = rect.max, ymin = -Inf, ymax = Inf, frames = x),
+            fill = "blue", alpha = 0.3) +
+  scale_x_continuous(limits = c(0, 50), 
+                     breaks = seq(0, 50, by = 5), 
+                     labels = seq(0, 50, by = 5)) +
+  theme_bw() +
+  theme(axis.ticks = element_line(color = "black"),
+        axis.text = element_text(color = "black"),
+        plot.margin = margin(1, 1, 1, 1, "cm"))
+
+# Animate the plot with transition_manual for frame-by-frame movement
+anim <- p +
+  transition_manual(frames = x) +
+  ease_aes('linear')+
+  geom_point()
+
+# Display the animation
+anim
+
+
+allSlopes.after = allSlopes %>% filter(period == "after heatwave")
+
+allSlopes.after %>% filter(lake == "R") %>% 
+  ggplot(aes(x = daysAfter, y = percent_change, color = event_no))+
+  geom_point()
+
+
+allSlopes.after %>% group_by(daysAfter) %>% summarize(nrow(.))

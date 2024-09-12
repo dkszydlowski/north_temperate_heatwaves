@@ -124,6 +124,9 @@ ggplot(casc.nut, aes(x = daynum, y = tn_ug, color = lakename))+
 
 
 
+write.csv(casc.nut, "./formatted data/explanatory variables heatwaves/nutrients 2008 to 2016.csv")
+
+
 
 ##### Make a dataframe of cumulative nutrient loading by year and lake for each experiment #######
 
@@ -722,3 +725,25 @@ ggplot(heatwaves.exp, aes(x = log10(biomass.during), y = percentChange, fill = l
   scale_fill_manual(values = c("R" = "#4AB5C4", "L" = "#ADDAE3", "T" = "#BAAD8D"))+
   ylim(0, 250)
 
+
+
+
+
+
+##### see how many lines of code heatwaves is #####
+
+script.files = list.files("./R scripts/RLT heatwave scripts/")
+script.files = script.files[!grepl("chl shiny app", script.files)]
+script.files = script.files[!grepl("troubleshooting 2024", script.files)]
+
+total = 0
+
+for(i in 1:length(script.files)){
+  
+  test = readLines(paste("./R scripts/RLT heatwave scripts/", script.files[i], sep = ""))
+  print(script.files[i])
+  
+  total = total + length(test)
+  print(total)
+  
+}
