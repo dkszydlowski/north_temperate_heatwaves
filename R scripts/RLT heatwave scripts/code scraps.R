@@ -4,6 +4,24 @@
 # currently has random date comparison
 
 
+# testing color gradients in distribution plots
+
+# 
+# allSlopes %>%
+#   filter(period != "exclude after heatwave", lake == "L", daysAfter == get("daysAfter", envir=globalenv())) %>%
+#   ggplot(aes(x = percent_change, y = factor(period, levels = desired_order), fill = stat(x))) +
+#   geom_density_ridges_gradient(scale = 3, rel_min_height = 0.01) +
+#   scale_fill_gradientn(colours = c("#4AB5C4", "forestgreen"),
+#                        values = scales::rescale(c(-200, 300, 300, 600))) +
+#   labs(title = 'All Lakes') +
+#   theme_classic() +
+#   geom_text(data = mean_dfL %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+#             aes(x = mean_percent_change,
+#                 y = factor(period, levels = desired_order),
+#                 label = as.character(round(mean_percent_change, digits = 0))),
+#             color = "black",
+#             size = 4,
+#             vjust = 2)
 
 ######## Testing code ##########
 peter15 = allSonde %>% filter(lake == "R" & year == 2015)

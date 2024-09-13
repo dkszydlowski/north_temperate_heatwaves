@@ -41,6 +41,9 @@ library(readxl)
 if (!require(ggpubr)) install.packages('ggpubr')
 library(ggpubr)
 
+if (!require(ggborderline)) install.packages('ggborderline')
+library(ggborderline)
+
 library(DescTools)
 
 #==============================================================================#
@@ -293,7 +296,7 @@ slopes$period = "all other days"
 # one column, "exclude after heatwaves," are slopes within 40 days after a heatwave
 # that are not in the current rolling window
 
-numSlopes = 8
+numSlopes = 3
 
 for(daysAfterLoop in -20:40){
   
@@ -313,7 +316,7 @@ for(daysAfterLoop in -20:40){
     
    #numSlopes = length(dates)
     
-    #print(dates)
+    print(dates)
     
     # excludes dates that are part of rolling window but not currently considered in after heatwave
     # dates that are within 40 days after a heatwave but not in our window for analysis as
@@ -334,7 +337,7 @@ for(daysAfterLoop in -20:40){
     # fill the dataframe "period" column with the correct categorization
     #slopes = slopes %>% mutate(period = replace(period, date %in% datesExcluded & lake == hw.lake, "exclude after heatwave"))
     slopes = slopes %>% mutate(period = replace(period, date %in% datesAnalyzed & lake == hw.lake, "after heatwave"))
-    slopes = slopes %>% mutate(period = replace(period, date %in% dates & lake == hw.lake, "during heatwave"))
+    #slopes = slopes %>% mutate(period = replace(period, date %in% dates & lake == hw.lake, "during heatwave"))
     
     slopes$daysAfter = daysAfterLoop
   }
@@ -351,7 +354,7 @@ for(daysAfterLoop in -20:40){
   
 }
 
-allSlopes.after = allSlopes %>% filter(period == "after heatwave")
+#allSlopes.after = allSlopes %>% filter(period == "after heatwave")
 
 
 # update so that we are not excluding other dates after the heatwave
@@ -555,40 +558,40 @@ mean.all  %>% filter(lake != "all") %>%
   ggplot(aes( x= daysAfter, y = mean_percent_change, color = lake))+
   #scale_color_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE"))+
   #scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE"))+
-  annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  # annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  # annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  # annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  # annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  # annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  # annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  # annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  # annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  # annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  # annotate("rect", xmin=-6, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  # annotate("rect", xmin=-6, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  # annotate("rect", xmin=-7, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  # annotate("rect", xmin=-7, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  # annotate("rect", xmin=-7, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  annotate("rect", xmin=-7, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  annotate("rect", xmin=-7, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  annotate("rect", xmin=-7, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  annotate("rect", xmin=-7, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  # annotate("rect", xmin=-8, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  # annotate("rect", xmin=-8, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  # annotate("rect", xmin=-8, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  # annotate("rect", xmin=-8, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  # annotate("rect", xmin=-9, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  # annotate("rect", xmin=-9, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  annotate("rect", xmin=-10, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  annotate("rect", xmin=-10, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  annotate("rect", xmin=-10, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  annotate("rect", xmin=-10, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  annotate("rect", xmin=-13, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  annotate("rect", xmin=-13, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  annotate("rect", xmin=-15, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
-  annotate("rect", xmin=-16, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="red") +
+  annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  # annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  # annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  # annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  # annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  # annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  # annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  # annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  # annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  # annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  # annotate("rect", xmin=-6, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  # annotate("rect", xmin=-6, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  # annotate("rect", xmin=-7, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  # annotate("rect", xmin=-7, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  # annotate("rect", xmin=-7, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  annotate("rect", xmin=-7, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  annotate("rect", xmin=-7, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  annotate("rect", xmin=-7, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  annotate("rect", xmin=-7, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  # annotate("rect", xmin=-8, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  # annotate("rect", xmin=-8, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  # annotate("rect", xmin=-8, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  # annotate("rect", xmin=-8, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  # annotate("rect", xmin=-9, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  # annotate("rect", xmin=-9, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  annotate("rect", xmin=-10, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  annotate("rect", xmin=-10, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  annotate("rect", xmin=-10, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  annotate("rect", xmin=-10, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  annotate("rect", xmin=-13, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  annotate("rect", xmin=-13, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  annotate("rect", xmin=-15, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
+  annotate("rect", xmin=-16, xmax=0, ymin=-Inf, ymax=Inf, alpha = 0.05, fill="#920000") +
   geom_line(size = 1.5)+
   geom_point(size = 2)+
   labs(title = "HW response over time")+
@@ -599,6 +602,10 @@ mean.all  %>% filter(lake != "all") %>%
   scale_color_manual(values = c("R"=  "#4AB5C4", "L" = "#ADDAE3", "T"=  "#BAAD8D", "all" = "grey"))+
   xlim(-16, 20)+
   geom_hline(yintercept = 0, linetype = "dashed")
+  
+
+
+#scale_fill_manual(values = c("R"=  "#4AB5C4", "L" = "#ADDAE3", "T"=  "#BAAD8D"))+
   
 
 #write.csv(mean.all, "./results/response over time/chl response over time 2008-2011.csv", row.names = FALSE)
@@ -648,34 +655,6 @@ Alldist <- allSlopes %>%
         axis.title=element_text(size=18,face="bold"))+
   annotate("text",  x=Inf, y = Inf, label = paste("Days after heatwave: ", daysAfter, sep = ""), vjust=1, hjust=1)
 
-
-
- 
-# testing color
-
-
-
-
-allSlopes %>%
-  filter(period != "exclude after heatwave", lake == "L", daysAfter == get("daysAfter", envir=globalenv())) %>%
-  ggplot(aes(x = percent_change, y = factor(period, levels = desired_order), fill = stat(x))) +
-  geom_density_ridges_gradient(scale = 3, rel_min_height = 0.01) +
-  scale_fill_gradientn(colours = c("#4AB5C4", "forestgreen"),
-                       values = scales::rescale(c(-200, 300, 300, 600))) +
-  labs(title = 'All Lakes') +
-  theme_classic() +
-  geom_text(data = mean_dfL %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
-            aes(x = mean_percent_change,
-                y = factor(period, levels = desired_order),
-                label = as.character(round(mean_percent_change, digits = 0))),
-            color = "black",
-            size = 4,
-            vjust = 2)
-
-
-
-#"R" = "#4AB5C4", "L" = "#ADDAE3", "T"=  "#BAAD8D"
-  
   
 
 # Tuesday
@@ -710,7 +689,7 @@ Tdist <- allSlopes %>%
   ylab("") +
   xlab("% change in surface chlorophyll-a")+
   labs(title = "Tuesday") +
-  scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE")) +  # Specify fill colors for groups
+  scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "grey", "all other days" = "#BAAD8D")) +  # Specify fill colors for groups
   theme_classic()+
   theme(axis.text=element_text(size=14),
         axis.title=element_text(size=18,face="bold"))+
@@ -756,7 +735,7 @@ Rdist <- allSlopes %>%
   ylab("") +
   xlab("% change in surface chlorophyll-a")+
   labs(title = "Peter") +
-  scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE")) +  # Specify fill colors for groups
+  scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "grey", "all other days" = "#4AB5C4")) +  # Specify fill colors for groups
   theme_classic()+
   theme(axis.text=element_text(size=14),
         axis.title=element_text(size=18,face="bold"))+
@@ -799,7 +778,7 @@ Ldist <- allSlopes %>%
   ylab("") +
   xlab("% change in surface chlorophyll-a")+
   labs(title = "Paul") +
-  scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE")) +  # Specify fill colors for groups
+  scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "grey", "all other days" = "#ADDAE3")) +  # Specify fill colors for groups
   theme_classic()+
   theme(axis.text=element_text(size=14),
         axis.title=element_text(size=18,face="bold"))+
@@ -807,6 +786,214 @@ Ldist <- allSlopes %>%
 
 
 #dev.off()
+
+
+
+#-------------------------------------------------------------------------------#
+###### COMBINED TIMESCALES AND DIST FIGURE ######
+
+over.time = 
+  mean.all  %>% filter(lake != "all") %>% 
+  ggplot(aes( x= daysAfter - 7, y = mean_percent_change, color = lake))+
+  annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=20, alpha = 0.07, fill="#ADDAE3", color = "grey") +
+  annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=20, alpha = 0.07, fill="#ADDAE3", color = "grey") +
+  annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=20, alpha = 0.07, fill="#ADDAE3", color = "grey") +
+  annotate("rect", xmin=-5, xmax=0, ymin=80, ymax=Inf, alpha = 0.07, fill="#BAAD8D", color = "grey") +
+  annotate("rect", xmin=-5, xmax=0, ymin=80, ymax=Inf, alpha = 0.07, fill="#BAAD8D", color = "grey") +
+  annotate("rect", xmin=-5, xmax=0, ymin=80, ymax=Inf, alpha = 0.07, fill="#BAAD8D", color = "grey") +
+  annotate("rect", xmin=-5, xmax=0, ymin=20, ymax=80, alpha = 0.07, fill="#4AB5C4", color = "grey") +
+  annotate("rect", xmin=-5, xmax=0, ymin=20, ymax=80, alpha = 0.07, fill="#4AB5C4", color = "grey") +
+  annotate("rect", xmin=-5, xmax=0, ymin=20, ymax=80, alpha = 0.07, fill="#4AB5C4", color = "grey") +
+  annotate("rect", xmin=-5, xmax=0, ymin=20, ymax=80, alpha = 0.07, fill="#4AB5C4", color = "grey") +
+  annotate("rect", xmin=-5, xmax=0, ymin=20, ymax=80, alpha = 0.07, fill="#4AB5C4", color = "grey") +
+  annotate("rect", xmin=-6, xmax=0, ymin=-75, ymax=Inf, alpha = 0.07, fill="#ADDAE3", color = "grey") +
+  annotate("rect", xmin=-6, xmax=0, ymin=20, ymax=80, alpha = 0.07, fill="#4AB5C4", color = "grey") +
+  annotate("rect", xmin=-7, xmax=0, ymin=-Inf, ymax=20, alpha = 0.07, fill="#ADDAE3", color = "grey") +
+  annotate("rect", xmin=-7, xmax=0, ymin=-Inf, ymax=20, alpha = 0.07, fill="#ADDAE3", color = "grey") +
+  annotate("rect", xmin=-7, xmax=0, ymin=-Inf, ymax=20, alpha = 0.07, fill="#ADDAE3", color = "grey") +
+  annotate("rect", xmin=-7, xmax=0, ymin=-Inf, ymax=20, alpha = 0.07, fill="#ADDAE3", color = "grey") +
+  annotate("rect", xmin=-7, xmax=0, ymin=20, ymax=80, alpha = 0.07, fill="#4AB5C4", color = "grey") +
+  annotate("rect", xmin=-7, xmax=0, ymin=20, ymax=80, alpha = 0.07, fill="#4AB5C4", color = "grey") +
+  annotate("rect", xmin=-7, xmax=0, ymin=20, ymax=80, alpha = 0.07, fill="#4AB5C4", color = "grey") +
+  annotate("rect", xmin=-8, xmax=0, ymin=-Inf, ymax=20, alpha = 0.07, fill="#ADDAE3", color = "grey") +
+  annotate("rect", xmin=-8, xmax=0, ymin=80, ymax=Inf, alpha = 0.07, fill="#BAAD8D", color = "grey") +
+  annotate("rect", xmin=-8, xmax=0, ymin=20, ymax=80, alpha = 0.07, fill="#4AB5C4", color = "grey") +
+  annotate("rect", xmin=-8, xmax=0, ymin=20, ymax=80, alpha = 0.07, fill="#4AB5C4", color = "grey") +
+  annotate("rect", xmin=-9, xmax=0, ymin=80, ymax=Inf, alpha = 0.07, fill="#BAAD8D", color = "grey") +
+  annotate("rect", xmin=-9, xmax=0, ymin=80, ymax=Inf, alpha = 0.07, fill="#BAAD8D", color = "grey") +
+  annotate("rect", xmin=-10, xmax=0, ymin=-Inf, ymax=20, alpha = 0.07, fill="#ADDAE3", color = "grey") +
+  annotate("rect", xmin=-10, xmax=0, ymin=-Inf, ymax=20, alpha = 0.07, fill="#ADDAE3", color = "grey") +
+  annotate("rect", xmin=-10, xmax=0, ymin=20, ymax=80, alpha = 0.07, fill="#4AB5C4", color = "grey") +
+  annotate("rect", xmin=-10, xmax=0, ymin=20, ymax=80, alpha = 0.07, fill="#4AB5C4", color = "grey") +
+  annotate("rect", xmin=-13, xmax=0, ymin=-Inf, ymax=20, alpha = 0.07, fill="#ADDAE3", color = "grey") +
+  annotate("rect", xmin=-13, xmax=0, ymin=20, ymax=80, alpha = 0.07, fill="#4AB5C4", color = "grey") +
+  annotate("rect", xmin=-15, xmax=0, ymin=20, ymax=80, alpha = 0.07, fill="#4AB5C4", color = "grey") +
+  annotate("rect", xmin=-16, xmax=0, ymin=-Inf, ymax=20, alpha = 0.07, fill="#ADDAE3", color = "grey") +
+  geom_borderline(size = 1, bordercolour = "black")+
+  scale_color_manual(values = c("R"=  "#4AB5C4", "L" = "#ADDAE3", "T"=  "#BAAD8D", "all" = "grey"))+
+  geom_point(size = 2.5, pch = 21, aes(fill = lake),  color = "black", stroke = 0.7)+
+  labs(title = "Response of chlorophyll to heatwaves over time")+
+  ylim(min(mean.all.by.lake$mean_percent_change)-10, max(mean.all.by.lake$mean_percent_change)+1)+
+  #geom_ribbon(aes(ymin = mean_percent_change - sd_percent_change, ymax = mean_percent_change + sd_percent_change, fill = period), alpha = 0.07)+
+  labs(x = "days relative to end of heatwave", y = "mean % change in chlorophyll \nacross heatwaves")+
+  theme_classic()+
+  scale_fill_manual(values = c("R"=  "#4AB5C4", "L" = "#ADDAE3", "T"=  "#BAAD8D", "all" = "grey"), labels = c("L" = "Paul", "R" = "Peter", "T" = "Tuesday"))+
+  xlim(-16, 20)+
+  geom_hline(yintercept = 0, linetype = "dashed")+
+  theme(plot.title = element_text(hjust = 0.5))+
+  theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=12))
+
+
+# Tuesday
+Tdist <- allSlopes %>%
+  filter(lake == "T") %>%
+  filter(period != "exclude after heatwave", daysAfter == get("daysAfter", envir=globalenv())) %>%
+  ggplot(aes(x = percent_change,
+             y = factor(period, levels = desired_order),  # Use factor with desired order
+             fill = period)) +
+  xlim(-200, 600)+
+  # geom_density_ridges(alpha = 0.7,
+  #                     quantile_lines = TRUE,
+  #                     quantile_fun = function(x, ...) median(x), 
+  #                     scale = 2, size = 0.7) +
+  geom_density_ridges(alpha = 0.7,
+                      quantile_lines = TRUE,
+                      quantile_fun = function(x, ...) mean(x), 
+                      scale = 2, size = 0.7) +
+  geom_text(data = mean_dfT %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+            aes(x = mean_percent_change,
+                y = factor(period, levels = desired_order),  # Use factor with desired order
+                label = as.character(round(mean_percent_change, digits = 0))),
+            color = "black",
+            size = 4,
+            vjust = 1) +
+  geom_text(data = mean_dfT %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+            aes(x = 400,
+                y = factor(period, levels = desired_order),  # Use factor with desired order
+                label = paste("n = ", number_percent_change, sep = "")),
+            color = "black",
+            size = 4,
+            vjust = 2) +
+  ylab("") +
+  xlab("% change in surface \n chlorophyll-a")+
+  labs(title = "Tuesday") +
+  scale_fill_manual(values = c("during heatwave" = "red3", "all other days" = "darkgrey", "after heatwave" = "#BAAD8D")) +  # Specify fill colors for groups
+  theme_classic()+
+  theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=12))+
+  theme(axis.text.y = element_blank())+
+  theme(legend.position="none")
+
+
+#dev.off()
+
+
+
+
+#png("./figures/science in the northwoods figures/Peter Lake heatwave results 4 days after.png", height = 7, width = 13, units = "in", res = 600)
+
+Rdist <- allSlopes %>%
+  filter(lake == "R") %>%
+  filter(period != "exclude after heatwave", daysAfter == get("daysAfter", envir=globalenv())) %>%
+  ggplot(aes(x = percent_change,
+             y = factor(period, levels = desired_order),  # Use factor with desired order
+             fill = period)) +
+  xlim(-200, 600)+
+  # geom_density_ridges(alpha = 0.7,
+  #                     quantile_lines = TRUE,
+  #                     quantile_fun = function(x, ...) median(x), 
+  #                     scale = 2, size = 0.7) +
+  geom_density_ridges(alpha = 0.7,
+                      quantile_lines = TRUE,
+                      quantile_fun = function(x, ...) mean(x), 
+                      scale = 2, size = 0.7) +
+  geom_text(data = mean_dfR %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+            aes(x = mean_percent_change,
+                y = factor(period, levels = desired_order),  # Use factor with desired order
+                label = as.character(round(mean_percent_change, digits = 0))),
+            color = "black",
+            size = 4,
+            vjust = 2) +
+  geom_text(data = mean_dfR %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+            aes(x = 400,
+                y = factor(period, levels = desired_order),  # Use factor with desired order
+                label = paste("n = ", number_percent_change, sep = "")),
+            color = "black",
+            size = 4,
+            vjust = 2) +
+  ylab("") +
+  xlab("% change in surface \n chlorophyll-a")+
+  labs(title = "Peter") +
+  scale_fill_manual(values = c("after heatwave" = "#4AB5C4", "all other days" = "darkgrey")) +  # Specify fill colors for groups
+  theme_classic()+
+  theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=12))+
+  theme(axis.text.y = element_blank())+
+  theme(legend.position="none")
+
+
+#dev.off()
+
+#png("./figures/science in the northwoods figures/Paul Lake heatwave results 4 days after.png", height = 7, width = 13, units = "in", res = 600)
+
+
+
+Ldist <- allSlopes %>%
+  filter(lake == "L") %>%
+  filter(period != "exclude after heatwave", daysAfter == get("daysAfter", envir=globalenv())) %>%
+  ggplot(aes(x = percent_change,
+             y = factor(period, levels = desired_order),  # Use factor with desired order
+             fill = period)) +
+  xlim(-200, 600)+
+  # geom_density_ridges(alpha = 0.7,
+  #                     quantile_lines = TRUE,
+  #                     quantile_fun = function(x, ...) median(x), 
+  #                     scale = 2, size = 0.7) +
+  geom_density_ridges(alpha = 0.7,
+                      quantile_lines = TRUE,
+                      quantile_fun = function(x, ...) mean(x), 
+                      scale = 2, size = 0.7) +
+  geom_text(data = mean_dfL %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+            aes(x = mean_percent_change,
+                y = factor(period, levels = desired_order),  # Use factor with desired order
+                label = as.character(round(mean_percent_change, digits = 0))),
+            color = "black",
+            size = 4,
+            vjust = 2) +
+  geom_text(data = mean_dfL %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+            aes(x = 400,
+                y = factor(period, levels = desired_order),  # Use factor with desired order
+                label = paste("n = ", number_percent_change, sep = "")),
+            color = "black",
+            size = 4,
+            vjust = 2) +
+  ylab("") +
+  xlab("% change in surface \n chlorophyll-a")+
+  labs(title = "Paul") +
+  scale_fill_manual(values = c("after heatwave" = "#ADDAE3", "all other days" = "darkgrey")) +  # Specify fill colors for groups
+  theme_classic()+
+  theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=12))+
+  theme(axis.text.y = element_blank())+
+  theme(legend.position="none")
+
+
+
+
+ggarrange(over.time, ggarrange(Ldist, Rdist, Tdist, ncol = 3), nrow = 2, legend = "top")
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #==============================================================================#
@@ -1104,7 +1291,7 @@ Ldist <- allSlopes %>%
   ylab("") +
   xlab("% change in surface \n chlorophyll-a")+
   labs(title = "Paul") +
-  scale_fill_manual(values = c("during heatwave" = "red3", "all other days" = "#88CCEE")) +  # Specify fill colors for groups
+  scale_fill_manual(values = c("after heatwave" = "darkgreen", "all other days" = "#88CCEE")) +  # Specify fill colors for groups
   theme_classic()+
   theme(axis.text=element_text(size=12),
         axis.title=element_text(size=12))+
@@ -1601,162 +1788,162 @@ all.Slopes.wide = all.Slopes.wide %>%
 
 
 
-
-
-###### MOVING BOX OVER TIME #####
-
-# Install and load necessary packages
-# install.packages("ggplot2")
-# install.packages("gganimate")
-#library(ggplot2)
-library(gganimate)
-
-# Create a sample dataset
-data <- data.frame(x = 0:40)
-
-# Define the width of the box
-box_width <- 5
-
-# Create the plot
-p <- ggplot(data, aes(x = x)) +
-  geom_rect(aes(xmin = x - box_width / 2, xmax = x + box_width / 2, ymin = -Inf, ymax = Inf),
-            fill = "blue", alpha = 0.3) +
-  scale_x_continuous(limits = c(0, 40)) +
-  theme_minimal()
-
-# Animate the plot
-anim <- p +
-  transition_states(x, transition_length = 2, state_length = 1) +
-  ease_aes('linear')
-
-# Save the animation (optional)
-anim_save("moving_box.gif", animation = anim)
-
-
-
-
-
-
-library(ggplot2)
-library(gganimate)
-
-# Create a sample dataset
-data <- data.frame(x = 0:40, y = 0:40)
-
-# Define the width of the box
-box_width <- 5
-
-# Create the plot with clamped xmin and xmax
-p <- ggplot(data, aes(x = x, y = y)) +
-  geom_point()+
-  geom_rect(aes(xmin = pmax(x - box_width / 2, 0), 
-                xmax = pmin(x + box_width / 2, 40), ymin = -Inf, ymax = Inf),
-            fill = "blue", alpha = 0.3) +
- # scale_x_continuous(limits = c(0, 40)) +
-  theme_minimal()
-
-# Animate the plot
-anim <- p +
-  transition_states(x, transition_length = 1, state_length = 0.5) +
-  ease_aes('linear')
-
-# Save the animation (optional)
-anim_save("moving_box.gif", animation = anim)
-
-
-
-
-
-
-library(ggplot2)
-library(gganimate)
-
-# Create a sample dataset
-data <- data.frame(x = -5:45, y = 0:40)
-
-# Define the width of the box
-box_width <- 5
-
-data = data %>% mutate(rect.min = x)
-data = data %>% mutate(rect.max = x+box_width)
-
-
-
-
-# Create the plot with clamped xmin and xmax
-p <- ggplot(data, aes(x = x, y = y)) +
-  geom_point() +
-  geom_rect(aes(xmin = rect.min, 
-                xmax = x + rect.max / 2, ymin = -Inf, ymax = Inf),
-            fill = "blue", alpha = 0.3) +
-  scale_x_continuous(limits = c(0, 50)) +
-  theme_bw()
-
-# Animate the plot using transition_reveal for smoother movement
-anim <- p +
-  transition_states(x, transition_length = 1, state_length = 0.5) +
-  ease_aes('linear')
-
-anim
-
-# Save the animation (optional)
-anim_save("moving_box_smooth.gif", animation = anim)
-
-
-
-anim <- p +
-  transition_reveal(along = x) +
-  ease_aes('linear')
-
-anim
-
-
-
-
-#### more points
-
-
-
-# Create a finer sample dataset for smoother movement
-data <- data.frame(x = seq(-5, 45, by = 0.1), y = seq(0, 40, length.out = 501))
-
-# Define the width of the box
-box_width <- 5
-
-data <- data %>% 
-  mutate(rect.min = x,
-         rect.max = x + box_width)
-
-# Create the plot with clamped xmin and xmax
-# Create the plot with clamped xmin and xmax
-p <- ggplot(data, aes(x = x, y = y)) +
-  geom_point() +
-  geom_rect(aes(xmin = rect.min, 
-                xmax = rect.max, ymin = -Inf, ymax = Inf, frames = x),
-            fill = "blue", alpha = 0.3) +
-  scale_x_continuous(limits = c(0, 50), 
-                     breaks = seq(0, 50, by = 5), 
-                     labels = seq(0, 50, by = 5)) +
-  theme_bw() +
-  theme(axis.ticks = element_line(color = "black"),
-        axis.text = element_text(color = "black"),
-        plot.margin = margin(1, 1, 1, 1, "cm"))
-
-# Animate the plot with transition_manual for frame-by-frame movement
-anim <- p +
-  transition_manual(frames = x) +
-  ease_aes('linear')+
-  geom_point()
-
-# Display the animation
-anim
-
-
-allSlopes.after = allSlopes %>% filter(period == "after heatwave")
-
-allSlopes.after %>% filter(lake == "R") %>% 
-  ggplot(aes(x = daysAfter, y = percent_change, color = event_no))+
-  geom_point()
-
-
-allSlopes.after %>% group_by(daysAfter) %>% summarize(nrow(.))
+# 
+# 
+# ###### MOVING BOX OVER TIME #####
+# 
+# # Install and load necessary packages
+# # install.packages("ggplot2")
+# # install.packages("gganimate")
+# #library(ggplot2)
+# library(gganimate)
+# 
+# # Create a sample dataset
+# data <- data.frame(x = 0:40)
+# 
+# # Define the width of the box
+# box_width <- 5
+# 
+# # Create the plot
+# p <- ggplot(data, aes(x = x)) +
+#   geom_rect(aes(xmin = x - box_width / 2, xmax = x + box_width / 2, ymin = -Inf, ymax = Inf),
+#             fill = "blue", alpha = 0.3) +
+#   scale_x_continuous(limits = c(0, 40)) +
+#   theme_minimal()
+# 
+# # Animate the plot
+# anim <- p +
+#   transition_states(x, transition_length = 2, state_length = 1) +
+#   ease_aes('linear')
+# 
+# # Save the animation (optional)
+# anim_save("moving_box.gif", animation = anim)
+# 
+# 
+# 
+# 
+# 
+# 
+# library(ggplot2)
+# library(gganimate)
+# 
+# # Create a sample dataset
+# data <- data.frame(x = 0:40, y = 0:40)
+# 
+# # Define the width of the box
+# box_width <- 5
+# 
+# # Create the plot with clamped xmin and xmax
+# p <- ggplot(data, aes(x = x, y = y)) +
+#   geom_point()+
+#   geom_rect(aes(xmin = pmax(x - box_width / 2, 0), 
+#                 xmax = pmin(x + box_width / 2, 40), ymin = -Inf, ymax = Inf),
+#             fill = "blue", alpha = 0.3) +
+#  # scale_x_continuous(limits = c(0, 40)) +
+#   theme_minimal()
+# 
+# # Animate the plot
+# anim <- p +
+#   transition_states(x, transition_length = 1, state_length = 0.5) +
+#   ease_aes('linear')
+# 
+# # Save the animation (optional)
+# anim_save("moving_box.gif", animation = anim)
+# 
+# 
+# 
+# 
+# 
+# 
+# library(ggplot2)
+# library(gganimate)
+# 
+# # Create a sample dataset
+# data <- data.frame(x = -5:45, y = 0:40)
+# 
+# # Define the width of the box
+# box_width <- 5
+# 
+# data = data %>% mutate(rect.min = x)
+# data = data %>% mutate(rect.max = x+box_width)
+# 
+# 
+# 
+# 
+# # Create the plot with clamped xmin and xmax
+# p <- ggplot(data, aes(x = x, y = y)) +
+#   geom_point() +
+#   geom_rect(aes(xmin = rect.min, 
+#                 xmax = x + rect.max / 2, ymin = -Inf, ymax = Inf),
+#             fill = "blue", alpha = 0.3) +
+#   scale_x_continuous(limits = c(0, 50)) +
+#   theme_bw()
+# 
+# # Animate the plot using transition_reveal for smoother movement
+# anim <- p +
+#   transition_states(x, transition_length = 1, state_length = 0.5) +
+#   ease_aes('linear')
+# 
+# anim
+# 
+# # Save the animation (optional)
+# anim_save("moving_box_smooth.gif", animation = anim)
+# 
+# 
+# 
+# anim <- p +
+#   transition_reveal(along = x) +
+#   ease_aes('linear')
+# 
+# anim
+# 
+# 
+# 
+# 
+# #### more points
+# 
+# 
+# 
+# # Create a finer sample dataset for smoother movement
+# data <- data.frame(x = seq(-5, 45, by = 0.1), y = seq(0, 40, length.out = 501))
+# 
+# # Define the width of the box
+# box_width <- 5
+# 
+# data <- data %>% 
+#   mutate(rect.min = x,
+#          rect.max = x + box_width)
+# 
+# # Create the plot with clamped xmin and xmax
+# # Create the plot with clamped xmin and xmax
+# p <- ggplot(data, aes(x = x, y = y)) +
+#   geom_point() +
+#   geom_rect(aes(xmin = rect.min, 
+#                 xmax = rect.max, ymin = -Inf, ymax = Inf, frames = x),
+#             fill = "blue", alpha = 0.3) +
+#   scale_x_continuous(limits = c(0, 50), 
+#                      breaks = seq(0, 50, by = 5), 
+#                      labels = seq(0, 50, by = 5)) +
+#   theme_bw() +
+#   theme(axis.ticks = element_line(color = "black"),
+#         axis.text = element_text(color = "black"),
+#         plot.margin = margin(1, 1, 1, 1, "cm"))
+# 
+# # Animate the plot with transition_manual for frame-by-frame movement
+# anim <- p +
+#   transition_manual(frames = x) +
+#   ease_aes('linear')+
+#   geom_point()
+# 
+# # Display the animation
+# anim
+# 
+# 
+# allSlopes.after = allSlopes %>% filter(period == "after heatwave")
+# 
+# allSlopes.after %>% filter(lake == "R") %>% 
+#   ggplot(aes(x = daysAfter, y = percent_change, color = event_no))+
+#   geom_point()
+# 
+# 
+# allSlopes.after %>% group_by(daysAfter) %>% summarize(nrow(.))
