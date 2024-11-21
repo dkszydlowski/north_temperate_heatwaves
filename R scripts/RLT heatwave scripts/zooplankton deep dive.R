@@ -1,10 +1,6 @@
 
 library(tidyverse)
-<<<<<<< HEAD
 library(DescTools)
-=======
-
->>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
 
 
 zoops.18.19 = read.csv("./formatted data/explanatory variables heatwaves/cascade_zoops_2018_2019_lterFormat_v1.csv")
@@ -186,13 +182,9 @@ ggplot(casc.weekly.zoops.total %>% filter(year4 != 2016), aes(x = daynum, y = bi
 # get zooplankton biomass before, during, and after heatwaves
 # do this for holopedium, Daphnia, and total biomass
 
-<<<<<<< HEAD
 #hw.exp = read.csv("./formatted data/explanatory variables heatwaves/heatwaves with percent zoop color nutrients.csv")
 
 hw.exp = read.csv("./formatted data/master explanatory dataset/heatwaves explained var3.csv")
-=======
-hw.exp = read.csv("./formatted data/explanatory variables heatwaves/heatwaves with percent zoop color nutrients.csv")
->>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
 
 # get rid of rows with no biomass
 cur.casc.weekly.zoops = casc.weekly.zoops %>% filter(!is.na(biomass))
@@ -265,11 +257,7 @@ results = left_join(results, testing, by = "event_group")
 
 hw.exp = results
 
-<<<<<<< HEAD
 i = 1
-=======
-
->>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
 for(i in 1:nrow(hw.exp)){
   
   # save the start date of current heatwave
@@ -286,15 +274,9 @@ for(i in 1:nrow(hw.exp)){
 
   
   # filter the zooplankton dataframe to match each category
-<<<<<<< HEAD
   cur.casc.exp.before = cur.casc.weekly.zoops %>% filter(lakeid == targ.lake, year4 == targ.year, daynum < targ.doy & daynum >= targ.doy - 7)
   cur.casc.exp.during = cur.casc.weekly.zoops %>% filter(lakeid == targ.lake, year4 == targ.year, daynum <= targ.doy.end & daynum >= targ.doy)
   cur.casc.exp.after = cur.casc.weekly.zoops %>% filter(lakeid == targ.lake, year4 == targ.year, daynum > targ.doy.end & daynum <= targ.doy.end + 7)
-=======
-  cur.casc.exp.before = cur.casc.weekly.zoops %>% filter(lakeid == targ.lake, year4 == targ.year, daynum < targ.doy)
-  cur.casc.exp.during = cur.casc.weekly.zoops %>% filter(lakeid == targ.lake, year4 == targ.year, daynum <= targ.doy.end & daynum >= targ.doy)
-  cur.casc.exp.after = cur.casc.weekly.zoops %>% filter(lakeid == targ.lake, year4 == targ.year, daynum > targ.doy.end)
->>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
   
   
   # add in the start date if there is actually data
@@ -403,7 +385,6 @@ hw.exp = hw.exp %>% mutate(pchange.total.zoop = 100*(total.biomass.during - tota
                            pchange.daphnia.length = 100*(daphnia.length.before- daphnia.length.during)/daphnia.length.during)
 
 
-<<<<<<< HEAD
 #hw.exp.zoop = hw.exp %>% select(date_start, date_end, lake, year, percentChange, pchange.daphnia.zoop, pchange.daphnia.length, abschange.daphnia.zoop,
 #                                pchange.total.zoop, pchange.total.zoop.during.to.after, zoop.days.before,
 #                                daphnia.biomass.before, daphnia.biomass.during, daphnia.biomass.after,
@@ -412,16 +393,6 @@ hw.exp = hw.exp %>% mutate(pchange.total.zoop = 100*(total.biomass.during - tota
 #                                total.biomass.before, total.biomass.during, total.biomass.after,
 #                                manual.chl.before, manual.chl.during, manual.chl.after,
 #                                zoop.days.before, zoop.days.after.start.during.hw, zoop.days.after.hw)
-=======
-hw.exp.zoop = hw.exp %>% select(date_start, date_end, lake, year, percentChange, pchange.daphnia.zoop, pchange.daphnia.length, abschange.daphnia.zoop,
-                                pchange.total.zoop, pchange.total.zoop.during.to.after, zoop.days.before,
-                                daphnia.biomass.before, daphnia.biomass.during, daphnia.biomass.after,
-                                daphnia.length.before, daphnia.length.during, daphnia.length.after,
-                                holop.biomass.before, holop.biomass.during, holop.biomass.after,
-                                total.biomass.before, total.biomass.during, total.biomass.after,
-                                manual.chl.before, manual.chl.during, manual.chl.after,
-                                zoop.days.before, zoop.days.after.start.during.hw, zoop.days.after.hw)
->>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
 
 
 
@@ -429,13 +400,8 @@ hw.exp = hw.exp %>% mutate(pchange.daphnia.zoop = 100*(daphnia.biomass.during - 
                            abschange.daphnia.zoop = daphnia.biomass.during- daphnia.biomass.before,
                            abschange.daphnia.zoop.during.to.after = daphnia.biomass.after - daphnia.biomass.during)
 
-<<<<<<< HEAD
 hw.exp = hw.exp %>% mutate(pchange.chl.weekly = 100*(manual.chl.after - manual.chl.before)/manual.chl.before,
                            abschange.chl = manual.chl.after- manual.chl.before)
-=======
-hw.exp = hw.exp %>% mutate(pchange.chl.weekly = 100*(manual.chl.during - manual.chl.before)/manual.chl.before,
-                           abschange.chl = manual.chl.during- manual.chl.before)
->>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
 
 
 ggplot(hw.exp, aes(x = pchange.total.zoop, y = pchange.chl.weekly, fill = lake))+
@@ -541,7 +507,6 @@ ggplot(hw.exp, aes(x = percentChange, y = pchange.total.zoop.during.to.after, fi
 
 
 ### line plots between before and after points
-<<<<<<< HEAD
 # hw.zoops.long = hw.exp %>% select(daphnia.biomass.before, daphnia.biomass.during, daphnia.biomass.after, lake, year, X) %>% 
 #   pivot_longer(cols = c("daphnia.biomass.before", "daphnia.biomass.during", "daphnia.biomass.after"), names_to ="timing", values_to = "biomass")
 # 
@@ -549,15 +514,6 @@ ggplot(hw.exp, aes(x = percentChange, y = pchange.total.zoop.during.to.after, fi
 # ggplot(hw.zoops.long, aes(x = timing, y = biomass, group = X, color = lake))+
 #   geom_point()+
 #   geom_line()
-=======
-hw.zoops.long = hw.exp %>% select(daphnia.biomass.before, daphnia.biomass.during, daphnia.biomass.after, lake, year, X) %>% 
-  pivot_longer(cols = c("daphnia.biomass.before", "daphnia.biomass.during", "daphnia.biomass.after"), names_to ="timing", values_to = "biomass")
-
-
-ggplot(hw.zoops.long, aes(x = timing, y = biomass, group = X, color = lake))+
-  geom_point()+
-  geom_line()
->>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
 
 # get the average percent increase in zooplankton by lake
 mean.perc.increase = hw.exp %>% group_by(lake) %>% summarize(mean.zoop.increase = median(pchange.total.zoop.during.to.after, na.rm = TRUE))
@@ -758,7 +714,6 @@ library(MuMIn)
 
 r.squaredGLMM(test)
 
-<<<<<<< HEAD
 
 
 
@@ -769,6 +724,3 @@ r.squaredGLMM(test)
 
 write.csv(hw.exp, "./formatted data/master explanatory dataset/heatwaves explained var4.csv", row.names = FALSE)
 
-=======
-##### Make a plot of zooplankton that are normalized over time, relative to the heatwave ######
->>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
