@@ -46,9 +46,12 @@ library(ggpubr)
 if (!require(ggborderline)) install.packages('ggborderline')
 library(ggborderline)
 
+<<<<<<< HEAD
 if (!require(ggallin)) install.packages('ggallin')
 library(ggallin)
 
+=======
+>>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
 library(DescTools)
 
 #==============================================================================#
@@ -61,6 +64,7 @@ slopeLength = 8 # length of the rolling window slope to be calculated
 
 # slope aggregation choices
 
+<<<<<<< HEAD
 numSlopes = 1 # the number of slopes we want to include in analysis
 
 daysAfter = 3 # time lag of how many days after the heatwave we want to look
@@ -68,6 +72,10 @@ daysAfter = 3 # time lag of how many days after the heatwave we want to look
 # create a separate daysAfter variable for Tuesday because the analysis peaks one day
 # earlier than Peter and Paul
 daysAfterT = 2
+=======
+daysAfter = 0 # time lag of how many days after the heatwave we want to look
+numSlopes = 7 # the number of slopes we want to include in analysis
+>>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
 
 exclude.after.heatwaves = FALSE # if TRUE, excludes slopes for days within 20 days 
 # of the heatwave that don't fall within our aggregating window
@@ -443,6 +451,7 @@ slopes$period = "all other days"
 # one column, "exclude after heatwaves," are slopes within 40 days after a heatwave
 # that are not in the current rolling window
 
+<<<<<<< HEAD
 
 # need to add dates.to.exclude to slopes
 
@@ -478,6 +487,13 @@ for(daysAfterLoop in -16:20){
   
   slopes$period = slopes.periods
   slopes$numSlopes = numSlopes
+=======
+numSlopes = 3
+
+for(daysAfterLoop in -20:40){
+  
+  slopes$period = "all other days"
+>>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
   
   # add a column to slopes which indicates whether or not there is a heatwave
   for(i in 1:nrow(heatwaves)){
@@ -490,13 +506,22 @@ for(daysAfterLoop in -16:20){
     hw.lake = heatwaves$lake[i]
     hw.year = heatwaves$year[i]
     
+    # current lake of the heatwave
+    hw.lake = heatwaves$lake[i]
+    
     # sequence of dates during the heatwave
     dates = seq(start, end, 1)
     
+<<<<<<< HEAD
     dates.to.exclude = seq(start, end+8, 1)
     
     
     # numSlopes = length(dates)-3
+=======
+   #numSlopes = length(dates)
+    
+    print(dates)
+>>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
     
     # excludes dates that are part of rolling window but not currently considered in after heatwave
     # after heatwave because of our current daysAfterLoop selection.
@@ -509,6 +534,7 @@ for(daysAfterLoop in -16:20){
     # daysAfterLoop is set to, to that same value plus the numSlopes. So it sets a window daysAfterLooped
     # X number of days after the heatwave
     
+<<<<<<< HEAD
     if(relative.to.hw == "end"){
       
       datesAnalyzed = seq(end+daysAfterLoop,  end + daysAfterLoop+numSlopes-1, 1)
@@ -520,13 +546,22 @@ for(daysAfterLoop in -16:20){
       datesAnalyzed = seq(start+daysAfterLoop,  start + daysAfterLoop+numSlopes-1, 1)
       
     }
+=======
+    datesAnalyzed = seq(end+daysAfterLoop,  end + daysAfterLoop+numSlopes-1, 1)
+>>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
     
     # fill the dataframe "period" column with the correct categorization
     
     # fill the dataframe "period" column with the correct categorization
+<<<<<<< HEAD
     slopes = slopes %>% mutate(period = replace(period, date %in% datesAnalyzed & lake == hw.lake, "after heatwave"))
     # slopes = slopes %>% mutate(period = replace(period, date %in% dates & lake == hw.lake, "during heatwave"))
     # slopes = slopes %>% mutate(period = replace(period, event_code != -100 & event_code != event & lake == hw.lake, "exclude after heatwave"))
+=======
+    #slopes = slopes %>% mutate(period = replace(period, date %in% datesExcluded & lake == hw.lake, "exclude after heatwave"))
+    slopes = slopes %>% mutate(period = replace(period, date %in% datesAnalyzed & lake == hw.lake, "after heatwave"))
+    #slopes = slopes %>% mutate(period = replace(period, date %in% dates & lake == hw.lake, "during heatwave"))
+>>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
     
     slopes$daysAfter = daysAfterLoop
     
@@ -545,6 +580,7 @@ for(daysAfterLoop in -16:20){
     
   }
   
+<<<<<<< HEAD
   
   
 }
@@ -556,6 +592,20 @@ for(daysAfterLoop in -16:20){
 
 # write.csv(allSlopes, "./R scripts/RLT heatwave scripts/bar chart shiny app/slopes.csv")
 
+=======
+  # combine to the main dataframe
+  if(daysAfterLoop == -16){
+    slopes$event_no = heatwaves$event_no[i]
+    allSlopes = slopes
+  }
+  if(daysAfterLoop > -16){
+    slopes$event_no = heatwaves$event_no[i]
+    allSlopes = rbind(allSlopes, slopes)
+  }
+  
+}
+
+>>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
 #allSlopes.after = allSlopes %>% filter(period == "after heatwave")
 
 
@@ -585,6 +635,7 @@ mean_df$mean_percent_change <- round(mean_df$mean_percent_change, 1)
 allSlopes = allSlopes %>% select(-event_no)
 
 allSlopes = allSlopes %>% distinct()
+<<<<<<< HEAD
 
 # # clean to get rid of pseudoreplication
 # collapsed_all_other_days <- allSlopes %>%
@@ -603,6 +654,8 @@ allSlopes = allSlopes %>% distinct()
 # head(allSlopes_cleaned)
 # 
 # allSlopes = allSlopes_cleaned
+=======
+>>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
 
 #==============================================================================#
 #### RESPONSE TIMING LINE PLOTS ####
@@ -634,7 +687,11 @@ mean_df <- allSlopes %>%  #filter(year %in% c(2008, 2009, 2010, 2011)) %>%
                    median_percent_change = median(percent_change, na.rm = TRUE)) 
 
 # Peter
+<<<<<<< HEAD
 mean_dfR = allSlopes %>% filter(lake == "R") %>%  
+=======
+mean_dfR <- allSlopes %>% filter(lake == "R") %>%  # filter(year %in% c(2008, 2009, 2010, 2011)) %>% 
+>>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
   filter(period != "exclude after heatwave", !is.na(percent_change)) %>% 
   group_by(period, daysAfter) %>% 
   dplyr::summarise(mean_percent_change = mean(percent_change), 
@@ -914,13 +971,21 @@ mean.all  %>% filter(lake != "all") %>%
   #geom_ribbon(aes(ymin = mean_percent_change - sd_percent_change, ymax = mean_percent_change + sd_percent_change, fill = period), alpha = 0.1)+
   labs(x = "days after heatwave")+
   theme_classic()+
+<<<<<<< HEAD
   scale_color_manual(values = c("R"=  "#60BFCC", "L" = "#D9EEF3", "T"=  "#544C34", "all" = "grey"))+
+=======
+  scale_color_manual(values = c("R"=  "#4AB5C4", "L" = "#ADDAE3", "T"=  "#BAAD8D", "all" = "grey"))+
+>>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
   xlim(-16, 20)+
   geom_hline(yintercept = 0, linetype = "dashed")
   
 
 
+<<<<<<< HEAD
 #scale_fill_manual(values = c("R"=  "#60BFCC", "L" = "#D9EEF3", "T"=  "#544C34"))+
+=======
+#scale_fill_manual(values = c("R"=  "#4AB5C4", "L" = "#ADDAE3", "T"=  "#BAAD8D"))+
+>>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
   
 
 #write.csv(mean.all, "./results/response over time/chl response over time 2008-2011.csv", row.names = FALSE)
@@ -1004,7 +1069,11 @@ Tdist <- allSlopes %>%
   ylab("") +
   xlab("% change in chlorophyll-a")+
   labs(title = "Tuesday") +
+<<<<<<< HEAD
   scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "grey", "all other days" = "#544C34")) +  # Specify fill colors for groups
+=======
+  scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "grey", "all other days" = "#BAAD8D")) +  # Specify fill colors for groups
+>>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
   theme_classic()+
   theme(axis.text=element_text(size=14),
         axis.title=element_text(size=18,face="bold"))+
@@ -1050,7 +1119,11 @@ Rdist <- allSlopes %>%
   ylab("") +
   xlab("% change in chlorophyll-a")+
   labs(title = "Peter") +
+<<<<<<< HEAD
   scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "grey", "all other days" = "#60BFCC")) +  # Specify fill colors for groups
+=======
+  scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "grey", "all other days" = "#4AB5C4")) +  # Specify fill colors for groups
+>>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
   theme_classic()+
   theme(axis.text=element_text(size=14),
         axis.title=element_text(size=18,face="bold"))+
@@ -1093,7 +1166,11 @@ Ldist <- allSlopes %>%
  # ylab("") +
   xlab("% change in chlorophyll-a")+
   labs(title = "Paul") +
+<<<<<<< HEAD
   scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "grey", "all other days" = "#D9EEF3")) +  # Specify fill colors for groups
+=======
+  scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "grey", "all other days" = "#ADDAE3")) +  # Specify fill colors for groups
+>>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
   theme_classic()+
   theme(axis.text=element_text(size=14),
         axis.title=element_text(size=18,face="bold"))+
@@ -1106,6 +1183,7 @@ Ldist <- allSlopes %>%
 
 #-------------------------------------------------------------------------------#
 ###### COMBINED TIMESCALES AND DIST FIGURE ######
+<<<<<<< HEAD
 # over.time = 
 #   mean.all  %>% filter(lake != "all") %>% 
 #   ggplot(aes( x= daysAfter, y = mean_percent_change, color = lake))+
@@ -1228,20 +1306,83 @@ over.time =
   theme(legend.text = element_text(size = 16)) + 
   guides(color = guide_legend(title = NULL), fill = guide_legend(title = NULL))
 
+=======
+
+over.time = 
+  mean.all  %>% filter(lake != "all") %>% 
+  ggplot(aes( x= daysAfter - 7, y = mean_percent_change, color = lake))+
+  annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=20, alpha = 0.07, fill="#ADDAE3", color = "grey") +
+  annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=20, alpha = 0.07, fill="#ADDAE3", color = "grey") +
+  annotate("rect", xmin=-5, xmax=0, ymin=-Inf, ymax=20, alpha = 0.07, fill="#ADDAE3", color = "grey") +
+  annotate("rect", xmin=-5, xmax=0, ymin=80, ymax=Inf, alpha = 0.07, fill="#BAAD8D", color = "grey") +
+  annotate("rect", xmin=-5, xmax=0, ymin=80, ymax=Inf, alpha = 0.07, fill="#BAAD8D", color = "grey") +
+  annotate("rect", xmin=-5, xmax=0, ymin=80, ymax=Inf, alpha = 0.07, fill="#BAAD8D", color = "grey") +
+  annotate("rect", xmin=-5, xmax=0, ymin=20, ymax=80, alpha = 0.07, fill="#4AB5C4", color = "grey") +
+  annotate("rect", xmin=-5, xmax=0, ymin=20, ymax=80, alpha = 0.07, fill="#4AB5C4", color = "grey") +
+  annotate("rect", xmin=-5, xmax=0, ymin=20, ymax=80, alpha = 0.07, fill="#4AB5C4", color = "grey") +
+  annotate("rect", xmin=-5, xmax=0, ymin=20, ymax=80, alpha = 0.07, fill="#4AB5C4", color = "grey") +
+  annotate("rect", xmin=-5, xmax=0, ymin=20, ymax=80, alpha = 0.07, fill="#4AB5C4", color = "grey") +
+  annotate("rect", xmin=-6, xmax=0, ymin=-75, ymax=Inf, alpha = 0.07, fill="#ADDAE3", color = "grey") +
+  annotate("rect", xmin=-6, xmax=0, ymin=20, ymax=80, alpha = 0.07, fill="#4AB5C4", color = "grey") +
+  annotate("rect", xmin=-7, xmax=0, ymin=-Inf, ymax=20, alpha = 0.07, fill="#ADDAE3", color = "grey") +
+  annotate("rect", xmin=-7, xmax=0, ymin=-Inf, ymax=20, alpha = 0.07, fill="#ADDAE3", color = "grey") +
+  annotate("rect", xmin=-7, xmax=0, ymin=-Inf, ymax=20, alpha = 0.07, fill="#ADDAE3", color = "grey") +
+  annotate("rect", xmin=-7, xmax=0, ymin=-Inf, ymax=20, alpha = 0.07, fill="#ADDAE3", color = "grey") +
+  annotate("rect", xmin=-7, xmax=0, ymin=20, ymax=80, alpha = 0.07, fill="#4AB5C4", color = "grey") +
+  annotate("rect", xmin=-7, xmax=0, ymin=20, ymax=80, alpha = 0.07, fill="#4AB5C4", color = "grey") +
+  annotate("rect", xmin=-7, xmax=0, ymin=20, ymax=80, alpha = 0.07, fill="#4AB5C4", color = "grey") +
+  annotate("rect", xmin=-8, xmax=0, ymin=-Inf, ymax=20, alpha = 0.07, fill="#ADDAE3", color = "grey") +
+  annotate("rect", xmin=-8, xmax=0, ymin=80, ymax=Inf, alpha = 0.07, fill="#BAAD8D", color = "grey") +
+  annotate("rect", xmin=-8, xmax=0, ymin=20, ymax=80, alpha = 0.07, fill="#4AB5C4", color = "grey") +
+  annotate("rect", xmin=-8, xmax=0, ymin=20, ymax=80, alpha = 0.07, fill="#4AB5C4", color = "grey") +
+  annotate("rect", xmin=-9, xmax=0, ymin=80, ymax=Inf, alpha = 0.07, fill="#BAAD8D", color = "grey") +
+  annotate("rect", xmin=-9, xmax=0, ymin=80, ymax=Inf, alpha = 0.07, fill="#BAAD8D", color = "grey") +
+  annotate("rect", xmin=-10, xmax=0, ymin=-Inf, ymax=20, alpha = 0.07, fill="#ADDAE3", color = "grey") +
+  annotate("rect", xmin=-10, xmax=0, ymin=-Inf, ymax=20, alpha = 0.07, fill="#ADDAE3", color = "grey") +
+  annotate("rect", xmin=-10, xmax=0, ymin=20, ymax=80, alpha = 0.07, fill="#4AB5C4", color = "grey") +
+  annotate("rect", xmin=-10, xmax=0, ymin=20, ymax=80, alpha = 0.07, fill="#4AB5C4", color = "grey") +
+  annotate("rect", xmin=-13, xmax=0, ymin=-Inf, ymax=20, alpha = 0.07, fill="#ADDAE3", color = "grey") +
+  annotate("rect", xmin=-13, xmax=0, ymin=20, ymax=80, alpha = 0.07, fill="#4AB5C4", color = "grey") +
+  annotate("rect", xmin=-15, xmax=0, ymin=20, ymax=80, alpha = 0.07, fill="#4AB5C4", color = "grey") +
+  annotate("rect", xmin=-16, xmax=0, ymin=-Inf, ymax=20, alpha = 0.07, fill="#ADDAE3", color = "grey") +
+  geom_borderline(size = 1, bordercolour = "black")+
+  scale_color_manual(values = c("R"=  "#4AB5C4", "L" = "#ADDAE3", "T"=  "#BAAD8D", "all" = "grey"))+
+  geom_point(size = 2.5, pch = 21, aes(fill = lake),  color = "black", stroke = 0.7)+
+  labs(title = "Response of chlorophyll to heatwaves over time")+
+  ylim(min(mean.all.by.lake$mean_percent_change)-10, max(mean.all.by.lake$mean_percent_change)+1)+
+  #geom_ribbon(aes(ymin = mean_percent_change - sd_percent_change, ymax = mean_percent_change + sd_percent_change, fill = period), alpha = 0.07)+
+  labs(x = "days relative to end of heatwave", y = "mean % change in chlorophyll \nacross heatwaves")+
+  theme_classic()+
+  scale_fill_manual(values = c("R"=  "#4AB5C4", "L" = "#ADDAE3", "T"=  "#BAAD8D", "all" = "grey"), labels = c("L" = "Paul", "R" = "Peter", "T" = "Tuesday"))+
+  xlim(-16, 20)+
+  geom_hline(yintercept = 0, linetype = "dashed")+
+  theme(plot.title = element_text(hjust = 0.5))+
+  theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=12))
+>>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
 
 
 # Tuesday
 Tdist <- allSlopes %>%
   filter(lake == "T") %>%
+<<<<<<< HEAD
   filter(period != "exclude after heatwave" & period != "during heatwave", daysAfter == 2) %>%
   ggplot(aes(x = percent_change,
              y = factor(period, levels = desired_order),  # Use factor with desired order
              fill = period)) +
  # xlim(-200, 600)+
+=======
+  filter(period != "exclude after heatwave", daysAfter == get("daysAfter", envir=globalenv())) %>%
+  ggplot(aes(x = percent_change,
+             y = factor(period, levels = desired_order),  # Use factor with desired order
+             fill = period)) +
+  xlim(-200, 600)+
+>>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
   # geom_density_ridges(alpha = 0.7,
   #                     quantile_lines = TRUE,
   #                     quantile_fun = function(x, ...) median(x), 
   #                     scale = 2, size = 0.7) +
+<<<<<<< HEAD
   geom_density_ridges(alpha = 0.9,
                       quantile_lines = TRUE,
                       quantile_fun = function(x, ...) mean(x), 
@@ -1267,6 +1408,33 @@ Tdist <- allSlopes %>%
   theme_classic()+
   theme(axis.text=element_text(size=12),
         axis.title=element_text(size=16))+
+=======
+  geom_density_ridges(alpha = 0.7,
+                      quantile_lines = TRUE,
+                      quantile_fun = function(x, ...) mean(x), 
+                      scale = 2, size = 0.7) +
+  geom_text(data = mean_dfT %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+            aes(x = mean_percent_change,
+                y = factor(period, levels = desired_order),  # Use factor with desired order
+                label = as.character(round(mean_percent_change, digits = 0))),
+            color = "black",
+            size = 4,
+            vjust = 1) +
+  geom_text(data = mean_dfT %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+            aes(x = 400,
+                y = factor(period, levels = desired_order),  # Use factor with desired order
+                label = paste("n = ", number_percent_change, sep = "")),
+            color = "black",
+            size = 4,
+            vjust = 2) +
+  ylab("") +
+  xlab("% change in surface \n chlorophyll-a")+
+  labs(title = "Tuesday") +
+  scale_fill_manual(values = c("during heatwave" = "red3", "all other days" = "darkgrey", "after heatwave" = "#BAAD8D")) +  # Specify fill colors for groups
+  theme_classic()+
+  theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=12))+
+>>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
   theme(axis.text.y = element_blank())+
   theme(legend.position="none")
 
@@ -1274,6 +1442,7 @@ Tdist <- allSlopes %>%
 #dev.off()
 
 
+<<<<<<< HEAD
 # read in the fish graphic 
 # library(png)
 # library(grid)
@@ -1281,20 +1450,32 @@ Tdist <- allSlopes %>%
 # g <- rasterGrob(img, interpolate=TRUE)
 # 
 # qplot(1:10, 1:10, geom="blank")
+=======
+
+>>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
 
 #png("./figures/science in the northwoods figures/Peter Lake heatwave results 4 days after.png", height = 7, width = 13, units = "in", res = 600)
 
 Rdist <- allSlopes %>%
   filter(lake == "R") %>%
+<<<<<<< HEAD
   filter(period != "exclude after heatwave" & period != "during heatwave", daysAfter == 3) %>%
   ggplot(aes(x = percent_change,
              y = factor(period, levels = desired_order),  # Use factor with desired order
              fill = period)) +
   #xlim(-200, 800)+
+=======
+  filter(period != "exclude after heatwave", daysAfter == get("daysAfter", envir=globalenv())) %>%
+  ggplot(aes(x = percent_change,
+             y = factor(period, levels = desired_order),  # Use factor with desired order
+             fill = period)) +
+  xlim(-200, 600)+
+>>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
   # geom_density_ridges(alpha = 0.7,
   #                     quantile_lines = TRUE,
   #                     quantile_fun = function(x, ...) median(x), 
   #                     scale = 2, size = 0.7) +
+<<<<<<< HEAD
   geom_density_ridges(alpha = 0.9,
                       quantile_lines = TRUE,
                       quantile_fun = function(x, ...) mean(x), 
@@ -1319,6 +1500,33 @@ Rdist <- allSlopes %>%
   theme_classic()+
   theme(axis.text=element_text(size=12),
         axis.title=element_text(size=16))+
+=======
+  geom_density_ridges(alpha = 0.7,
+                      quantile_lines = TRUE,
+                      quantile_fun = function(x, ...) mean(x), 
+                      scale = 2, size = 0.7) +
+  geom_text(data = mean_dfR %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+            aes(x = mean_percent_change,
+                y = factor(period, levels = desired_order),  # Use factor with desired order
+                label = as.character(round(mean_percent_change, digits = 0))),
+            color = "black",
+            size = 4,
+            vjust = 2) +
+  geom_text(data = mean_dfR %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+            aes(x = 400,
+                y = factor(period, levels = desired_order),  # Use factor with desired order
+                label = paste("n = ", number_percent_change, sep = "")),
+            color = "black",
+            size = 4,
+            vjust = 2) +
+  ylab("") +
+  xlab("% change in surface \n chlorophyll-a")+
+  labs(title = "Peter") +
+  scale_fill_manual(values = c("after heatwave" = "#4AB5C4", "all other days" = "darkgrey")) +  # Specify fill colors for groups
+  theme_classic()+
+  theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=12))+
+>>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
   theme(axis.text.y = element_blank())+
   theme(legend.position="none")
 
@@ -1331,15 +1539,24 @@ Rdist <- allSlopes %>%
 
 Ldist <- allSlopes %>%
   filter(lake == "L") %>%
+<<<<<<< HEAD
   filter(period != "exclude after heatwave" & period != "during heatwave", daysAfter == 3) %>%
   ggplot(aes(x = percent_change,
              y = factor(period, levels = desired_order),  # Use factor with desired order
              fill = period)) +
   #xlim(-200, 500)+
+=======
+  filter(period != "exclude after heatwave", daysAfter == get("daysAfter", envir=globalenv())) %>%
+  ggplot(aes(x = percent_change,
+             y = factor(period, levels = desired_order),  # Use factor with desired order
+             fill = period)) +
+  xlim(-200, 600)+
+>>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
   # geom_density_ridges(alpha = 0.7,
   #                     quantile_lines = TRUE,
   #                     quantile_fun = function(x, ...) median(x), 
   #                     scale = 2, size = 0.7) +
+<<<<<<< HEAD
   geom_density_ridges(alpha = 0.9,
                       quantile_lines = TRUE,
                       quantile_fun = function(x, ...) mean(x), 
@@ -1366,14 +1583,50 @@ Ldist <- allSlopes %>%
   theme(axis.text=element_text(size=12),
         axis.title=element_text(size=16))+
   #theme(axis.text.y = element_blank())+
+=======
+  geom_density_ridges(alpha = 0.7,
+                      quantile_lines = TRUE,
+                      quantile_fun = function(x, ...) mean(x), 
+                      scale = 2, size = 0.7) +
+  geom_text(data = mean_dfL %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+            aes(x = mean_percent_change,
+                y = factor(period, levels = desired_order),  # Use factor with desired order
+                label = as.character(round(mean_percent_change, digits = 0))),
+            color = "black",
+            size = 4,
+            vjust = 2) +
+  geom_text(data = mean_dfL %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+            aes(x = 400,
+                y = factor(period, levels = desired_order),  # Use factor with desired order
+                label = paste("n = ", number_percent_change, sep = "")),
+            color = "black",
+            size = 4,
+            vjust = 2) +
+  ylab("") +
+  xlab("% change in surface \n chlorophyll-a")+
+  labs(title = "Paul") +
+  scale_fill_manual(values = c("after heatwave" = "#ADDAE3", "all other days" = "darkgrey")) +  # Specify fill colors for groups
+  theme_classic()+
+  theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=12))+
+  theme(axis.text.y = element_blank())+
+>>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
   theme(legend.position="none")
 
 
 
+<<<<<<< HEAD
 png("./figures/manuscript draft 2024-11-11/heatwave results 2_or_3 days after.png", height = 7, width = 10, units = "in", res = 600)
 ggarrange(over.time, ggarrange(Ldist, Rdist, Tdist, ncol = 3),
           nrow = 2, legend = "top")
 dev.off()
+=======
+
+ggarrange(over.time, ggarrange(Ldist, Rdist, Tdist, ncol = 3), nrow = 2, legend = "top")
+
+
+
+>>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
 
 
 
@@ -1383,6 +1636,7 @@ dev.off()
 
 
 
+<<<<<<< HEAD
 3# Ensure panel.spacing is consistent
 # Ldist_adjusted <- Ldist + theme(panel.spacing = unit(2, "lines"), 
 #                                 plot.margin = margin(1, 20, 5.5, 5.5))  # Adjust margins
@@ -1396,6 +1650,8 @@ dev.off()
 # Arrange the plots
 # ggarrange(over.time, ggarrange(Ldist, Rdist_adjusted, Tdist_adjusted, ncol = 3, widths = c(2, 1, 1)), 
 #           nrow = 2, legend = "top", align = "v")
+=======
+>>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
 
 
 #==============================================================================#
@@ -2407,6 +2663,7 @@ all.Slopes.wide = all.Slopes.wide %>%
 # 
 # 
 # allSlopes.after %>% group_by(daysAfter) %>% summarize(nrow(.))
+<<<<<<< HEAD
 
 
 
@@ -2420,3 +2677,5 @@ all.Slopes.wide = all.Slopes.wide %>%
 
 
 # check which h
+=======
+>>>>>>> d6e5a897ae92551e7d58ccb6ce55f0ddcb69bfda
