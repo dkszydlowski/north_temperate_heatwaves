@@ -130,7 +130,6 @@ wtr = load.ts("./formatted data/LRT temp chains rLakeAnalyzer/Tuesday_temperatur
 # approximate missing values in wtr
 wtr = wtr %>% mutate(across(where(~ !inherits(., "POSIXct")), ~ na.approx(., na.rm = FALSE, rule = 2)))
 
-
 schmidt_T15 = ts.schmidt.stability(wtr, bathy, na.rm = FALSE)
 
 # replace with NA where date was initially missing
@@ -142,6 +141,58 @@ ggplot(schmidt_T15, aes(x = datetime, y = (schmidt.stability)))+
   geom_line(linewidth = 1, color = "darkorchid4")+
   theme_classic()+
   labs(title = "Tuesday 2015 Schmidt Stability")+
+  ylab('Schmidt Stability')+
+  xlab('date')
+
+# Paul 2009
+Ao = bathyL$areas[1]
+wtr = load.ts("./formatted data/LRT temp chains rLakeAnalyzer/Paul_temperature_2009_rLakeAnalyzer.csv", tz = "America/Chicago")
+
+# approximate missing values in wtr
+wtr = wtr %>% mutate(across(where(~ !inherits(., "POSIXct")), ~ na.approx(., na.rm = FALSE, rule = 2)))
+
+schmidt_L09 = ts.schmidt.stability(wtr, bathy, na.rm = FALSE)
+
+
+ggplot(schmidt_L09, aes(x = datetime, y = (schmidt.stability)))+
+  geom_line(linewidth = 1, color = "darkorchid4")+
+  theme_classic()+
+  labs(title = "Paul 2009 Schmidt Stability")+
+  ylab('Schmidt Stability')+
+  xlab('date')
+
+# Paul 2010
+Ao = bathyL$areas[1]
+wtr = load.ts("./formatted data/LRT temp chains rLakeAnalyzer/Paul_temperature_2010_rLakeAnalyzer.csv", tz = "America/Chicago")
+
+# approximate missing values in wtr
+wtr = wtr %>% mutate(across(where(~ !inherits(., "POSIXct")), ~ na.approx(., na.rm = FALSE, rule = 2)))
+
+schmidt_L10 = ts.schmidt.stability(wtr, bathy, na.rm = FALSE)
+
+
+ggplot(schmidt_L10, aes(x = datetime, y = (schmidt.stability)))+
+  geom_line(linewidth = 1, color = "darkorchid4")+
+  theme_classic()+
+  labs(title = "Paul 2010 Schmidt Stability")+
+  ylab('Schmidt Stability')+
+  xlab('date')
+
+
+# Paul 2011
+Ao = bathyL$areas[1]
+wtr = load.ts("./formatted data/LRT temp chains rLakeAnalyzer/Paul_temperature_2011_rLakeAnalyzer.csv", tz = "America/Chicago")
+
+# approximate missing values in wtr
+wtr = wtr %>% mutate(across(where(~ !inherits(., "POSIXct")), ~ na.approx(., na.rm = FALSE, rule = 2)))
+
+schmidt_L11 = ts.schmidt.stability(wtr, bathy, na.rm = FALSE)
+
+
+ggplot(schmidt_L11, aes(x = datetime, y = (schmidt.stability)))+
+  geom_line(linewidth = 1, color = "darkorchid4")+
+  theme_classic()+
+  labs(title = "Paul 2011 Schmidt Stability")+
   ylab('Schmidt Stability')+
   xlab('date')
 
@@ -223,6 +274,62 @@ ggplot(schmidt_L18, aes(x = datetime, y = (schmidt.stability)))+
 
 
 
+
+# Peter 2009
+Ao = bathyR$areas[1]
+wtr = load.ts("./formatted data/LRT temp chains rLakeAnalyzer/Peter_temperature_2009_rLakeAnalyzer.csv", tz = "America/Chicago")
+
+# approximate missing values in wtr
+wtr = wtr %>% mutate(across(where(~ !inherits(., "POSIXct")), ~ na.approx(., na.rm = FALSE, rule = 2)))
+
+schmidt_R09 = ts.schmidt.stability(wtr, bathy, na.rm = FALSE)
+
+
+ggplot(schmidt_R09, aes(x = datetime, y = (schmidt.stability)))+
+  geom_line(linewidth = 1, color = "darkorchid4")+
+  theme_classic()+
+  labs(title = "Peter 2009 Schmidt Stability")+
+  ylab('Schmidt Stability')+
+  xlab('date')
+
+
+
+
+# Peter 2010
+Ao = bathyR$areas[1]
+wtr = load.ts("./formatted data/LRT temp chains rLakeAnalyzer/Peter_temperature_2010_rLakeAnalyzer.csv", tz = "America/Chicago")
+
+# approximate missing values in wtr
+wtr = wtr %>% mutate(across(where(~ !inherits(., "POSIXct")), ~ na.approx(., na.rm = FALSE, rule = 2)))
+
+schmidt_R10 = ts.schmidt.stability(wtr, bathy, na.rm = FALSE)
+
+
+ggplot(schmidt_R10, aes(x = datetime, y = (schmidt.stability)))+
+  geom_line(linewidth = 1, color = "darkorchid4")+
+  theme_classic()+
+  labs(title = "Peter 2010 Schmidt Stability")+
+  ylab('Schmidt Stability')+
+  xlab('date')
+
+
+
+# Peter 2011
+Ao = bathyR$areas[1]
+wtr = load.ts("./formatted data/LRT temp chains rLakeAnalyzer/Peter_temperature_2011_rLakeAnalyzer.csv", tz = "America/Chicago")
+
+# approximate missing values in wtr
+wtr = wtr %>% mutate(across(where(~ !inherits(., "POSIXct")), ~ na.approx(., na.rm = FALSE, rule = 2)))
+
+schmidt_R11 = ts.schmidt.stability(wtr, bathy, na.rm = FALSE)
+
+
+ggplot(schmidt_R11, aes(x = datetime, y = (schmidt.stability)))+
+  geom_line(linewidth = 1, color = "darkorchid4")+
+  theme_classic()+
+  labs(title = "Peter 2011 Schmidt Stability")+
+  ylab('Schmidt Stability')+
+  xlab('date')
 
 
 
@@ -322,4 +429,46 @@ ggplot(schmidt_R19, aes(x = datetime, y = (schmidt.stability)))+
 
 
 
+#### combine stability measures
+schmidt_L09 = schmidt_L09 %>% mutate(lake = "Paul")
+schmidt_L10 = schmidt_L10 %>% mutate(lake = "Paul")
+schmidt_L11 = schmidt_L11 %>% mutate(lake = "Paul")
+schmidt_L13 = schmidt_L13 %>% mutate(lake = "Paul")
+schmidt_L14 = schmidt_L14 %>% mutate(lake = "Paul")
+schmidt_L15 = schmidt_L15 %>% mutate(lake = "Paul")
+schmidt_L18 = schmidt_L18 %>% mutate(lake = "Paul")
 
+schmidt_R09 = schmidt_R09 %>% mutate(lake = "Peter")
+schmidt_R10 = schmidt_R10 %>% mutate(lake = "Peter")
+schmidt_R11 = schmidt_R11 %>% mutate(lake = "Peter")
+schmidt_R13 = schmidt_R13 %>% mutate(lake = "Peter")
+schmidt_R14 = schmidt_R14 %>% mutate(lake = "Peter")
+schmidt_R15 = schmidt_R15 %>% mutate(lake = "Peter")
+schmidt_R18 = schmidt_R18 %>% mutate(lake = "Peter")
+schmidt_R19 = schmidt_R19 %>% mutate(lake = "Peter")
+
+schmidt_T13 = schmidt_T13 %>% mutate(lake = "Tuesday")
+schmidt_T14 = schmidt_T14 %>% mutate(lake = "Tuesday")
+schmidt_T15 = schmidt_T15 %>% mutate(lake = "Tuesday")
+
+schmidt.all = rbind(schmidt_L09, schmidt_L10, schmidt_L11, schmidt_L13, schmidt_L14, schmidt_L15, schmidt_L18,
+                    schmidt_R09, schmidt_R10, schmidt_R11, schmidt_R13, schmidt_R14, schmidt_R15, schmidt_R18, schmidt_R19,
+                    schmidt_T13, schmidt_T14, schmidt_T15)
+
+
+schmidt.all = schmidt.all %>% mutate(year = year(datetime), doy = yday(datetime)) %>% 
+  filter(!is.na(datetime))
+  
+
+schmidt.avg = schmidt.all %>% group_by(lake, year, doy) %>% 
+  summarize(avg.schmidt.stability = min(schmidt.stability, na.rm = TRUE)) %>% ungroup()
+
+ggplot(schmidt.avg, aes(x = doy, y = avg.schmidt.stability, color = lake))+
+  geom_point()+
+  geom_line()+
+  facet_wrap(~year)+
+  scale_color_manual(values = c("Peter" = '#1F78B4', "Paul" = '#FED976', "Tuesday" = '#8C510A'))+
+  theme_classic()
+
+# save the dataframe
+write.csv(schmidt.avg, "./formatted data/stability 2009 to 2019.csv", row.names = FALSE)

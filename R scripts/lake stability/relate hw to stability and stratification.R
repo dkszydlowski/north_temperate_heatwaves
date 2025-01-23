@@ -5,7 +5,9 @@
 library(tidyverse)
 library(rLakeAnalyzer)
 
-strat = read.csv("./formatted data/stability and stratification/stability results all combinations.csv")
+strat = read.csv("./formatted data/stability 2009 to 2019.csv")
+
+#strat = read.csv("./formatted data/stability and stratification/stability results all combinations.csv")
 
 # read in the sonde data to get the lake_years
 allData = read.csv("./formatted data/interpolated_manual_chl_for_slopes.csv")
@@ -13,9 +15,9 @@ allData = read.csv("./formatted data/interpolated_manual_chl_for_slopes.csv")
 lake_years = unique(allData$lake_year)
 
 # remove 2008, 2009, 2010, and 2011 because we don't have tchain data for those years
-lake_years = lake_years[-which(grepl("2009", lake_years))]
-lake_years = lake_years[-which(grepl("2010", lake_years))]
-lake_years = lake_years[-which(grepl("2011", lake_years))]
+# lake_years = lake_years[-which(grepl("2009", lake_years))]
+# lake_years = lake_years[-which(grepl("2010", lake_years))]
+# lake_years = lake_years[-which(grepl("2011", lake_years))]
 lake_years = lake_years[-which(grepl("2008", lake_years))]
 lake_years = lake_years[-which(grepl("L_2019", lake_years))]
 

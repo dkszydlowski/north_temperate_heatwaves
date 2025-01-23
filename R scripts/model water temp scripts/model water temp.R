@@ -8,6 +8,8 @@ library(lme4)
 library(lmerTest)
 library(MuMIn)
 
+
+
 ########## RESULTS FROM THIS SCRIPT ###############
 # R2 values for different models
 # PRISM air temp and Cascade routine surface temp: R2 = 0.657

@@ -187,3 +187,36 @@ ggplot(phyto_nmds_scores, aes(x = NMDS1, y = NMDS2, fill = lakeid)) +
   scale_fill_manual(values = c("R" = "#4AB5C4", "L" = "#ADDAE3", "T" = "#BAAD8D")) +
   theme(legend.position = "right")
 
+
+
+
+
+##### identify dominant species of phytoplankton during heatwaves when we have the data #####
+phyto = dt1
+
+phyto = phyto %>% filter(year4 >= 2008 & lakeid %in% c("L", "R", "T"))
+
+## get total volume by species ##
+phyto.total = phyto %>% group_by(division, lakeid, year4, daynum) %>% 
+  summarize(total.volume = sum(total_vol, na.rm = TRUE))
+
+
+ggplot(phyto.total %>% filter(division != "Miscellaneous"), aes(x = daynum, y = percent, fill = division)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Year", y = "Percent of total", fill = "Division") +
+  facet_wrap(year4~lakeid)+
+  scale_fill_manual(values = c("Bacillariophyta" = "black", "Chlorophyta" = "#009292", "Chrysophyta" = "#ffff6d", "Cryptophyta" = "#db6d00",
+                               "Cyanophyta" = "#004949", "Euglenophyta" = "#b66dff", "Rhodophyta" = "#920000", "Pyrrhophyta" = "#924900",
+                               "Xanthophyta" = "#ffb6db", "Haptophyta" = "#006ddb"))+
+  theme_bw()
+
+
+# color-blind friendly colors
+# "#000000","#004949","#009292","#ff6db6","#ffb6db",
+# "#490092","#006ddb","#b66dff","#6db6ff","#b6dbff",
+# "#920000","#924900","#db6d00","#24ff24","#ffff6d"
+
+## create a column that has the percent of total volume ##
+phyto.total = phyto.total %>% group_by(lakeid, year4, daynum) %>% 
+  mutate(day.total = sum(total.volume, na.rm = TRUE)) %>% 
+  mutate(percent = 100*total.volume/day.total)
