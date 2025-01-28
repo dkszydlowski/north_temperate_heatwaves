@@ -445,6 +445,16 @@ saveRDS(paulHW.categories, file = "./results/heatwave modeled outputs/paul heatw
 saveRDS(peterHW.categories, file = "./results/heatwave modeled outputs/peter heatwave outputs modeled categories 95th.rds")
 saveRDS(tuesdayHW.categories, file = "./results/heatwave modeled outputs/tuesday heatwave outputs modeled categories 95th.rds")
 
+peterHW = peterHW$event %>% mutate(lake = "R")
+paulHW = paulHW$event %>% mutate(lake = "L")
+tuesdayHW = tuesdayHW$event %>% mutate(lake = "T")
+
+hw.all = rbind(peterHW, paulHW, tuesdayHW)
+
+hw.all = hw.all %>% mutate(year = year(date_start), lake_year = paste(lake, year, sep = "_"))
+
+write.csv(hw.all, "./results/heatwave modeled outputs/heatwave events LRT 95th.csv", row.names = FALSE)
+
 
 
 #### calculate heatwaves where the threshold is the 85th percentile of events instead ####
@@ -525,7 +535,15 @@ saveRDS(peterHW.categories, file = "./results/heatwave modeled outputs/peter hea
 saveRDS(tuesdayHW.categories, file = "./results/heatwave modeled outputs/tuesday heatwave outputs modeled categories 85th.rds")
 
 
+peterHW = peterHW$event %>% mutate(lake = "R")
+paulHW = paulHW$event %>% mutate(lake = "L")
+tuesdayHW = tuesdayHW$event %>% mutate(lake = "T")
 
+hw.all = rbind(peterHW, paulHW, tuesdayHW)
+
+hw.all = hw.all %>% mutate(year = year(date_start), lake_year = paste(lake, year, sep = "_"))
+
+write.csv(hw.all, "./results/heatwave modeled outputs/heatwave events LRT 85th.csv", row.names = FALSE)
 
 
 
@@ -624,6 +642,20 @@ num.heatwaves.percentile = num.heatwaves.percentile %>% mutate(num.hw = replace(
   mutate(duration.hw = replace(duration.hw, lake == "T" & percentile == percent, lengthHWT)) %>% 
   mutate(duration.hw = replace(duration.hw, lake == "R" & percentile == percent, lengthHWR)) %>%
   mutate(duration.hw = replace(duration.hw, lake == "L" & percentile == percent, lengthHWL))
+
+
+
+peterHW = peterHW$event %>% mutate(lake = "R")
+paulHW = paulHW$event %>% mutate(lake = "L")
+tuesdayHW = tuesdayHW$event %>% mutate(lake = "T")
+
+hw.all = rbind(peterHW, paulHW, tuesdayHW)
+
+hw.all = hw.all %>% mutate(year = year(date_start), lake_year = paste(lake, year, sep = "_"))
+
+write.csv(hw.all, paste("./results/heatwave modeled outputs/heatwave events LRT ", percent, " percent.csv", sep = ""), row.names = FALSE)
+
+
 
 }
 
