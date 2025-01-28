@@ -118,6 +118,10 @@ dev.off()
 
 
 
+
+
+
+
 ##### explanatory plots for ASLO ######
 
 a = ggplot(heatwaves.exp, aes(x = log10(biomass), y = percentChange, fill = lake))+

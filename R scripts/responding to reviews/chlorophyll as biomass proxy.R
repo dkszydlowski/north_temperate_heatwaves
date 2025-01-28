@@ -5,6 +5,7 @@
 ## 
 
 library(tidyverse)
+library(ggborderline)
 
 
 ### daily surface grabs vs PML ###
@@ -148,16 +149,79 @@ detach(dt1)
 
 routines.chl = dt1
 
-routines.chl = routines.chl %>% filter(lakeid %in% c("L", "R", "T"))
+routines.chl = routines.chl %>% filter(lakeid %in% c("L", "R", "T") & depth_id %in% c(1:6))
 
-routines.chl.13.15 = routines.chl %>% filter(year4 %in% c(2008, 2009, 2010, 2011, 2013, 2014, 2015)) %>% 
-  filter(depth_id %in% c(1, 2, 3, 4))
+# %>% filter(year4 %in% c(2008, 2009, 2010, 2011, 2013, 2014, 2015))
+  # filter(depth_id %in% c(1, 2, 3, 4))
 
-ggplot(routines.chl.13.15, aes(x = as.factor(doy), y = chla, fill = lakeid))+
+ggplot(routines.chl, aes(x = as.factor(doy), y = chla, fill = lakeid))+
   geom_boxplot()+
   facet_wrap(~year4)
 
-# calculate standard deviation of chlorophyll
-std.chl = routines.chl.13.15 %>% group_by(lakeid, year4) %>% 
-  summarize(mean.chl = mean(chla, na.rm = TRUE), sd.chl = se(chla, na.rm = TRUE))
+
+### make a plot that is number of depths included (x) vs standard deviation of chlorophyll (y) by lake
+
+routines.chl = routines.chl %>% group_by(daynum, lakeid, year4) %>% 
+  mutate(depth_id = as.numeric(depth_id))
+
+for(i in 1:6){
+  
+  cur.chl = routines.chl %>% filter(depth_id <= i)
+  
+  chl.results = cur.chl %>% group_by(lakeid, daynum, year4) %>% 
+    summarize(sd.chl = sd(chla, na.rm = TRUE))
+  
+  chl.results$depth.included = i
+  if(i == 1){
+    chl.all.results =  chl.results
+  }
+  if(i > 1){
+  chl.all.results = rbind(chl.all.results, chl.results)
+  }
+  
+}
+
+
+ggplot(chl.all.results, aes(x = depth.included, y = sd.chl, color = lakeid))+
+  geom_point()
+
+# get mean sd by depth for each lake
+
+chl.all.results.mean = chl.all.results %>% group_by(lakeid, depth.included) %>% 
+  summarize(mean.sd = mean(sd.chl, na.rm = TRUE))
+
+
+ggplot(chl.all.results.mean, aes(x = depth.included, y = mean.sd, fill = lakeid, color = lakeid))+
+  geom_point(size = 5, pch = 21, color = "black")+
+  geom_borderline(size = 1, bordercolour = "black") +
+  theme_classic()+
+  scale_fill_manual(values = c("R"=  "#60BFCC", "L" = "#D9EEF3", "T"=  "#544C34"),
+                     labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday"))+
+  scale_color_manual(values = c("R"=  "#60BFCC", "L" = "#D9EEF3", "T"=  "#544C34"),
+                    labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday"))+
+  scale_x_continuous(breaks = 1:6, 
+                     labels = c("100", "50", "25", "10", "5", "1")) +
+  labs(x = "percent light", y = "mean standard deviation (ug/L)")+
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 14))
+
+
+
+#### individual replicate standard deviation calculation ####
+
+mean.chl = routines.chl %>% group_by(lakeid, depth_id) %>% 
+  summarize(chl.mean = mean(chla, na.rm = TRUE))
+
+ggplot(mean.chl, aes(x = chl.mean, y = depth_id, color = lakeid))+
+  geom_point(size = 3.5, pch = 21, color = "black", aes(fill = lakeid))+
+  geom_borderline(size = 1, bordercolour = "black")+
+  scale_fill_manual(values = c("R"=  "#60BFCC", "L" = "#D9EEF3", "T"=  "#544C34"),
+                    labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday"))+
+  scale_color_manual(values = c("R"=  "#60BFCC", "L" = "#D9EEF3", "T"=  "#544C34"),
+                     labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday"))+
+  scale_y_reverse(breaks = 1:6,
+                  labels = c("100", "50", "25", "10", "5", "1"))+
+  labs(y = "percent light", x = "mean chlorophyll (ug/L), 1984 to 2016")+
+  theme_bw()+
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 14))
+
 

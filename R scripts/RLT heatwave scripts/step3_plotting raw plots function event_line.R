@@ -1707,8 +1707,10 @@ r13percent_change = ggplot(data = r13, aes( x = doy, y = percent_change))+
 #            fill = "red", alpha = 0.5)
 
 
-png("./figures/manuscript draft 2024-11-11/methods figure 2024-11-11.png", height = 8, width = 8, units = "in", res = 300)
-print(ggarrange(nrow = 4, ncol = 3, l13temp, r13temp, t13temp, l13chl, r13chl,  t13chl, l13slope, r13slope, t13slope, l13percent_change, r13percent_change,  t13percent_change))
+png("./figures/revisions draft 2025-01-27/methods figure 2025-01-27.png", height = 8, width = 8, units = "in", res = 300)
+print(ggarrange(nrow = 4, ncol = 3, l13temp, r13temp, t13temp,
+                l13chl, r13chl,  t13chl, l13slope, r13slope, t13slope, 
+                l13percent_change, r13percent_change,  t13percent_change, align = "v"))
 dev.off()
 
 
