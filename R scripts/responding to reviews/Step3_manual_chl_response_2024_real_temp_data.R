@@ -1,3 +1,8 @@
+##### manual chlorophyll response if heatwaves are calculated just with normal temp data,
+# no modeling
+
+
+
 ### calculate chlorophyll results with different heatwaves and approaches
 
 # Re-run step 3 but with the manual chlorophyll data
@@ -137,366 +142,110 @@ metadata_plot <- ggplot() +
 #                           "L.all.other.days", "L.during.heatwave", "L.after.heatwave",
 #                           "T.all.other.days", "T.during.heatwave", "T.after.heatwave")
 # 
-for(percent in 85:99){
 
-#==============================================================================#
-#### read in the data ####
-# read in the heatwaves data calculated in the previous step
-# heatwaves = read.csv("./formatted data/heatwavesdata.csv")
-heatwaves = read.csv(paste("./results/heatwave modeled outputs/heatwave events LRT ", percent, " percent.csv", sep = ""))
-
-#permanent.heatwaves = heatwaves
-# read in the manual chl data
-allData = read.csv("./formatted data/interpolated_manual_chl_for_slopes.csv")
-
-# make a vector of unique lake years
-lake_years = unique(allData$lake_year)
-
-# 
-# L = 1
-# for(slopeLength in 3:8){
-#   for(daysAfter in -15:20){
-#     for(numSlopes in 1:10){
-#       for(relative.to.hw in rel.hw){
-#       
-# 
-#       looped.results$slopeLength[L] = slopeLength
-#       looped.results$daysAfter[L] = daysAfter
-#       looped.results$numSlopes[L] = numSlopes
-#       looped.results$orientation[L] = relative.to.hw
-# 
-
-#heatwaves = permanent.heatwaves
-
-
-#==============================================================================#
-#### CALCULATE SLOPES FOR CHLOROPHYLL ####
-
-# cycle through each lake year, fit linear models for each rolling window, then store model slopes
-# in the 'slopes' dataframe. Need to initially store the model results in a list
-
-# then, calculate the percent change in chlorophyll relative to the baseline specified above
-
-# Model results are the slopes, originally calculated based on the preceding 8 days
-
-for(i in 1:length(lake_years)){
   
-  temp = allData %>% filter(lake_year == lake_years[i]) # temp dataframe for this lake_year
+  #==============================================================================#
+  #### read in the data ####
+  # read in the heatwaves data calculated in the previous step
+  # heatwaves = read.csv("./formatted data/heatwavesdata.csv")
+  heatwaves = read.csv("./results/heatwave modeled outputs/heatwaves with actual temp data.csv")
   
-  models <- slide(
-    temp, 
-    ~lm(mean_chl ~ doyCat, data = .x), 
-    .before = slopeLength -1, # add the minus one so the slopeLength matches the user input
-    .complete = TRUE
-  )
+  #permanent.heatwaves = heatwaves
+  # read in the manual chl data
+  allData = read.csv("./formatted data/interpolated_manual_chl_for_slopes.csv")
   
-  temp$chl_slope = NA
-  temp$chl_intercept = NA
-  temp$se = NA
-  temp$p_value = NA
-  temp$r_squared = NA
+  # make a vector of unique lake years
+  lake_years = unique(allData$lake_year)
   
-  for(j in 1:nrow(temp)){
+  # 
+  # L = 1
+  # for(slopeLength in 3:8){
+  #   for(daysAfter in -15:20){
+  #     for(numSlopes in 1:10){
+  #       for(relative.to.hw in rel.hw){
+  #       
+  # 
+  #       looped.results$slopeLength[L] = slopeLength
+  #       looped.results$daysAfter[L] = daysAfter
+  #       looped.results$numSlopes[L] = numSlopes
+  #       looped.results$orientation[L] = relative.to.hw
+  # 
+  
+  #heatwaves = permanent.heatwaves
+  
+  
+  #==============================================================================#
+  #### CALCULATE SLOPES FOR CHLOROPHYLL ####
+  
+  # cycle through each lake year, fit linear models for each rolling window, then store model slopes
+  # in the 'slopes' dataframe. Need to initially store the model results in a list
+  
+  # then, calculate the percent change in chlorophyll relative to the baseline specified above
+  
+  # Model results are the slopes, originally calculated based on the preceding 8 days
+  
+  for(i in 1:length(lake_years)){
     
-    model = models[[j]]
-    coef <- coefficients(model) 
-    # extracting the coefficients from the current model
+    temp = allData %>% filter(lake_year == lake_years[i]) # temp dataframe for this lake_year
     
-    if(!(is.null(coef))){
-      Slope <- coef["doyCat"]
-      Intercept <- coef["(Intercept)"]
-      temp$chl_intercept[j] = Intercept
-      temp$chl_slope[j] = Slope # pull out the slope from the model
-      temp$p_value[j] = summary(model)$coefficients[2,4] 
-      temp$se[j] = summary(model)$coefficients["doyCat", "Std. Error"] 
-      temp$r_squared[j] = summary(model)$r.squared # pull out r_squared from model
+    models <- slide(
+      temp, 
+      ~lm(mean_chl ~ doyCat, data = .x), 
+      .before = slopeLength -1, # add the minus one so the slopeLength matches the user input
+      .complete = TRUE
+    )
+    
+    temp$chl_slope = NA
+    temp$chl_intercept = NA
+    temp$se = NA
+    temp$p_value = NA
+    temp$r_squared = NA
+    
+    for(j in 1:nrow(temp)){
+      
+      model = models[[j]]
+      coef <- coefficients(model) 
+      # extracting the coefficients from the current model
+      
+      if(!(is.null(coef))){
+        Slope <- coef["doyCat"]
+        Intercept <- coef["(Intercept)"]
+        temp$chl_intercept[j] = Intercept
+        temp$chl_slope[j] = Slope # pull out the slope from the model
+        temp$p_value[j] = summary(model)$coefficients[2,4] 
+        temp$se[j] = summary(model)$coefficients["doyCat", "Std. Error"] 
+        temp$r_squared[j] = summary(model)$r.squared # pull out r_squared from model
+      }
+      
+      temp$absolute_change = temp$chl_slope*slopeLength
+      temp$percent_change = 100*temp$chl_slope*slopeLength/lag(temp$mean_chl, slopeLength-1, default = NA)
+      temp$chl_baseline = lag(temp$mean_chl, slopeLength-1, default = NA)
+      temp$se.percent = 100*temp$se*slopeLength/lag(temp$mean_chl, slopeLength-1, default = NA)
     }
     
-    temp$absolute_change = temp$chl_slope*slopeLength
-    temp$percent_change = 100*temp$chl_slope*slopeLength/lag(temp$mean_chl, slopeLength-1, default = NA)
-    temp$chl_baseline = lag(temp$mean_chl, slopeLength-1, default = NA)
-    temp$se.percent = 100*temp$se*slopeLength/lag(temp$mean_chl, slopeLength-1, default = NA)
-  }
-  
-  if(i ==1){ slopes = temp} # if first iteration, creates slopes, the final dataframe
-  
-  if(i >1){slopes = rbind(slopes, temp)} # else, appends to slopes 
-  
-}
-
-
-# test case to make sure the slide function works as we think it does
-# test = slopes[1:7, ]
-# summary(lm(test$mean_chl~test$doyCat))
-# 
-
-#==============================================================================#
-# add heatwave information to the slopes dataframe
-# the goal is to have the event_no of each heatwave listed just where the slopes
-# include data from during the heatwave
-# this will help us exclude data from analysis of one heatwave that is from a subsequent event
-
-# the default event code will be -100
-
-slopes = slopes %>% mutate(event_code = -100)
-heatwaves = heatwaves %>% mutate(date_start = as.Date(date_start), date_end = as.Date(date_end))
-
-for(i in 1:nrow(heatwaves)){
-  
-  start = heatwaves$date_start[i] # start date of the current heatwave
-  end = heatwaves$date_end[i] # end date of the current heatwave
-  event = heatwaves$event_no[i]
-  
-  # current lake of the heatwave
-  hw.lake = heatwaves$lake[i]
-  
-  # sequence of dates during the heatwave
-  dates = seq(start, end+slopeLength-1, 1)
-  
-  #print(dates)
-  
-  slopes = slopes %>% mutate(event_code = replace(event_code, date %in% dates, event))
-  
-  
-}
-
-#==============================================================================#
-#### SELECT SLOPES IN SPECIFIED WINDOW ####
-# currently, the slopes dataframe has daily rolling window slopes for all of the lake_year combinations
-# Need to select the slopes just following a heatwave
-# heatwave is the date of a heatwave, targLake is the lake, data is our dataset of all the calculated slopes
-
-hwSlopes <- function(heatwaveStart, heatwaveEnd,  targLake, data){
-  
-  if(targLake == "T"){
-    if(relative.to.hw == "end"){
-      startDate = as.Date(heatwaveEnd)+daysAfterT 
-      endDate = as.Date(heatwaveEnd)+daysAfterT+numSlopes-1
-    }
+    if(i ==1){ slopes = temp} # if first iteration, creates slopes, the final dataframe
     
-    if(relative.to.hw == "start"){
-      startDate = as.Date(heatwaveStart)+daysAfterT 
-      endDate = as.Date(heatwaveStart)+daysAfterT+numSlopes-1
-    }
+    if(i >1){slopes = rbind(slopes, temp)} # else, appends to slopes 
     
   }
-  if(targLake != "T"){
-    
-    if(relative.to.hw == "end"){
-      startDate = as.Date(heatwaveEnd)+daysAfter 
-      endDate = as.Date(heatwaveEnd)+daysAfter+numSlopes-1
-    }
-    
-    if(relative.to.hw == "start"){
-      startDate = as.Date(heatwaveStart)+daysAfter 
-      endDate = as.Date(heatwaveStart)+daysAfter+numSlopes-1
-    }
-  }
-  
-  # filter out the slopes we are interested in
-  selected.slopes = data %>% filter(lake == targLake, date >= startDate, date <= endDate)
-  
-}
-
-
-# ==============================================================================#
-#### CALCULATE AVG CHL SLOPES FOLLOWING HEATWAVES ####
-heatwaves$averageSlope = NA
-heatwaves$intercept = NA
-heatwaves$SE = NA
-heatwaves$SE.percent = NA
-heatwaves$absoluteChange = NA
-heatwaves$percentChange = NA
-heatwaves$sdSlope = NA
-heatwaves$sdSlopePercent = NA
-heatwaves$medianSlopePercent = NA
-heatwaves$num.slopes.included = NA
-
-
-#Using a For Loop
-lengthHW = nrow(heatwaves)
-
-# take the average slope and calculate the percent change in chlorophyll based on the slope
-
-for(i in 1:lengthHW){
-  slopes.subset = hwSlopes(heatwaves$date_start[i], heatwaves$date_end[i], heatwaves$lake[i], slopes)
-  
-  # save the mean of the slopes to the heatwaves dataframe
-  heatwaves$averageSlope[i] = mean(slopes.subset$chl_slope, na.rm = TRUE)
-  
-  heatwaves$absoluteChange[i] = mean(slopes.subset$absolute_change, na.rm = TRUE)
-  
-  heatwaves$intercept[i] = mean(slopes.subset$chl_intercept, na.rm = TRUE)
-  
-  heatwaves$SE[i] = mean(slopes.subset$se, na.rm = TRUE)
-  
-  heatwaves$SE.percent[i] = mean(slopes.subset$se.percent, na.rm = TRUE)
-  
-  # save the standard deviation of the slopes to the heatwaves dataframe
-  heatwaves$sdSlope[i] = sd(slopes.subset$chl_slope, na.rm = TRUE)
-  
-  # save the mean of the percent change to the heatwaves dataframe
-  heatwaves$percentChange[i] = mean(slopes.subset$percent_change, na.rm = TRUE)
-  
-  # save the standard deviation of the percent changes to the heatwaves dataframe
-  heatwaves$sdSlopePercent[i] = sd(slopes.subset$percent_change, na.rm = TRUE)
-  
-  # save the median of the percent changes to the heatwaves dataframe
-  heatwaves$medianSlopePercent[i] = median(slopes.subset$percent_change, na.rm = TRUE)
-  
-  # save the number of slopes averaged to the heatwaves dataframe
-  heatwaves$num.slopes.included[i] = nrow(slopes.subset)
   
   
-  # save the slopes dataframe
-  if(i == 1 & nrow(slopes.subset)> 0){
-    slopes.of.interest = slopes.subset
-  }
-  if(i > 1 & nrow(slopes.subset)> 0){
-    slopes.of.interest = rbind(slopes.of.interest, slopes.subset)
-  }
+  # test case to make sure the slide function works as we think it does
+  # test = slopes[1:7, ]
+  # summary(lm(test$mean_chl~test$doyCat))
+  # 
   
-}
-
-# save the static results
-#write.csv(heatwaves, "./results/heatwaves_with_average_slopes_MANUAL_CHL.csv", row.names = FALSE)
-
-###### CATEGORIZE SLOPES BY NUTRIENT ADDITION STATUS ########
-
-# create a nutrient addition column
-slopes.of.interest = slopes.of.interest %>% mutate(nutrient.addition = "no nutrients added")
-
-slopes.of.interest = slopes.of.interest %>% 
-  mutate(nutrient.addition = 
-           replace(nutrient.addition, year == 2013 & (lake == "R" | lake == "T") & doyCat >= 154, "nutrients added")) %>% 
-  mutate(nutrient.addition = 
-           replace(nutrient.addition, year == 2014 & (lake == "R" | lake == "T") & doyCat >= 153, "nutrients added")) %>% 
-  mutate(nutrient.addition = 
-           replace(nutrient.addition, year == 2015 & (lake == "R" | lake == "T") & doyCat >= 152, "nutrients added")) %>% 
-  mutate(nutrient.addition = 
-           replace(nutrient.addition, year == 2013 & (lake == "R") & doyCat >= 161, "nutrients added"))
-
-
-ggplot(slopes.of.interest, aes(x = nutrient.addition, y = percent_change, fill = nutrient.addition))+
-  geom_boxplot()+
-  theme_classic()+
-  labs(x = "", y = "percent change in chlorophyll")+
-  stat_compare_means(method = "t.test")+
-  theme(legend.position = "none")+
-  scale_fill_manual(values = c("no nutrients added" = "blue", "nutrients added" = "green"))
-
-
-
-
-#   # nut.load <- nut.load %>%
-# mutate(daily.load = case_when(
-#   year == 2013 & (lake == "R" | lake == "T") & doy >= 154 ~ 0.5 + 0.3125 * ((doy - 154) %/% 7),
-#   year == 2013 & (lake == "R" | lake == "T") & doy < 154 ~ 0,
-#   year == 2013 & (lake == "R" | lake == "T") & doy > 203 ~ 0.5 + 0.625 * ((doy - 203) %/% 7),
-#   (lake == "R" | lake == "T") & year == 2014 & doy >= 153 & doy <= 241 ~ 3,
-#   (lake == "R") & year == 2015 & doy >= 152 & doy <= 180 ~ 3,
-#   (lake == "T") & year == 2015 & doy >= 152 & doy <= 240 ~ 3,
-#   (lake == "R") & year == 2019 & doy >= 161 & doy <= 237 ~ calculate_daily_load_2019(doy),
-#   TRUE ~ daily.load
-# ))
-
-#slopes.of.interest %>% group_by(lake) %>%  summarize(median(percent_change, na.rm = TRUE))
-
-#==============================================================================#
-#### PLOT AVG SLOPES ####
-#results = read.csv("./results/heatwaves_with_average_slopes_MANUAL_CHL.csv")
-
-results = heatwaves
-
-#break up by lake by filtering data
-resultsT = results %>% filter(lake == "T")
-resultsL = results %>% filter(lake == "L")
-resultsR = results %>% filter(lake == "R")
-
-# make sure heatwaves date is a date
-heatwaves = heatwaves %>% mutate(date_start = as.Date(date_start))
-
-
-
-
-#png(filename = "./figures/preliminary figures/R_slopes_2023_02_09", height = 8, width = 11, units = "in", res = 300)
-
-indHWResp <- ggplot(data = results, aes(x = as.character(date_start), y = percentChange, fill = lake))+
-  geom_bar(stat = "identity", position = "identity", alpha = 0.5, color = "black")+
-  theme_classic()+
-  ylab("percent change in chl")+
-  xlab("start date of heatwave")+
-  ggtitle("Average chl percent change by event")+
-  scale_fill_manual(values = c("R"=  "#60BFCC", "L" = "#D9EEF3", "T"=  "#544C34"))+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  annotate("text",  x=Inf, y = Inf, label = paste("Days after heatwave: ", daysAfter, sep = ""), vjust=1, hjust=1)+
-  annotate("text",  x=Inf, y = Inf, label = paste("Number of slopes averaged per event: ", numSlopes, sep = ""), vjust=2.5, hjust=1)
-
-
-#write.csv(heatwaves, "./formatted data/explanatory variables heatwaves/heatwaves with percent.csv")
-
-
-
-
-
-#==============================================================================#
-#### COMPARE DISTRIBUTIONS OVER TIME ####
-
-# We might also consider the distributions of chlorophyll slopes following a heatwave,
-# rather than just taking the average for a certain window
-
-# make sure heatwaves date_start and date_end are formatted as dates
-heatwaves$date_end = as.Date(heatwaves$date_end)
-heatwaves$date_start = as.Date(heatwaves$date_start)
-slopes$date = as.Date(slopes$date)
-slopes$period = "all other days"
-
-# write slopes to a file
-#write.csv(slopes, "./formatted data/slopes_3day.csv", row.names = FALSE)
-
-### This creates a dataframe, all slopes, that has the slopes categorized
-# by their time period (during or after a heatwave, or all other days)
-# and includes the number of days after the heatwave event (daysAfterLoop) that is considered
-# one column, "exclude after heatwaves," are slopes within 40 days after a heatwave
-# that are not in the current rolling window
-
-
-# need to add dates.to.exclude to slopes
-
-# update to better categorize slopes
-# and exclucde from analysis non-target slopes
-
-slopes$period = "all other days"
-
-for(i in 1:nrow(heatwaves)){
+  #==============================================================================#
+  # add heatwave information to the slopes dataframe
+  # the goal is to have the event_no of each heatwave listed just where the slopes
+  # include data from during the heatwave
+  # this will help us exclude data from analysis of one heatwave that is from a subsequent event
   
+  # the default event code will be -100
   
-  start = heatwaves$date_start[i] # start date of the current heatwave
-  end = heatwaves$date_end[i] # end date of the current heatwave
+  slopes = slopes %>% mutate(event_code = -100)
+  heatwaves = heatwaves %>% mutate(date_start = as.Date(date_start), date_end = as.Date(date_end))
   
-  # current lake of the heatwave
-  hw.lake = heatwaves$lake[i]
-  hw.year = heatwaves$year[i]
-  
-  # create 
-  dates.to.exclude = seq(start, end+8-1, 1)
-  
-  slopes = slopes %>% mutate(period = replace(period, date %in% dates.to.exclude & lake == hw.lake, "exclude after heatwave"))
-  
-  
-}
-
-slopes.periods = slopes$period
-
-# test case for -15
-daysAfterLoop = -15
-
-for(daysAfterLoop in -16:20){
-  
-  slopes$period = slopes.periods
-  slopes$numSlopes = numSlopes
-  
-  # add a column to slopes which indicates whether or not there is a heatwave
   for(i in 1:nrow(heatwaves)){
     
     start = heatwaves$date_start[i] # start date of the current heatwave
@@ -505,447 +254,645 @@ for(daysAfterLoop in -16:20){
     
     # current lake of the heatwave
     hw.lake = heatwaves$lake[i]
-    hw.year = heatwaves$year[i]
     
     # sequence of dates during the heatwave
-    dates = seq(start, end, 1)
+    dates = seq(start, end+slopeLength-1, 1)
     
-    dates.to.exclude = seq(start, end+8, 1)
+    #print(dates)
+    
+    slopes = slopes %>% mutate(event_code = replace(event_code, date %in% dates, event))
     
     
-    # numSlopes = length(dates)-3
+  }
+  
+  #==============================================================================#
+  #### SELECT SLOPES IN SPECIFIED WINDOW ####
+  # currently, the slopes dataframe has daily rolling window slopes for all of the lake_year combinations
+  # Need to select the slopes just following a heatwave
+  # heatwave is the date of a heatwave, targLake is the lake, data is our dataset of all the calculated slopes
+  
+  hwSlopes <- function(heatwaveStart, heatwaveEnd,  targLake, data){
     
-    # excludes dates that are part of rolling window but not currently considered in after heatwave
-    # after heatwave because of our current daysAfterLoop selection.
-    # This gets overwritten in part by "after heatwave" for those dates that are included
-    # in analysis
-    #datesExcluded = seq(end -14, end + 40, 1) 
-    
-    # dates to be analyzed after the heatwaves
-    # this creates a sequence of numbers, from the end of the heatwave plus whatever
-    # daysAfterLoop is set to, to that same value plus the numSlopes. So it sets a window daysAfterLooped
-    # X number of days after the heatwave
-    
-    if(relative.to.hw == "end"){
+    if(targLake == "T"){
+      if(relative.to.hw == "end"){
+        startDate = as.Date(heatwaveEnd)+daysAfterT 
+        endDate = as.Date(heatwaveEnd)+daysAfterT+numSlopes-1
+      }
       
-      datesAnalyzed = seq(end+daysAfterLoop,  end + daysAfterLoop+numSlopes-1, 1)
+      if(relative.to.hw == "start"){
+        startDate = as.Date(heatwaveStart)+daysAfterT 
+        endDate = as.Date(heatwaveStart)+daysAfterT+numSlopes-1
+      }
+      
+    }
+    if(targLake != "T"){
+      
+      if(relative.to.hw == "end"){
+        startDate = as.Date(heatwaveEnd)+daysAfter 
+        endDate = as.Date(heatwaveEnd)+daysAfter+numSlopes-1
+      }
+      
+      if(relative.to.hw == "start"){
+        startDate = as.Date(heatwaveStart)+daysAfter 
+        endDate = as.Date(heatwaveStart)+daysAfter+numSlopes-1
+      }
+    }
+    
+    # filter out the slopes we are interested in
+    selected.slopes = data %>% filter(lake == targLake, date >= startDate, date <= endDate)
+    
+  }
+  
+  
+  # ==============================================================================#
+  #### CALCULATE AVG CHL SLOPES FOLLOWING HEATWAVES ####
+  heatwaves$averageSlope = NA
+  heatwaves$intercept = NA
+  heatwaves$SE = NA
+  heatwaves$SE.percent = NA
+  heatwaves$absoluteChange = NA
+  heatwaves$percentChange = NA
+  heatwaves$sdSlope = NA
+  heatwaves$sdSlopePercent = NA
+  heatwaves$medianSlopePercent = NA
+  heatwaves$num.slopes.included = NA
+  
+  
+  #Using a For Loop
+  lengthHW = nrow(heatwaves)
+  
+  # take the average slope and calculate the percent change in chlorophyll based on the slope
+  
+  for(i in 1:lengthHW){
+    slopes.subset = hwSlopes(heatwaves$date_start[i], heatwaves$date_end[i], heatwaves$lake[i], slopes)
+    
+    # save the mean of the slopes to the heatwaves dataframe
+    heatwaves$averageSlope[i] = mean(slopes.subset$chl_slope, na.rm = TRUE)
+    
+    heatwaves$absoluteChange[i] = mean(slopes.subset$absolute_change, na.rm = TRUE)
+    
+    heatwaves$intercept[i] = mean(slopes.subset$chl_intercept, na.rm = TRUE)
+    
+    heatwaves$SE[i] = mean(slopes.subset$se, na.rm = TRUE)
+    
+    heatwaves$SE.percent[i] = mean(slopes.subset$se.percent, na.rm = TRUE)
+    
+    # save the standard deviation of the slopes to the heatwaves dataframe
+    heatwaves$sdSlope[i] = sd(slopes.subset$chl_slope, na.rm = TRUE)
+    
+    # save the mean of the percent change to the heatwaves dataframe
+    heatwaves$percentChange[i] = mean(slopes.subset$percent_change, na.rm = TRUE)
+    
+    # save the standard deviation of the percent changes to the heatwaves dataframe
+    heatwaves$sdSlopePercent[i] = sd(slopes.subset$percent_change, na.rm = TRUE)
+    
+    # save the median of the percent changes to the heatwaves dataframe
+    heatwaves$medianSlopePercent[i] = median(slopes.subset$percent_change, na.rm = TRUE)
+    
+    # save the number of slopes averaged to the heatwaves dataframe
+    heatwaves$num.slopes.included[i] = nrow(slopes.subset)
+    
+    
+    # save the slopes dataframe
+    if(i == 1 & nrow(slopes.subset)> 0){
+      slopes.of.interest = slopes.subset
+    }
+    if(i > 1 & nrow(slopes.subset)> 0){
+      slopes.of.interest = rbind(slopes.of.interest, slopes.subset)
+    }
+    
+  }
+  
+  # save the static results
+  #write.csv(heatwaves, "./results/heatwaves_with_average_slopes_MANUAL_CHL.csv", row.names = FALSE)
+  
+  ###### CATEGORIZE SLOPES BY NUTRIENT ADDITION STATUS ########
+  
+  # create a nutrient addition column
+  slopes.of.interest = slopes.of.interest %>% mutate(nutrient.addition = "no nutrients added")
+  
+  slopes.of.interest = slopes.of.interest %>% 
+    mutate(nutrient.addition = 
+             replace(nutrient.addition, year == 2013 & (lake == "R" | lake == "T") & doyCat >= 154, "nutrients added")) %>% 
+    mutate(nutrient.addition = 
+             replace(nutrient.addition, year == 2014 & (lake == "R" | lake == "T") & doyCat >= 153, "nutrients added")) %>% 
+    mutate(nutrient.addition = 
+             replace(nutrient.addition, year == 2015 & (lake == "R" | lake == "T") & doyCat >= 152, "nutrients added")) %>% 
+    mutate(nutrient.addition = 
+             replace(nutrient.addition, year == 2013 & (lake == "R") & doyCat >= 161, "nutrients added"))
+  
+  
+  ggplot(slopes.of.interest, aes(x = nutrient.addition, y = percent_change, fill = nutrient.addition))+
+    geom_boxplot()+
+    theme_classic()+
+    labs(x = "", y = "percent change in chlorophyll")+
+    stat_compare_means(method = "t.test")+
+    theme(legend.position = "none")+
+    scale_fill_manual(values = c("no nutrients added" = "blue", "nutrients added" = "green"))
+  
+  
+  
+  
+  #   # nut.load <- nut.load %>%
+  # mutate(daily.load = case_when(
+  #   year == 2013 & (lake == "R" | lake == "T") & doy >= 154 ~ 0.5 + 0.3125 * ((doy - 154) %/% 7),
+  #   year == 2013 & (lake == "R" | lake == "T") & doy < 154 ~ 0,
+  #   year == 2013 & (lake == "R" | lake == "T") & doy > 203 ~ 0.5 + 0.625 * ((doy - 203) %/% 7),
+  #   (lake == "R" | lake == "T") & year == 2014 & doy >= 153 & doy <= 241 ~ 3,
+  #   (lake == "R") & year == 2015 & doy >= 152 & doy <= 180 ~ 3,
+  #   (lake == "T") & year == 2015 & doy >= 152 & doy <= 240 ~ 3,
+  #   (lake == "R") & year == 2019 & doy >= 161 & doy <= 237 ~ calculate_daily_load_2019(doy),
+  #   TRUE ~ daily.load
+  # ))
+  
+  #slopes.of.interest %>% group_by(lake) %>%  summarize(median(percent_change, na.rm = TRUE))
+  
+  #==============================================================================#
+  #### PLOT AVG SLOPES ####
+  #results = read.csv("./results/heatwaves_with_average_slopes_MANUAL_CHL.csv")
+  
+  results = heatwaves
+  
+  #break up by lake by filtering data
+  resultsT = results %>% filter(lake == "T")
+  resultsL = results %>% filter(lake == "L")
+  resultsR = results %>% filter(lake == "R")
+  
+  # make sure heatwaves date is a date
+  heatwaves = heatwaves %>% mutate(date_start = as.Date(date_start))
+  
+  
+  
+  
+  #png(filename = "./figures/preliminary figures/R_slopes_2023_02_09", height = 8, width = 11, units = "in", res = 300)
+  
+  indHWResp <- ggplot(data = results, aes(x = as.character(date_start), y = percentChange, fill = lake))+
+    geom_bar(stat = "identity", position = "identity", alpha = 0.5, color = "black")+
+    theme_classic()+
+    ylab("percent change in chl")+
+    xlab("start date of heatwave")+
+    ggtitle("Average chl percent change by event")+
+    scale_fill_manual(values = c("R"=  "#60BFCC", "L" = "#D9EEF3", "T"=  "#544C34"))+
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+    annotate("text",  x=Inf, y = Inf, label = paste("Days after heatwave: ", daysAfter, sep = ""), vjust=1, hjust=1)+
+    annotate("text",  x=Inf, y = Inf, label = paste("Number of slopes averaged per event: ", numSlopes, sep = ""), vjust=2.5, hjust=1)
+  
+  
+  #write.csv(heatwaves, "./formatted data/explanatory variables heatwaves/heatwaves with percent.csv")
+  
+  
+  
+  
+  
+  #==============================================================================#
+  #### COMPARE DISTRIBUTIONS OVER TIME ####
+  
+  # We might also consider the distributions of chlorophyll slopes following a heatwave,
+  # rather than just taking the average for a certain window
+  
+  # make sure heatwaves date_start and date_end are formatted as dates
+  heatwaves$date_end = as.Date(heatwaves$date_end)
+  heatwaves$date_start = as.Date(heatwaves$date_start)
+  slopes$date = as.Date(slopes$date)
+  slopes$period = "all other days"
+  
+  # write slopes to a file
+  #write.csv(slopes, "./formatted data/slopes_3day.csv", row.names = FALSE)
+  
+  ### This creates a dataframe, all slopes, that has the slopes categorized
+  # by their time period (during or after a heatwave, or all other days)
+  # and includes the number of days after the heatwave event (daysAfterLoop) that is considered
+  # one column, "exclude after heatwaves," are slopes within 40 days after a heatwave
+  # that are not in the current rolling window
+  
+  
+  # need to add dates.to.exclude to slopes
+  
+  # update to better categorize slopes
+  # and exclucde from analysis non-target slopes
+  
+  slopes$period = "all other days"
+  
+  for(i in 1:nrow(heatwaves)){
+    
+    
+    start = heatwaves$date_start[i] # start date of the current heatwave
+    end = heatwaves$date_end[i] # end date of the current heatwave
+    
+    # current lake of the heatwave
+    hw.lake = heatwaves$lake[i]
+    hw.year = heatwaves$year[i]
+    
+    # create 
+    dates.to.exclude = seq(start, end+8-1, 1)
+    
+    slopes = slopes %>% mutate(period = replace(period, date %in% dates.to.exclude & lake == hw.lake, "exclude after heatwave"))
+    
+    
+  }
+  
+  slopes.periods = slopes$period
+  
+  # test case for -15
+  daysAfterLoop = -15
+  
+  for(daysAfterLoop in -16:20){
+    
+    slopes$period = slopes.periods
+    slopes$numSlopes = numSlopes
+    
+    # add a column to slopes which indicates whether or not there is a heatwave
+    for(i in 1:nrow(heatwaves)){
+      
+      start = heatwaves$date_start[i] # start date of the current heatwave
+      end = heatwaves$date_end[i] # end date of the current heatwave
+      event = heatwaves$event_no[i]
+      
+      # current lake of the heatwave
+      hw.lake = heatwaves$lake[i]
+      hw.year = heatwaves$year[i]
+      
+      # sequence of dates during the heatwave
+      dates = seq(start, end, 1)
+      
+      dates.to.exclude = seq(start, end+8, 1)
+      
+      
+      # numSlopes = length(dates)-3
+      
+      # excludes dates that are part of rolling window but not currently considered in after heatwave
+      # after heatwave because of our current daysAfterLoop selection.
+      # This gets overwritten in part by "after heatwave" for those dates that are included
+      # in analysis
+      #datesExcluded = seq(end -14, end + 40, 1) 
+      
+      # dates to be analyzed after the heatwaves
+      # this creates a sequence of numbers, from the end of the heatwave plus whatever
+      # daysAfterLoop is set to, to that same value plus the numSlopes. So it sets a window daysAfterLooped
+      # X number of days after the heatwave
+      
+      if(relative.to.hw == "end"){
+        
+        datesAnalyzed = seq(end+daysAfterLoop,  end + daysAfterLoop+numSlopes-1, 1)
+        
+      }
+      
+      if(relative.to.hw == "start"){
+        
+        datesAnalyzed = seq(start+daysAfterLoop,  start + daysAfterLoop+numSlopes-1, 1)
+        
+      }
+      
+      # fill the dataframe "period" column with the correct categorization
+      
+      # fill the dataframe "period" column with the correct categorization
+      slopes = slopes %>% mutate(period = replace(period, date %in% datesAnalyzed & lake == hw.lake, "after heatwave"))
+      # slopes = slopes %>% mutate(period = replace(period, date %in% dates & lake == hw.lake, "during heatwave"))
+      # slopes = slopes %>% mutate(period = replace(period, event_code != -100 & event_code != event & lake == hw.lake, "exclude after heatwave"))
+      
+      slopes$daysAfter = daysAfterLoop
+      
+      # combine to the main dataframe
+      if(daysAfterLoop == -16 & i == 1){
+        slopes$event_no = heatwaves$event_no[i]
+        allSlopes = slopes %>% filter(lake == hw.lake & year == hw.year)
+      }
+      if(daysAfterLoop != -16 | i != 1){
+        slopes$event_no = heatwaves$event_no[i]
+        allSlopes = rbind(allSlopes, slopes %>% filter(lake == hw.lake & year == hw.year))
+      }
+      
+      print(daysAfterLoop)
+      print(i)
       
     }
     
-    if(relative.to.hw == "start"){
-      
-      datesAnalyzed = seq(start+daysAfterLoop,  start + daysAfterLoop+numSlopes-1, 1)
-      
-    }
     
-    # fill the dataframe "period" column with the correct categorization
-    
-    # fill the dataframe "period" column with the correct categorization
-    slopes = slopes %>% mutate(period = replace(period, date %in% datesAnalyzed & lake == hw.lake, "after heatwave"))
-    # slopes = slopes %>% mutate(period = replace(period, date %in% dates & lake == hw.lake, "during heatwave"))
-    # slopes = slopes %>% mutate(period = replace(period, event_code != -100 & event_code != event & lake == hw.lake, "exclude after heatwave"))
-    
-    slopes$daysAfter = daysAfterLoop
-    
-    # combine to the main dataframe
-    if(daysAfterLoop == -16 & i == 1){
-      slopes$event_no = heatwaves$event_no[i]
-      allSlopes = slopes %>% filter(lake == hw.lake & year == hw.year)
-    }
-    if(daysAfterLoop != -16 | i != 1){
-      slopes$event_no = heatwaves$event_no[i]
-      allSlopes = rbind(allSlopes, slopes %>% filter(lake == hw.lake & year == hw.year))
-    }
-    
-    print(daysAfterLoop)
-    print(i)
     
   }
   
   
   
-}
+  
+  
+  
+  # write.csv(allSlopes, "./R scripts/RLT heatwave scripts/bar chart shiny app/slopes.csv")
+  
+  #allSlopes.after = allSlopes %>% filter(period == "after heatwave")
+  
+  
+  # update so that we are not excluding other dates after the heatwave
+  # allSlopes = allSlopes %>% mutate(period = replace(period, period == "exclude after heatwave", "all other days"))
+  #mutate(period = replace(period, period == "during heatwave", "all other days"))
+  
+  
+  # save the allPercent data to a dataframe
+  # save interpolated allData data to a dataframe
+  
+  # write.csv(allData, "./formatted data/allData_interpolated.csv", row.names = FALSE)
+  # write.csv(allPercent, "./formatted data/results_random_and_heatwaves.csv")
+  
+  # calculate mean values by period and daysAfter
+  # across all lakes, this will give the mean slope following all heatwave events
+  # by time period
+  
+  mean_df <- allSlopes %>% 
+    filter(period != "exclude after heatwave", !is.na(percent_change)) %>% 
+    group_by(period, daysAfter) %>% 
+    dplyr::summarise(mean_percent_change = mean(percent_change), n.included = n()) 
+  
+  # round mean values to one decimal place
+  mean_df$mean_percent_change <- round(mean_df$mean_percent_change, 1)
+  
+  allSlopes = allSlopes %>% select(-event_no)
+  
+  allSlopes = allSlopes %>% distinct()
+  
+  # # clean to get rid of pseudoreplication
+  # collapsed_all_other_days <- allSlopes %>%
+  #   filter(period == "all other days") %>%
+  #   group_by(across(-c(daysAfter))) %>%
+  #   summarise(dayAfter = first(daysAfter), event_no = first(event_no), .groups = "drop")
+  # 
+  # # Keep rows where period is not "all other days"
+  # other_periods <- allSlopes %>%
+  #   filter(period != "all other days")
+  # 
+  # # Combine the two parts back together
+  # allSlopes_cleaned <- bind_rows(other_periods, collapsed_all_other_days)
+  # 
+  # # View the cleaned dataframe
+  # head(allSlopes_cleaned)
+  # 
+  # allSlopes = allSlopes_cleaned
+  
+  #==============================================================================#
+  #### RESPONSE TIMING LINE PLOTS ####
+  
+  # track down which of the heatwaves is not included when aggregated
+  test = allSlopes %>% filter(daysAfter == 3 & period == "after heatwave")
+  test.0 = allSlopes %>% filter(daysAfter == 0 & period == "after heatwave")
+  
+  test = test %>% mutate(unique.id = paste(lake, year, as.Date(doyCat - 1, origin = paste0(year, "-01-01"))))
+  test.0 = test.0 %>%  mutate(unique.id = paste(lake, year, as.Date(doyCat +2, origin = paste0(year, "-01-01"))))
+  
+  test.id = unique(test$unique.id)
+  test0.id = unique(test.0$unique.id)
+  
+  which(!(test0.id %in% test.id))
+  
+  test0.id[which(!(test0.id %in% test.id))]
+  
+  slopes13 = slopes %>% filter(year == 2013)
+  # the last day of year in 2013 is 244. So why does the individual response work?
+  
+  # calculate mean values of percent change for each lake by # of days after heatwave
+  mean_df <- allSlopes %>%  #filter(year %in% c(2008, 2009, 2010, 2011)) %>% 
+    filter( period != "exclude after heatwave", !is.na(percent_change)) %>% 
+    group_by(period, daysAfter) %>% 
+    dplyr::summarise(mean_percent_change = mean(percent_change), 
+                     sd_percent_change = sd(percent_change), 
+                     number_percent_change = n(),
+                     median_percent_change = median(percent_change, na.rm = TRUE)) 
+  
+  # Peter
+  mean_dfR = allSlopes %>% filter(lake == "R") %>%  
+    filter(period != "exclude after heatwave", !is.na(percent_change)) %>% 
+    group_by(period, daysAfter) %>% 
+    dplyr::summarise(mean_percent_change = mean(percent_change), 
+                     sd_percent_change = sd(percent_change), 
+                     number_percent_change = n(),
+                     median_percent_change = median(percent_change, na.rm = TRUE) )
+  
+  # Paul
+  mean_dfL <- allSlopes %>% filter(lake == "L") %>%  #filter(year %in% c(2008, 2009, 2010, 2011)) %>% 
+    filter( period != "exclude after heatwave", !is.na(percent_change)) %>% 
+    group_by(period, daysAfter) %>% 
+    dplyr::summarise(mean_percent_change = mean(percent_change), 
+                     sd_percent_change = sd(percent_change), 
+                     number_percent_change = n(),
+                     median_percent_change = median(percent_change, na.rm = TRUE)) 
+  
+  # Tuesday
+  mean_dfT <- allSlopes %>% filter(lake == "T") %>% # filter(year %in% c(2008, 2009, 2010, 2011)) %>% 
+    filter( period != "exclude after heatwave", !is.na(percent_change)) %>% 
+    group_by(period, daysAfter) %>% 
+    dplyr::summarise(mean_percent_change = mean(percent_change), 
+                     sd_percent_change = sd(percent_change), 
+                     number_percent_change = n(),
+                     median_percent_change = median(percent_change, na.rm = TRUE)) 
+  
+  
+  
+  
+  ### version with distinct rows only used to calculate means ###
+  # mean_dfL <- allSlopes %>%
+  #   filter(lake == "L") %>%
+  #   filter(period != "exclude after heatwave", !is.na(percent_change)) %>%
+  #   group_by(period, daysAfter) %>%
+  #   summarise(
+  #     mean_percent_change = mean(distinct(across(-c(daysAfter, event_no)))$percent_change, na.rm = TRUE),
+  #     sd_percent_change = sd(distinct(across(-c(daysAfter, event_no)))$percent_change, na.rm = TRUE),
+  #     number_percent_change = n_distinct(percent_change),
+  #     median_percent_change = median(distinct(across(-c(daysAfter, event_no)))$percent_change, na.rm = TRUE)
+  #   )
+  # 
+  # 
+  # 
+  # mean_dfR <- allSlopes %>%
+  #   filter(lake == "R") %>%
+  #   filter(period != "exclude after heatwave", !is.na(percent_change)) %>%
+  #   group_by(period, daysAfter) %>%
+  #   summarise(
+  #     mean_percent_change = mean(distinct(across(-c(daysAfter, event_no)))$percent_change, na.rm = TRUE),
+  #     sd_percent_change = sd(distinct(across(-c(daysAfter, event_no)))$percent_change, na.rm = TRUE),
+  #     number_percent_change = n_distinct(percent_change),
+  #     median_percent_change = median(distinct(across(-c(daysAfter, event_no)))$percent_change, na.rm = TRUE)
+  #   )
+  # 
+  # mean_dfT <- allSlopes %>%
+  #   filter(lake == "T") %>%
+  #   filter(period != "exclude after heatwave", !is.na(percent_change)) %>%
+  #   group_by(period, daysAfter) %>%
+  #   summarise(
+  #     mean_percent_change = mean(distinct(across(-c(daysAfter, event_no)))$percent_change, na.rm = TRUE),
+  #     sd_percent_change = sd(distinct(across(-c(daysAfter, event_no)))$percent_change, na.rm = TRUE),
+  #     number_percent_change = n_distinct(percent_change),
+  #     median_percent_change = median(distinct(across(-c(daysAfter, event_no)))$percent_change, na.rm = TRUE)
+  #   )
+  # 
+  # 
+  # 
+  # mean_dfT <- allSlopes %>%
+  #   filter(lake == "T") %>%
+  #   filter(period != "exclude after heatwave", !is.na(percent_change)) %>%
+  #   group_by(period, daysAfter) %>%
+  #   summarise(
+  #     distinct_rows = distinct(across(-c(daysAfter, event_no))), # Get distinct rows for each group
+  #     mean_percent_change = mean(distinct_rows$percent_change, na.rm = TRUE),
+  #     sd_percent_change = sd(distinct_rows$percent_change, na.rm = TRUE),
+  #     number_percent_change = n_distinct(distinct_rows$percent_change),
+  #     median_percent_change = median(distinct_rows$percent_change, na.rm = TRUE)
+  #   ) %>%
+  #   ungroup()
+  # 
+  # 
+  # 
+  # mean_dfR <- allSlopes %>%
+  #   filter(lake == "R") %>%
+  #   filter(period != "exclude after heatwave", !is.na(percent_change)) %>%
+  #   group_by(period, daysAfter) %>%
+  #   summarise(
+  #     distinct_rows = distinct(across(-c(daysAfter, event_no))), # Get distinct rows for each group
+  #     mean_percent_change = mean(distinct_rows$percent_change, na.rm = TRUE),
+  #     sd_percent_change = sd(distinct_rows$percent_change, na.rm = TRUE),
+  #     number_percent_change = n_distinct(distinct_rows$percent_change),
+  #     median_percent_change = median(distinct_rows$percent_change, na.rm = TRUE)
+  #   ) %>%
+  #   ungroup()
+  
+  
+  
+  #==============================================================================#
+  #==============================================================================#
+  # #### END OF FOR LOOPS ####
+  # 
+  # # save results to the looped dataframe
+  # # being careful tp specify daysAfter as the global environment variable
+  # # and not the column
+  # 
+  # looped.results$all.all.other.days[L] = mean_df %>%
+  #   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "all other days") %>%
+  #   pull(mean_percent_change)
+  # 
+  # # looped.results$all.during.heatwave[L] = mean_df %>%
+  # #           filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "after heatwave") %>%
+  # #           pull(mean_percent_change)
+  # 
+  # looped.results$all.after.heatwave[L] = mean_df %>%
+  #   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "after heatwave") %>%
+  #   pull(mean_percent_change)
+  # 
+  # # results for R
+  # looped.results$R.all.other.days[L] = mean_dfR %>%
+  #   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "all other days") %>%
+  #   pull(mean_percent_change)
+  # 
+  # # looped.results$R.during.heatwave[L] = mean_dfR %>%
+  # #   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "after heatwave") %>%
+  # #   pull(mean_percent_change)
+  # 
+  # looped.results$R.after.heatwave[L] = mean_dfR %>%
+  #   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "after heatwave") %>%
+  #   pull(mean_percent_change)
+  # 
+  # # results for L
+  # looped.results$L.all.other.days[L] = mean_dfL %>%
+  #   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "all other days") %>%
+  #   pull(mean_percent_change)
+  # 
+  # # looped.results$L.during.heatwave[L] = mean_dfL %>%
+  # #   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "after heatwave") %>%
+  # #   pull(mean_percent_change)
+  # 
+  # looped.results$L.after.heatwave[L] = mean_dfL %>%
+  #   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "after heatwave") %>%
+  #   pull(mean_percent_change)
+  # 
+  # # results for T
+  # looped.results$T.all.other.days[L] = mean_dfT %>%
+  #   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "all other days") %>%
+  #   pull(mean_percent_change)
+  # 
+  # # looped.results$T.during.heatwave[L] = mean_dfT %>%
+  # #   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "after heatwave") %>%
+  # #   pull(mean_percent_change)
+  # 
+  # looped.results$T.after.heatwave[L] = mean_dfT %>%
+  #   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "after heatwave") %>%
+  #   pull(mean_percent_change)
+  # 
+  # print(L)
+  # L = L+1
+  # 
+  #     }
+  #   }
+  # }
+  # }
+  
+  
+  #==============================================================================#
+  #==============================================================================#
+  
+  # combine individual estimates of the mean so we can standardize axes
+  mean.all.by.lake = rbind(mean_dfR, mean_dfL)
+  mean.all.by.lake = rbind(mean.all.by.lake, mean_dfT)
+  
+  # mean.all.other.days = mean_df %>% filter(period == )
+  
+  # Plot the response over time
+  All.over.time <- mean_df %>% filter(period == "after heatwave") %>% 
+    ggplot(aes( x= daysAfter, y = mean_percent_change, color = period))+
+    # scale_color_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "forestgreen", "all other days" = "#88CCEE"))+
+    geom_rect(aes(xmin = -16, xmax = 0, ymin = -Inf, ymax = Inf), 
+              fill = "red", alpha = 0.3) +
+    #scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE"))+
+    geom_line(size = 1)+
+    geom_point()+
+    labs(title = "All lakes HW response over time")+
+    # ylim(min(mean.all.by.lake$mean_percent_change), max(mean.all.by.lake$mean_percent_change)-30)+
+    #geom_ribbon(aes(ymin = mean_percent_change - sd_percent_change, ymax = mean_percent_change + sd_percent_change, fill = period), alpha = 0.1)+
+    labs(x = "days after heatwave")+
+    theme_classic()+
+    geom_hline(yintercept = 0, linetype = "dashed")
+  
+  R.over.time <- mean_dfR %>% 
+    ggplot(aes( x= daysAfter, y = mean_percent_change, color = period))+
+    annotate("rect", xmin=-16, xmax=0, ymin=-Inf, ymax=Inf, alpha=0.2, fill="red") +
+    geom_line(size = 1)+
+    geom_point()+
+    labs(x = "days after heatwave")+
+    labs(title = "Peter Lake HW response over time")+
+    scale_color_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE"))+
+    ylim(min(mean.all.by.lake$mean_percent_change)-10, max(mean.all.by.lake$mean_percent_change)+10)+
+    theme_classic()
+  
+  L.over.time <- mean_dfL  %>% 
+    ggplot(aes( x= daysAfter, y = mean_percent_change, color = period))+
+    annotate("rect", xmin=-16, xmax=0, ymin=-Inf, ymax=Inf, alpha=0.2, fill="red") +
+    geom_line(size = 1)+
+    geom_point()+
+    labs(x = "days after heatwave")+
+    labs(title = "Paul Lake HW response over time")+
+    #ylim(min(mean.all.by.lake$mean_percent_change)-10, max(mean.all.by.lake$mean_percent_change)-30)+
+    scale_color_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE"))+
+    theme_classic()
+  
+  T.over.time <- mean_dfT  %>% 
+    ggplot(aes( x= daysAfter - 16, y = mean_percent_change, color = period))+
+    scale_color_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE"))+
+    #scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE"))+
+    geom_line(size = 1)+
+    geom_point()+
+    labs(title = "Tuesday Lake HW response over time")+
+    ylim(min(mean.all.by.lake$mean_percent_change)-10, max(mean.all.by.lake$mean_percent_change)+10)+
+    #geom_ribbon(aes(ymin = mean_percent_change - sd_percent_change, ymax = mean_percent_change + sd_percent_change, fill = period), alpha = 0.1)+
+    labs(x = "days after heatwave")+
+    theme_classic()
+  
+  
+  
+  #=============================================================================#
+  #### combined plot over time ####
+  mean_dfT = mean_dfT %>% mutate(lake = "T")
+  mean_dfR = mean_dfR %>% mutate(lake = "R")
+  mean_dfL = mean_dfL %>% mutate(lake = "L")
+  mean_df = mean_df %>% mutate(lake = "all")
+  
+  mean.all = rbind(mean_dfL, mean_dfR, mean_dfT, mean_df) %>% filter(period == "after heatwave")
+  
 
 
-
-
-
-
-# write.csv(allSlopes, "./R scripts/RLT heatwave scripts/bar chart shiny app/slopes.csv")
-
-#allSlopes.after = allSlopes %>% filter(period == "after heatwave")
-
-
-# update so that we are not excluding other dates after the heatwave
-# allSlopes = allSlopes %>% mutate(period = replace(period, period == "exclude after heatwave", "all other days"))
-#mutate(period = replace(period, period == "during heatwave", "all other days"))
-
-
-# save the allPercent data to a dataframe
-# save interpolated allData data to a dataframe
-
-# write.csv(allData, "./formatted data/allData_interpolated.csv", row.names = FALSE)
-# write.csv(allPercent, "./formatted data/results_random_and_heatwaves.csv")
-
-# calculate mean values by period and daysAfter
-# across all lakes, this will give the mean slope following all heatwave events
-# by time period
-
-mean_df <- allSlopes %>% 
-  filter(period != "exclude after heatwave", !is.na(percent_change)) %>% 
-  group_by(period, daysAfter) %>% 
-  dplyr::summarise(mean_percent_change = mean(percent_change), n.included = n()) 
-
-# round mean values to one decimal place
-mean_df$mean_percent_change <- round(mean_df$mean_percent_change, 1)
-
-allSlopes = allSlopes %>% select(-event_no)
-
-allSlopes = allSlopes %>% distinct()
-
-# # clean to get rid of pseudoreplication
-# collapsed_all_other_days <- allSlopes %>%
-#   filter(period == "all other days") %>%
-#   group_by(across(-c(daysAfter))) %>%
-#   summarise(dayAfter = first(daysAfter), event_no = first(event_no), .groups = "drop")
-# 
-# # Keep rows where period is not "all other days"
-# other_periods <- allSlopes %>%
-#   filter(period != "all other days")
-# 
-# # Combine the two parts back together
-# allSlopes_cleaned <- bind_rows(other_periods, collapsed_all_other_days)
-# 
-# # View the cleaned dataframe
-# head(allSlopes_cleaned)
-# 
-# allSlopes = allSlopes_cleaned
-
-#==============================================================================#
-#### RESPONSE TIMING LINE PLOTS ####
-
-# track down which of the heatwaves is not included when aggregated
-test = allSlopes %>% filter(daysAfter == 3 & period == "after heatwave")
-test.0 = allSlopes %>% filter(daysAfter == 0 & period == "after heatwave")
-
-test = test %>% mutate(unique.id = paste(lake, year, as.Date(doyCat - 1, origin = paste0(year, "-01-01"))))
-test.0 = test.0 %>%  mutate(unique.id = paste(lake, year, as.Date(doyCat +2, origin = paste0(year, "-01-01"))))
-
-test.id = unique(test$unique.id)
-test0.id = unique(test.0$unique.id)
-
-which(!(test0.id %in% test.id))
-
-test0.id[which(!(test0.id %in% test.id))]
-
-slopes13 = slopes %>% filter(year == 2013)
-# the last day of year in 2013 is 244. So why does the individual response work?
-
-# calculate mean values of percent change for each lake by # of days after heatwave
-mean_df <- allSlopes %>%  #filter(year %in% c(2008, 2009, 2010, 2011)) %>% 
-  filter( period != "exclude after heatwave", !is.na(percent_change)) %>% 
-  group_by(period, daysAfter) %>% 
-  dplyr::summarise(mean_percent_change = mean(percent_change), 
-                   sd_percent_change = sd(percent_change), 
-                   number_percent_change = n(),
-                   median_percent_change = median(percent_change, na.rm = TRUE)) 
-
-# Peter
-mean_dfR = allSlopes %>% filter(lake == "R") %>%  
-  filter(period != "exclude after heatwave", !is.na(percent_change)) %>% 
-  group_by(period, daysAfter) %>% 
-  dplyr::summarise(mean_percent_change = mean(percent_change), 
-                   sd_percent_change = sd(percent_change), 
-                   number_percent_change = n(),
-                   median_percent_change = median(percent_change, na.rm = TRUE) )
-
-# Paul
-mean_dfL <- allSlopes %>% filter(lake == "L") %>%  #filter(year %in% c(2008, 2009, 2010, 2011)) %>% 
-  filter( period != "exclude after heatwave", !is.na(percent_change)) %>% 
-  group_by(period, daysAfter) %>% 
-  dplyr::summarise(mean_percent_change = mean(percent_change), 
-                   sd_percent_change = sd(percent_change), 
-                   number_percent_change = n(),
-                   median_percent_change = median(percent_change, na.rm = TRUE)) 
-
-# Tuesday
-mean_dfT <- allSlopes %>% filter(lake == "T") %>% # filter(year %in% c(2008, 2009, 2010, 2011)) %>% 
-  filter( period != "exclude after heatwave", !is.na(percent_change)) %>% 
-  group_by(period, daysAfter) %>% 
-  dplyr::summarise(mean_percent_change = mean(percent_change), 
-                   sd_percent_change = sd(percent_change), 
-                   number_percent_change = n(),
-                   median_percent_change = median(percent_change, na.rm = TRUE)) 
-
-
-
-
-### version with distinct rows only used to calculate means ###
-# mean_dfL <- allSlopes %>%
-#   filter(lake == "L") %>%
-#   filter(period != "exclude after heatwave", !is.na(percent_change)) %>%
-#   group_by(period, daysAfter) %>%
-#   summarise(
-#     mean_percent_change = mean(distinct(across(-c(daysAfter, event_no)))$percent_change, na.rm = TRUE),
-#     sd_percent_change = sd(distinct(across(-c(daysAfter, event_no)))$percent_change, na.rm = TRUE),
-#     number_percent_change = n_distinct(percent_change),
-#     median_percent_change = median(distinct(across(-c(daysAfter, event_no)))$percent_change, na.rm = TRUE)
-#   )
-# 
-# 
-# 
-# mean_dfR <- allSlopes %>%
-#   filter(lake == "R") %>%
-#   filter(period != "exclude after heatwave", !is.na(percent_change)) %>%
-#   group_by(period, daysAfter) %>%
-#   summarise(
-#     mean_percent_change = mean(distinct(across(-c(daysAfter, event_no)))$percent_change, na.rm = TRUE),
-#     sd_percent_change = sd(distinct(across(-c(daysAfter, event_no)))$percent_change, na.rm = TRUE),
-#     number_percent_change = n_distinct(percent_change),
-#     median_percent_change = median(distinct(across(-c(daysAfter, event_no)))$percent_change, na.rm = TRUE)
-#   )
-# 
-# mean_dfT <- allSlopes %>%
-#   filter(lake == "T") %>%
-#   filter(period != "exclude after heatwave", !is.na(percent_change)) %>%
-#   group_by(period, daysAfter) %>%
-#   summarise(
-#     mean_percent_change = mean(distinct(across(-c(daysAfter, event_no)))$percent_change, na.rm = TRUE),
-#     sd_percent_change = sd(distinct(across(-c(daysAfter, event_no)))$percent_change, na.rm = TRUE),
-#     number_percent_change = n_distinct(percent_change),
-#     median_percent_change = median(distinct(across(-c(daysAfter, event_no)))$percent_change, na.rm = TRUE)
-#   )
-# 
-# 
-# 
-# mean_dfT <- allSlopes %>%
-#   filter(lake == "T") %>%
-#   filter(period != "exclude after heatwave", !is.na(percent_change)) %>%
-#   group_by(period, daysAfter) %>%
-#   summarise(
-#     distinct_rows = distinct(across(-c(daysAfter, event_no))), # Get distinct rows for each group
-#     mean_percent_change = mean(distinct_rows$percent_change, na.rm = TRUE),
-#     sd_percent_change = sd(distinct_rows$percent_change, na.rm = TRUE),
-#     number_percent_change = n_distinct(distinct_rows$percent_change),
-#     median_percent_change = median(distinct_rows$percent_change, na.rm = TRUE)
-#   ) %>%
-#   ungroup()
-# 
-# 
-# 
-# mean_dfR <- allSlopes %>%
-#   filter(lake == "R") %>%
-#   filter(period != "exclude after heatwave", !is.na(percent_change)) %>%
-#   group_by(period, daysAfter) %>%
-#   summarise(
-#     distinct_rows = distinct(across(-c(daysAfter, event_no))), # Get distinct rows for each group
-#     mean_percent_change = mean(distinct_rows$percent_change, na.rm = TRUE),
-#     sd_percent_change = sd(distinct_rows$percent_change, na.rm = TRUE),
-#     number_percent_change = n_distinct(distinct_rows$percent_change),
-#     median_percent_change = median(distinct_rows$percent_change, na.rm = TRUE)
-#   ) %>%
-#   ungroup()
-
-
-
-#==============================================================================#
-#==============================================================================#
-# #### END OF FOR LOOPS ####
-# 
-# # save results to the looped dataframe
-# # being careful tp specify daysAfter as the global environment variable
-# # and not the column
-# 
-# looped.results$all.all.other.days[L] = mean_df %>%
-#   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "all other days") %>%
-#   pull(mean_percent_change)
-# 
-# # looped.results$all.during.heatwave[L] = mean_df %>%
-# #           filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "after heatwave") %>%
-# #           pull(mean_percent_change)
-# 
-# looped.results$all.after.heatwave[L] = mean_df %>%
-#   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "after heatwave") %>%
-#   pull(mean_percent_change)
-# 
-# # results for R
-# looped.results$R.all.other.days[L] = mean_dfR %>%
-#   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "all other days") %>%
-#   pull(mean_percent_change)
-# 
-# # looped.results$R.during.heatwave[L] = mean_dfR %>%
-# #   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "after heatwave") %>%
-# #   pull(mean_percent_change)
-# 
-# looped.results$R.after.heatwave[L] = mean_dfR %>%
-#   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "after heatwave") %>%
-#   pull(mean_percent_change)
-# 
-# # results for L
-# looped.results$L.all.other.days[L] = mean_dfL %>%
-#   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "all other days") %>%
-#   pull(mean_percent_change)
-# 
-# # looped.results$L.during.heatwave[L] = mean_dfL %>%
-# #   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "after heatwave") %>%
-# #   pull(mean_percent_change)
-# 
-# looped.results$L.after.heatwave[L] = mean_dfL %>%
-#   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "after heatwave") %>%
-#   pull(mean_percent_change)
-# 
-# # results for T
-# looped.results$T.all.other.days[L] = mean_dfT %>%
-#   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "all other days") %>%
-#   pull(mean_percent_change)
-# 
-# # looped.results$T.during.heatwave[L] = mean_dfT %>%
-# #   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "after heatwave") %>%
-# #   pull(mean_percent_change)
-# 
-# looped.results$T.after.heatwave[L] = mean_dfT %>%
-#   filter(daysAfter == get("daysAfter", envir=globalenv()) & period == "after heatwave") %>%
-#   pull(mean_percent_change)
-# 
-# print(L)
-# L = L+1
-# 
-#     }
-#   }
-# }
-# }
-
-
-#==============================================================================#
-#==============================================================================#
-
-# combine individual estimates of the mean so we can standardize axes
-mean.all.by.lake = rbind(mean_dfR, mean_dfL)
-mean.all.by.lake = rbind(mean.all.by.lake, mean_dfT)
-
-# mean.all.other.days = mean_df %>% filter(period == )
-
-# Plot the response over time
-All.over.time <- mean_df %>% filter(period == "after heatwave") %>% 
-  ggplot(aes( x= daysAfter, y = mean_percent_change, color = period))+
-  # scale_color_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "forestgreen", "all other days" = "#88CCEE"))+
-  geom_rect(aes(xmin = -16, xmax = 0, ymin = -Inf, ymax = Inf), 
-            fill = "red", alpha = 0.3) +
-  #scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE"))+
-  geom_line(size = 1)+
-  geom_point()+
-  labs(title = "All lakes HW response over time")+
-  # ylim(min(mean.all.by.lake$mean_percent_change), max(mean.all.by.lake$mean_percent_change)-30)+
-  #geom_ribbon(aes(ymin = mean_percent_change - sd_percent_change, ymax = mean_percent_change + sd_percent_change, fill = period), alpha = 0.1)+
-  labs(x = "days after heatwave")+
-  theme_classic()+
-  geom_hline(yintercept = 0, linetype = "dashed")
-
-R.over.time <- mean_dfR %>% 
-  ggplot(aes( x= daysAfter, y = mean_percent_change, color = period))+
-  annotate("rect", xmin=-16, xmax=0, ymin=-Inf, ymax=Inf, alpha=0.2, fill="red") +
-  geom_line(size = 1)+
-  geom_point()+
-  labs(x = "days after heatwave")+
-  labs(title = "Peter Lake HW response over time")+
-  scale_color_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE"))+
-  ylim(min(mean.all.by.lake$mean_percent_change)-10, max(mean.all.by.lake$mean_percent_change)+10)+
-  theme_classic()
-
-L.over.time <- mean_dfL  %>% 
-  ggplot(aes( x= daysAfter, y = mean_percent_change, color = period))+
-  annotate("rect", xmin=-16, xmax=0, ymin=-Inf, ymax=Inf, alpha=0.2, fill="red") +
-  geom_line(size = 1)+
-  geom_point()+
-  labs(x = "days after heatwave")+
-  labs(title = "Paul Lake HW response over time")+
-  #ylim(min(mean.all.by.lake$mean_percent_change)-10, max(mean.all.by.lake$mean_percent_change)-30)+
-  scale_color_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE"))+
-  theme_classic()
-
-T.over.time <- mean_dfT  %>% 
-  ggplot(aes( x= daysAfter - 16, y = mean_percent_change, color = period))+
-  scale_color_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE"))+
-  #scale_fill_manual(values = c("during heatwave" = "#ff0000", "after heatwave" = "#ffc100", "all other days" = "#88CCEE"))+
-  geom_line(size = 1)+
-  geom_point()+
-  labs(title = "Tuesday Lake HW response over time")+
-  ylim(min(mean.all.by.lake$mean_percent_change)-10, max(mean.all.by.lake$mean_percent_change)+10)+
-  #geom_ribbon(aes(ymin = mean_percent_change - sd_percent_change, ymax = mean_percent_change + sd_percent_change, fill = period), alpha = 0.1)+
-  labs(x = "days after heatwave")+
-  theme_classic()
-
-
-
-#=============================================================================#
-#### combined plot over time ####
-mean_dfT = mean_dfT %>% mutate(lake = "T")
-mean_dfR = mean_dfR %>% mutate(lake = "R")
-mean_dfL = mean_dfL %>% mutate(lake = "L")
-mean_df = mean_df %>% mutate(lake = "all")
-
-mean.all = rbind(mean_dfL, mean_dfR, mean_dfT, mean_df)
-
-if(percent == 85){
-  mean.looped = mean.all %>% mutate(percentile = percent)
-}
-
-if(percent > 85){
-  mean.looped = rbind(mean.looped, mean.all %>% mutate(percentile = percent))
-}
-
-}
-
-
-
-### plot results for different thresholds ###
-mean.looped.3 = mean.looped %>% filter(daysAfter == 3 & lake != "all") 
-
-mean.looped.filtered = mean.looped  %>%  filter(period != "exclude after heatwave", lake != "all",
-                                            daysAfter == if_else(lake == "T", get("daysAfterT", envir = globalenv()),
-                                                                 get("daysAfter", envir = globalenv())))
-
-# get the mean of each non-heatwave day line
-mean.non.hw = mean.looped.filtered %>% filter(period == "all other days") %>% 
-  group_by(lake) %>% 
-  summarize(mean = mean(mean_percent_change))
-
-hw.mean.chl.sens = ggplot(mean.looped.filtered %>% 
-                            filter(period == "after heatwave"),
-                          aes(x = percentile, y = mean_percent_change, color = lake))+
-  geom_borderline(size = 0.5, bordercolour = "black")+
-  geom_point(size = 4, pch = 21, color = "black", aes(fill = lake))+
-  theme_classic()+
-  xlim(85, 95)+
-  scale_color_manual(values = c("R" = "#60BFCC", "L" = "#D9EEF3", "T" = "#544C34", "all" = "grey"),
-                     labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday")) +
-  scale_fill_manual(values = c("R" = "#60BFCC", "L" = "#D9EEF3", "T" = "#544C34", "all" = "grey"),
-                    labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday")) +
-  geom_vline(xintercept = 90, linetype = "dashed")+
-  geom_hline(color = "#D9EEF3", yintercept = 2.51, size = 1, linetype = "dashed")+
-  geom_hline(color = "#60BFCC", yintercept = 13.31, size = 1, linetype = "dashed")+
-  geom_hline(color = "#544C34", yintercept = 16.14, size = 1, linetype = "dashed")+
-  labs(x = "heatwave percentile threshold", y = "average percent change in chlorophyll")
-
-
-
-
-num.hw = ggplot(mean.looped.filtered %>% filter(period == "after heatwave"), aes(x = percentile, y = number_percent_change, color = lake))+
-  geom_borderline(size = 0.5, bordercolour = "black")+
-  geom_point(size = 4, pch = 21, color = "black", aes(fill = lake))+
-  theme_classic()+
-  xlim(85, 95)+
-  scale_color_manual(values = c("R" = "#60BFCC", "L" = "#D9EEF3", "T" = "#544C34", "all" = "grey"),
-                     labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday")) +
-  scale_fill_manual(values = c("R" = "#60BFCC", "L" = "#D9EEF3", "T" = "#544C34", "all" = "grey"),
-                    labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday")) +
-  geom_vline(xintercept = 90, linetype = "dashed")+
-  labs(x = "", y = "number of heatwaves identified")
-
-
-
-
-ggarrange(num.hw, hw.mean.chl.sens, nrow = 2, ncol = 1, align = "v", common.legend = TRUE)
 
 
 

@@ -7,6 +7,9 @@ library(ggpubr)
 library(lme4)
 library(lmerTest)
 library(MuMIn)
+library(tidyverse)
+library(gridExtra)
+library(grid)
 
 
 
@@ -29,7 +32,7 @@ hw.all = rbind(peterHW, paulHW, tuesdayHW) %>% select(-season)
 
 hw.all = hw.all %>% mutate(year = year(date_start), lake_year = paste(lake, year, sep = "_"))
 
-write.csv(hw.all, "./results/heatwave modeled outputs/heatwave events LRT.csv", row.names = FALSE)
+#write.csv(hw.all, "./results/heatwave modeled outputs/heatwave events LRT.csv", row.names = FALSE)
 
 
 
@@ -38,20 +41,20 @@ write.csv(hw.all, "./results/heatwave modeled outputs/heatwave events LRT.csv", 
 
 
 # check if heatwave characteristics are at all related to heatwave response
-heatwave.char = read.csv("./formatted data/explanatory variables heatwaves/heatwaves with percent.csv")
-
-
-global.model = lm(data = heatwave.char, percentChange ~ intensity_max+     +   intensity_mean    +                        +   intensity_max    +                         +   intensity_var    +                    
-      +   intensity_cumulative    +                  +   intensity_mean_relThresh    +              +   intensity_max_relThresh    +          
-       +   intensity_var_relThresh    +               +   intensity_cumulative_relThresh    +        +   intensity_mean_abs    +               
-        +   intensity_max_abs    +                     +   intensity_var_abs    +                     +   intensity_cumulative_abs    +         
-       +   rate_onset    +                            +   rate_decline,    na.action = na.pass)
-
-summary(lm(data = heatwave.char, ))
-
-
-summary(global.model)
-dredge(global.model)
+# heatwave.char = read.csv("./formatted data/explanatory variables heatwaves/heatwaves with percent.csv")
+# 
+# 
+# global.model = lm(data = heatwave.char, percentChange ~ intensity_max+     +   intensity_mean    +                        +   intensity_max    +                         +   intensity_var    +                    
+#       +   intensity_cumulative    +                  +   intensity_mean_relThresh    +              +   intensity_max_relThresh    +          
+#        +   intensity_var_relThresh    +               +   intensity_cumulative_relThresh    +        +   intensity_mean_abs    +               
+#         +   intensity_max_abs    +                     +   intensity_var_abs    +                     +   intensity_cumulative_abs    +         
+#        +   rate_onset    +                            +   rate_decline,    na.action = na.pass)
+# 
+# summary(lm(data = heatwave.char, ))
+# 
+# 
+# summary(global.model)
+# dredge(global.model)
 
 
 
@@ -60,8 +63,8 @@ dredge(global.model)
 
 ##### Explanatory variables analysis updated 2024_03_17
 
-heatwaves.exp = read.csv("./formatted data/explanatory variables heatwaves/heatwaves with percent zoop color nutrients.csv")
-
+# heatwaves.exp = read.csv("./formatted data/explanatory variables heatwaves/heatwaves with percent zoop color nutrients.csv")
+heatwaves.exp = read.csv("./formatted data/master explanatory dataset/heatwaves explained var6.csv")
 
 a = ggplot(heatwaves.exp, aes(x = log10(biomass), y = percentChange, fill = lake))+
   geom_point(size = 5, color = "black", shape = 21, stroke = 1, alpha = 0.95)+
@@ -74,6 +77,9 @@ a = ggplot(heatwaves.exp, aes(x = log10(biomass), y = percentChange, fill = lake
         axis.text = element_text(size = 12)) + 
   guides(fill = guide_legend(title = NULL), fill = guide_legend(title = NULL))+
   guides(fill = guide_legend(override.aes = list(shape = 22), title = NULL)) 
+
+
+heatwaves.exp %>% group_by(lake) %>% summarize(mean(percentChange, na.rm = TRUE)) %>% ungroup()
 
 b = ggplot(heatwaves.exp, aes(x = (PML.g440), y = (percentChange), fill = lake))+
   geom_point(size = 5, color = "black", shape = 21, stroke = 1, alpha = 0.95)+
@@ -112,13 +118,129 @@ d = ggplot(heatwaves.exp, aes(x = (daily.load), y = (percentChange), fill = lake
   guides(fill = guide_legend(title = NULL), fill = guide_legend(title = NULL))+
   guides(fill = guide_legend(override.aes = list(shape = 22), title = NULL)) 
 
-png("./figures/manuscript draft 2024-11-11/explanatory plots.png", height = 6, width = 8, units = "in", res = 300)
+#png("./figures/manuscript draft 2024-11-11/explanatory plots.png", height = 6, width = 8, units = "in", res = 300)
 ggarrange(b, a, c, d, common.legend = TRUE)
-dev.off()
+#dev.off()
 
 
 
 
+###### MORE MECHANISTIC response to reviewers figure ######
+
+# heatwaves.exp = read.csv("./formatted data/explanatory variables heatwaves/heatwaves with percent zoop color nutrients.csv")
+heatwaves.exp = read.csv("./formatted data/master explanatory dataset/heatwaves explained var6.csv")
+
+daph = ggplot(heatwaves.exp, aes(x = log10(biomass), y = percentChange, fill = lake))+
+  geom_point(size = 5, color = "black", shape = 21, stroke = 1, alpha = 0.95)+
+  labs(x = expression("log10(Daphnia dry biomass g/m"^2*")"), y = "% change in chlorophyll-a")+
+  theme_classic()+
+  scale_fill_manual(values = c("R" = "#60BFCC", "L" = "#D9EEF3", "T" = "#544C34"),
+                    labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday"))+
+  theme(legend.text = element_text(size = 16),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12)) + 
+  guides(fill = guide_legend(title = NULL), fill = guide_legend(title = NULL))+
+  guides(fill = guide_legend(override.aes = list(shape = 22), title = NULL)) 
+
+
+temp = ggplot(heatwaves.exp, aes(x = intensity_mean, y = percentChange, fill = lake))+
+  geom_point(size = 5, color = "black", shape = 21, stroke = 1, alpha = 0.95)+
+  labs(x =("mean heatwave intensity (°C)"), y = "% change in chlorophyll-a")+
+  theme_classic()+
+  scale_fill_manual(values = c("R" = "#60BFCC", "L" = "#D9EEF3", "T" = "#544C34"),
+                    labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday"))+
+  theme(legend.text = element_text(size = 16),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        legend.position = "none") + 
+  guides(fill = guide_legend(title = NULL), fill = guide_legend(title = NULL))+
+  guides(fill = guide_legend(override.aes = list(shape = 22), title = NULL)) 
+
+colo = ggplot(heatwaves.exp, aes(x = (PML.g440), y = (percentChange), fill = lake))+
+  geom_point(size = 5, color = "black", shape = 21, stroke = 1, alpha = 0.95)+
+  labs(x = expression("surface water color - g440 (m"^-1*")"), y = "")+
+  theme_classic()+
+  scale_fill_manual(values = c("R" = "#60BFCC", "L" = "#D9EEF3", "T" = "#544C34"),
+                    labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday"))+
+  theme(legend.text = element_text(size = 16),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12)) + 
+  guides(fill = guide_legend(title = NULL), fill = guide_legend(title = NULL))+
+  guides(fill = guide_legend(override.aes = list(shape = 22), title = NULL)) 
+
+light = ggplot(heatwaves.exp, aes(x = (mean.par.during), y = (percentChange), fill = lake))+
+  geom_point(size = 5, color = "black", shape = 21, stroke = 1, alpha = 0.95)+
+  labs(x = expression("mean PAR (mg/m"^2*")"), y = "")+
+  theme_classic()+
+  scale_fill_manual(values = c("R" = "#60BFCC", "L" = "#D9EEF3", "T" = "#544C34"),
+                    labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday"))+
+  theme(legend.text = element_text(size = 16),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        legend.position = "none") + 
+  guides(fill = guide_legend(title = NULL), fill = guide_legend(title = NULL))+
+  guides(fill = guide_legend(override.aes = list(shape = 22), title = NULL)) 
+
+
+tp = ggplot(heatwaves.exp, aes(x = (tp_ugL.after), y = (percentChange), fill = lake))+
+  geom_point(size = 5, color = "black", shape = 21, stroke = 1, alpha = 0.95)+
+  labs(x = expression("total P (mg/m"^2*")"), y = "")+
+  theme_classic()+
+  scale_fill_manual(values = c("R" = "#60BFCC", "L" = "#D9EEF3", "T" = "#544C34"),
+                    labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday"))+
+  theme(legend.text = element_text(size = 16),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        legend.position = "none") + 
+  guides(fill = guide_legend(title = NULL), fill = guide_legend(title = NULL))+
+  guides(fill = guide_legend(override.aes = list(shape = 22), title = NULL)) 
+
+
+strat = ggplot(heatwaves.exp, aes(x = (stability.during), y = (percentChange), fill = lake))+
+  geom_point(size = 5, color = "black", shape = 21, stroke = 1, alpha = 0.95)+
+  labs(x = expression("Schmidt stability (J/m"^2*")"), y = "", title = "sinking")+
+  theme_classic()+
+  scale_fill_manual(values = c("R" = "#60BFCC", "L" = "#D9EEF3", "T" = "#544C34"),
+                    labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday"))+
+  theme(legend.text = element_text(size = 16),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12)) + 
+  guides(fill = guide_legend(title = NULL), fill = guide_legend(title = NULL))+
+  guides(fill = guide_legend(override.aes = list(shape = 22), title = NULL)) 
+
+
+get_legend <- function(plot) {
+  g <- ggplotGrob(plot)
+  legend <- g$grobs[[which(sapply(g$grobs, function(x) x$name) == "guide-box")]]
+  return(legend)
+}
+
+legend = get_legend(strat)
+
+top = ggarrange(temp, light, tp, nrow = 1, legend = NULL, align = "h")
+bottom = ggarrange(daph, strat, legend, nrow = 1, ncol = 3, common.legend = TRUE, legend = "none", align = "h")
+
+ggarrange(top, bottom, nrow = 2, common.legend = TRUE)
+#png("./figures/manuscript draft 2024-11-11/explanatory plots.png", height = 6, width = 8, units = "in", res = 300)
+#dev.off()
+
+
+
+growth_banner <- textGrob("Growth Processes", gp=gpar(fontsize=16, fontface="bold", col="white", fill="blue", alpha=0.5))
+loss_banner <- textGrob("Loss Processes", gp=gpar(fontsize=16, fontface="bold", col="white", fill="blue", alpha=0.5))
+
+# Arrange the top row with banner
+top_with_banner <- ggarrange(top, nrow = 1, legend = NULL, align = "h")
+top_with_banner <- annotation_custom(growth_banner, xmin=-Inf, xmax=Inf, ymin=Inf, ymax=Inf) + top_with_banner
+
+# Arrange the bottom row with banner
+bottom_with_banner <- ggarrange(bottom, nrow = 1, legend = NULL, align = "h")
+bottom_with_banner <- annotation_custom(loss_banner, xmin=-Inf, xmax=Inf, ymin=Inf, ymax=Inf) + bottom_with_banner
+
+# Combine both rows
+final_plot <- ggarrange(top_with_banner, bottom_with_banner, nrow = 2, common.legend = TRUE)
+
+final_plot
 
 
 

@@ -127,6 +127,18 @@ metadata_plot <- ggplot() +
 # read in the heatwaves data calculated in the previous step
 # heatwaves = read.csv("./formatted data/heatwavesdata.csv")
 heatwaves = read.csv("./results/heatwave modeled outputs/heatwave events LRT.csv")
+heatwaves90 = read.csv("./results/heatwave modeled outputs/heatwave events LRT 90 percent.csv")
+
+heatwaves$date_start %in% heatwaves90$date_start
+#heatwaves$date_start %in% hw.all.original$date_start
+
+
+
+heatwaves$date_end %in% heatwaves90$date_end
+## 2 of the heatwaves have different end dates in heatwaves 90 than in heatwaves..... why?
+
+
+test = heatwaves == heatwaves90
 
 #permanent.heatwaves = heatwaves
 # read in the manual chl data
@@ -920,6 +932,9 @@ mean.all  %>% filter(lake != "all") %>%
   
 
 
+
+
+
 #scale_fill_manual(values = c("R"=  "#60BFCC", "L" = "#D9EEF3", "T"=  "#544C34"))+
   
 
@@ -932,6 +947,21 @@ mean.all  %>% filter(lake != "all") %>%
 desired_order <- c("after heatwave", "during heatwave", "all other days")
 
 #png("./figures/science in the northwoods figures/Tuesday Lake heatwave results 4 days after.png", height = 7, width = 13, units = "in", res = 600)
+
+
+### boxplot ####
+# showing that the response of chlorophyll following heatwaves is not outside the normal range
+allSlopes %>%
+  filter(period != "exclude after heatwave", 
+         daysAfter == if_else(lake == "T", get("daysAfterT", envir = globalenv()),
+                              get("daysAfter", envir = globalenv()))) %>% 
+  ggplot(aes(x= period, y = percent_change, fill = lake))+
+  geom_boxplot()+
+  labs(y = "% change in surface chlorophyll", x = "")+
+  scale_fill_manual(values = c("R"=  "#60BFCC", "L" = "#D9EEF3", "T"=  "#544C34", "all" = "grey"), 
+                    labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday"))+
+  theme_classic()
+  
 
 
 Alldist <- allSlopes %>%
@@ -1370,10 +1400,10 @@ Ldist <- allSlopes %>%
 
 
 
-png("./figures/manuscript draft 2024-11-11/heatwave results 2_or_3 days after.png", height = 7, width = 10, units = "in", res = 600)
+#png("./figures/manuscript draft 2024-11-11/heatwave results 2_or_3 days after.png", height = 7, width = 10, units = "in", res = 600)
 ggarrange(over.time, ggarrange(Ldist, Rdist, Tdist, ncol = 3),
           nrow = 2, legend = "top")
-dev.off()
+#dev.off()
 
 
 

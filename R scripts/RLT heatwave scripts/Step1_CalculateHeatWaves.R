@@ -14,7 +14,11 @@ library(heatwaveR)
 
 # CombinedData comes from "step0_DataCleaning.R", which combines all sonde data
 # we are just using temperature data from this set, which is from the hydrolabs
-allSonde = read.csv("./formatted data/CombinedData.csv")
+#allSonde = read.csv("./formatted data/CombinedData.csv")
+
+allSonde = read.csv("./formatted data/allSonde_interpolated.csv")
+
+
 allSonde$date = as.Date(allSonde$date)
 
 paul = allSonde %>%
@@ -93,8 +97,23 @@ heatwaves = heatwaves %>%
 allSonde = allSonde %>% mutate(lake.year = paste(lake, year, sep = "_"))
 
 
+
+
 ##### Save climatology from actual data #####
 saveRDS(paulHW, file = "./results/heatwave modeled outputs/paul heatwave outputs actual data.rds")
 saveRDS(peterHW, file = "./results/heatwave modeled outputs/peter heatwave outputs actual data.rds")
 saveRDS(tuesdayHW, file = "./results/heatwave modeled outputs/tuesday heatwave outputs actual data.rds")
 
+write.csv(heatwaves, "./results/heatwave modeled outputs/heatwaves with actual temp data.csv", row.names = FALSE)
+
+# 
+# peterHW = peterHW %>% mutate(lake = "R")
+# paulHW = paulHW %>% mutate(lake = "L")
+# tuesdayHW = tuesdayHW %>% mutate(lake = "T")
+# 
+# hw.all = rbind(peterHW, paulHW, tuesdayHW) %>% select(-season)
+# 
+# hw.all = hw.all %>% mutate(year = year(date_start), lake_year = paste(lake, year, sep = "_"))
+# 
+# 
+# 

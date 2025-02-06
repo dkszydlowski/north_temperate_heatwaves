@@ -467,7 +467,7 @@ ccf(temp.sonde.prism$mean_temp, temp.sonde.prism$tmean)
 
 
 ##### model with woodruff air temperature from LTER ######
-woodruff = read.csv("./formatted data/LTER daily temperature/woodruff airport temperature LTER.csv")
+woodruff = s.csv("./formatted data/LTER daily temperature/woodruff airport temperature LTER.csv")
 
 woodruff = woodruff %>% rename(year = year4, date = sampledate, doy = daynum)
 

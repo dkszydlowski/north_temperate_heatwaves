@@ -7,6 +7,7 @@ library(heatwaveR)
 library(lme4)
 library(lmerTest)
 library(MuMIn)
+library(data.table)
 
 
 
@@ -73,7 +74,7 @@ sonde.SP.woodruff.no.na = sonde.SP.woodruff %>%
 # set the seed so that the same rows are selected every time
 set.seed(125) # original model
 
-set.seed(126) 
+#set.seed(126) 
 
 # sample 75%
 sonde.SP.woodruff.training = sonde.SP.woodruff.no.na %>%
@@ -363,6 +364,13 @@ saveRDS(paulHW.categories, file = "./results/heatwave modeled outputs/paul heatw
 saveRDS(peterHW.categories, file = "./results/heatwave modeled outputs/peter heatwave outputs modeled categories.rds")
 saveRDS(tuesdayHW.categories, file = "./results/heatwave modeled outputs/tuesday heatwave outputs modeled categories.rds")
 
+peterHW = peterHW %>% mutate(lake = "R")
+paulHW = paulHW %>% mutate(lake = "L")
+tuesdayHW = tuesdayHW %>% mutate(lake = "T")
+
+hw.all.original = rbind(peterHW, paulHW, tuesdayHW)
+
+hw.all.original = hw.all.original %>% mutate(year = year(date_start), lake_year = paste(lake, year, sep = "_"))
 
 
 # SENSITIVITY ANALYSIS #
@@ -561,6 +569,9 @@ lakes <- c("L", "R", "T")
 num.heatwaves.percentile = data.frame(percentile = rep(seq(70, 99, 1), length(lakes)),  # Repeat percent sequence for each lake
                                         lake = rep(lakes, each = length(seq(70, 99, 1))), num.hw = NA, duration.hw = NA)  # Repeat each lake name for the sequence
 
+
+percent = 90
+
 for(percent in 70:99){
 
 # calculate climatology and thresholds
@@ -678,6 +689,7 @@ ggplot(num.heatwaves.percentile, aes(x = percentile, y = duration.hw, color = la
   geom_line(size = 1)+
   theme_classic()+
   ylim(0, 25)+
+  xlim(85, 95)+
   labs(y = "mean heatwave duration (days)", x = "percentile threshold")+
   scale_color_manual(values = c("L" = "#ADDAE3", "R"=  "#4AB5C4", "T"=  "#BAAD8D"))
 
@@ -686,12 +698,104 @@ ggplot(num.heatwaves.percentile, aes(x = percentile, y = duration.hw, color = la
 
 
 
+###### IDENTIFY HEATWAVES BASED ON 3-5 DAYS OF 3-5 DEGREES ABOVE NORMAL ######
+
+### use the long-term climatology and the temperature
+### identify periods where temp is 3-5 degrees above normal for 3-5 days
+
+## get the rolling-window mean temperature for each lake, called clim.all
+
+
+# calculate climatology and thresholds
+modeled.climOutputL = ts2clm(modeled.heatwaveR.L, climatologyPeriod = c(min(modeled.heatwaveR.L$t), max(modeled.heatwaveR.L$t)), pctile =90) %>% 
+  mutate(lake = "L", year = year(t)) %>%
+  filter(year == 1990) %>% 
+  select(lake, doy, seas) %>% 
+  filter(!is.na(seas))
+#paulHW = detect_event(modeled.climOutputL)
+
+modeled.climOutputR = ts2clm(modeled.heatwaveR.R, climatologyPeriod = c(min(modeled.heatwaveR.R$t), max(modeled.heatwaveR.R$t)), pctile = 90) %>% 
+  mutate(lake = "R", year = year(t)) %>%
+  filter(year == 1990) %>% 
+  select(lake, doy, seas) %>% 
+  filter(!is.na(seas))
+#peterHW = detect_event(modeled.climOutputR)
+
+modeled.climOutputT = ts2clm(modeled.heatwaveR.T, climatologyPeriod = c(min(modeled.heatwaveR.T$t), max(modeled.heatwaveR.T$t)), pctile = 90) %>% 
+  mutate(lake = "T", year = year(t)) %>%
+  filter(year == 1990) %>% 
+  select(lake, doy, seas) %>% 
+  filter(!is.na(seas))
+#tuesdayHW = detect_event(modeled.climOutputT)
+
+clim.all = rbind(modeled.climOutputL, modeled.climOutputR, modeled.climOutputT) %>% 
+  select(-year)
+
+# join to the actual temperature data
+
+L.climatology = left_join(L.temp.sonde, modeled.climOutputL, by = c("doy"), relationship = "many-to-many") %>% 
+  mutate(above_thresh = (temp-seas) >= 3)
+
+R.climatology = left_join(R.temp.sonde, modeled.climOutputR, by = c("doy"), relationship = "many-to-many")%>% 
+  mutate(above_thresh = (temp-seas) >= 3)
+
+T.climatology = left_join(T.temp.sonde, modeled.climOutputT, by = c("doy"), relationship = "many-to-many")%>% 
+  mutate(above_thresh = (temp-seas) >= 3)
+
+
+
+heatwaves_by_year.L <- L.climatology %>%
+  mutate(year = year(t)) %>% 
+  group_by(year) %>%
+  mutate(group = rleid(above_thresh)) %>%  # Assigns unique IDs to consecutive runs
+  filter(above_thresh) %>%  # Keep only threshold-exceeding days
+  group_by(year, group) %>%
+  summarise(
+    start_date = min(t),
+    end_date = max(t),
+    duration = n(),
+    .groups = "drop"
+  ) %>%
+  filter(duration >= 3) %>% 
+  mutate(lake = "L")
 
 
 
 
+heatwaves_by_year.R <- R.climatology %>%
+  mutate(year = year(t)) %>% 
+  group_by(year) %>%
+  mutate(group = rleid(above_thresh)) %>%  # Assigns unique IDs to consecutive runs
+  filter(above_thresh) %>%  # Keep only threshold-exceeding days
+  group_by(year, group) %>%
+  summarise(
+    start_date = min(t),
+    end_date = max(t),
+    duration = n(),
+    .groups = "drop"
+  ) %>%
+  filter(duration >= 3) %>% 
+  mutate(lake = "R")
 
 
+heatwaves_by_year.T <- T.climatology %>%
+  mutate(year = year(t)) %>% 
+  group_by(year) %>%
+  mutate(group = rleid(above_thresh)) %>%  # Assigns unique IDs to consecutive runs
+  filter(above_thresh) %>%  # Keep only threshold-exceeding days
+  group_by(year, group) %>%
+  summarise(
+    start_date = min(t),
+    end_date = max(t),
+    duration = n(),
+    .groups = "drop"
+  ) %>%
+  filter(duration >= 3) %>% 
+  mutate(lake = "T")
+
+
+
+hw.3to5 = rbind(heatwaves_by_year.L, heatwaves_by_year.R, heatwaves_by_year.T)
 
 
 

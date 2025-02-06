@@ -138,7 +138,6 @@ routine.nuts = routine.nuts %>% rename(lake = lakeid, doy = daynum, year = year4
 ##### combine actual nutrient concentrations with the explanatory dataset #####
 
 
-
 heatwaves.exp = read.csv("./formatted data/master explanatory dataset/heatwaves explained var4.csv")
 
 
@@ -148,8 +147,8 @@ heatwaves.exp = heatwaves.exp %>% mutate(doy = yday(date_start))
 
 
 # create new columns of heatwaves.exp for TP and TN
-heatwaves.exp = heatwaves.exp %>% mutate(tp_ugL.before = NA, tp_ugL.during = NA, tp_ugL.after = NA,
-                                         tn_ugL.before = NA, tn_ugL.during = NA, tn_ugL.after = NA)
+heatwaves.exp = heatwaves.exp %>% mutate(tp_ugL.before = NA, tp_ugL.during = NA, tp_ugL.after = NA, tp_ugL.analysis = NA,
+                                         tn_ugL.before = NA, tn_ugL.during = NA, tn_ugL.after = NA, tn_ugL.analysis = NA)
 
 
 for(i in 1:nrow(heatwaves.exp)){
@@ -168,11 +167,24 @@ for(i in 1:nrow(heatwaves.exp)){
   # make sure doy is <= the heatwave day
   routine.nuts.cur = routine.nuts %>% filter(lake == targ.lake, year == targ.year)
   
-  
+  # week before heatwave
   routine.nuts.before = routine.nuts.cur %>% filter(doy >= start.doy - 6 & doy <= start.doy)
+  
+  # during heatwave
   routine.nuts.during = routine.nuts.cur %>% filter(doy >= start.doy & doy <= end.doy)
+  
+  # after heatwave
   routine.nuts.after = routine.nuts.cur %>% filter(doy > end.doy & doy <= end.doy + 6)
   
+  # get nutrients strictly during the heatwave analysis period
+  if(targ.lake == "T"){
+  routine.nuts.analysis = routine.nuts.cur %>% filter(doy >= end.doy - 6 & doy <= end.doy + 2)
+  }
+  
+  
+  if(targ.lake != "T"){
+    routine.nuts.analysis = routine.nuts.cur %>% filter(doy >= end.doy - 6 & doy <= end.doy + 3)
+  }
   
   if(nrow(routine.nuts.during) > 0){
     nuts.during.hw = mean(routine.nuts.during$tp_ug, na.rm = TRUE)
@@ -200,6 +212,15 @@ for(i in 1:nrow(heatwaves.exp)){
   }
   
   
+  if(nrow(routine.nuts.analysis) > 0){
+    nuts.analysis.hw = mean(routine.nuts.analysis$tp_ug, na.rm = TRUE)
+    heatwaves.exp$tp_ugL.analysis[i] = nuts.analysis.hw
+    
+    nuts.analysis.hw = mean(routine.nuts.analysis$tn_ug, na.rm = TRUE)
+    heatwaves.exp$tn_ugL.analysis[i] = nuts.analysis.hw
+  }
+  
+  
   
   
 }
@@ -208,6 +229,11 @@ for(i in 1:nrow(heatwaves.exp)){
 
 
 ggplot(heatwaves.exp, aes(x = tp_ugL.after, y = percentChange, color = lake))+
+  geom_point(size = 3)+
+  theme_classic()
+
+
+ggplot(heatwaves.exp, aes(x = tp_ugL.analysis, y = percentChange, color = lake))+
   geom_point(size = 3)+
   theme_classic()
 
