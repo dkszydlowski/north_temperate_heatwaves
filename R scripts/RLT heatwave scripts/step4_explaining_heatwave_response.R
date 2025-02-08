@@ -229,7 +229,7 @@ ggarrange(top, bottom, nrow = 2, common.legend = TRUE)
 png("./figures/revisions draft 2025-01-27/figure 4 panels/stratification.png", height = 2.48, width = 2.376, units = "in", res = 300)
 ggplot(heatwaves.exp, aes(x = (stability.during), y = (percentChange), fill = lake))+
   geom_point(size = 4, color = "black", shape = 21, stroke = 1, alpha = 0.95)+
-  labs(x = expression("Schmidt stability (J/m"^2*")"), y = "% change in chl-a")+
+  labs(x = expression("Schmidt stability (J/m"^2*")"), y = "")+
   theme_classic()+
   scale_fill_manual(values = c("R" = "#60BFCC", "L" = "#D9EEF3", "T" = "#544C34"),
                     labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday"))+
