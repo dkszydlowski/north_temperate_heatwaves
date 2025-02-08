@@ -274,35 +274,54 @@ ggplot(heatwaves.exp, aes(x = log10(biomass), y = (percentChange), fill = lake))
   theme(legend.position = "none")
 dev.off()
 
-dev.off()
-ggplot(heatwaves.exp, aes(x = log10(biomass), y = percentChange, fill = lake))+
-  geom_point(size = 5, color = "black", shape = 21, stroke = 1, alpha = 0.95)+
-  labs(x = expression("log10(Daphnia dry biomass g/m"^2*")"), y = "% change in chlorophyll-a")+
+
+
+png("./figures/revisions draft 2025-01-27/figure 4 panels/water color.png", height = 2.48, width = 2.376, units = "in", res = 300)
+ggplot(heatwaves.exp, aes(x = PML.g440, y = (percentChange), fill = lake))+
+  geom_point(size = 4, color = "black", shape = 21, stroke = 1, alpha = 0.95)+
+  labs(x = expression("water color - g440 (m"^-1*")"), y = "")+
   theme_classic()+
   scale_fill_manual(values = c("R" = "#60BFCC", "L" = "#D9EEF3", "T" = "#544C34"),
                     labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday"))+
-  theme(legend.text = element_text(size = 16),
-        axis.title = element_text(size = 14),
-        axis.text = element_text(size = 12)) + 
+  theme(
+    axis.title.y = element_text(size = 12),
+    axis.title.x = element_text(size = 12),
+    axis.text = element_text(size = 8)) + 
   guides(fill = guide_legend(title = NULL), fill = guide_legend(title = NULL))+
-  guides(fill = guide_legend(override.aes = list(shape = 22), title = NULL)) 
+  guides(fill = guide_legend(override.aes = list(shape = 22), title = NULL)) +
+  theme(legend.position = "none")
+dev.off()
 
 
-growth_banner <- textGrob("Growth Processes", gp=gpar(fontsize=16, fontface="bold", col="white", fill="blue", alpha=0.5))
-loss_banner <- textGrob("Loss Processes", gp=gpar(fontsize=16, fontface="bold", col="white", fill="blue", alpha=0.5))
+png("./figures/revisions draft 2025-01-27/figure 4 panels/heatwave intensity.png", height = 2.48, width = 2.376, units = "in", res = 300)
+ggplot(heatwaves.exp, aes(x = intensity_mean, y = (percentChange), fill = lake))+
+  geom_point(size = 4, color = "black", shape = 21, stroke = 1, alpha = 0.95)+
+  labs(x =("heatwave intensity (°C)"), y = "% change in chl-a")+
+  theme_classic()+
+  scale_fill_manual(values = c("R" = "#60BFCC", "L" = "#D9EEF3", "T" = "#544C34"),
+                    labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday"))+
+  theme(
+    axis.title.y = element_text(size = 12),
+    axis.title.x = element_text(size = 12),
+    axis.text = element_text(size = 8)) + 
+  guides(fill = guide_legend(title = NULL), fill = guide_legend(title = NULL))+
+  guides(fill = guide_legend(override.aes = list(shape = 22), title = NULL)) +
+  theme(legend.position = "none")
+dev.off()
 
-# Arrange the top row with banner
-top_with_banner <- ggarrange(top, nrow = 1, legend = NULL, align = "h")
-top_with_banner <- annotation_custom(growth_banner, xmin=-Inf, xmax=Inf, ymin=Inf, ymax=Inf) + top_with_banner
 
-# Arrange the bottom row with banner
-bottom_with_banner <- ggarrange(bottom, nrow = 1, legend = NULL, align = "h")
-bottom_with_banner <- annotation_custom(loss_banner, xmin=-Inf, xmax=Inf, ymin=Inf, ymax=Inf) + bottom_with_banner
 
-# Combine both rows
-final_plot <- ggarrange(top_with_banner, bottom_with_banner, nrow = 2, common.legend = TRUE)
 
-final_plot
+
+
+
+
+
+
+
+
+
+
 
 
 

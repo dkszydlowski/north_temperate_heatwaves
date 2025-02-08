@@ -73,9 +73,18 @@ for(i in 1:length(lake_years)){
 # wtr.T = load.ts()
 
 
+strat = read.csv("./formatted data/stability 2009 to 2019.csv")
+
+
 # make a daily stability dataset
 schmidt.daily = all.schmidt %>% mutate(doy = yday(datetime)) %>% group_by(lake, year, doy) %>% 
   summarize(schmidt.stability = mean(schmidt.stability, na.rm = TRUE))
+
+
+
+#### read in the new lake stability data
+scmidt.daily = read.csv("./formatted data/stability 2009 to 2019.csv")
+
 
 
 ggplot(schmidt.daily, aes(x = doy, y = schmidt.stability, color = lake))+
@@ -84,7 +93,7 @@ ggplot(schmidt.daily, aes(x = doy, y = schmidt.stability, color = lake))+
   geom_line()+
   theme_bw()+
   labs(x = "day of year", y = "Schmidt stability (J/m2)")+
-  scale_color_manual(values = c("Peter" = "#4AB5C4", "Paul" = "#ADDAE3", "Tuesday" = "#BAAD8D")) 
+  scale_color_manual(values = c("R" = "#4AB5C4", "L" = "#ADDAE3", "T" = "#BAAD8D")) 
   
 
 
@@ -103,7 +112,7 @@ heatwaves.exp = heatwaves.exp %>% mutate(doy = yday(date_start))
 #heatwaves.exp = heatwaves.exp %>% group_by(lake, year) %>% join_by(casc.color.nut.zoops, date_start > date)
 
 
-# create new columns of heatwaves.exp for PML.g440, biomass, cumulative.load, daily.load
+# create new columns of heatwaves.exp for stability before, during, and after heatwaves
 heatwaves.exp = heatwaves.exp %>% mutate(stability.before = NA, stability.during = NA, stability.after = NA)
 
 schmidt.daily = schmidt.daily %>% 
