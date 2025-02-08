@@ -3,7 +3,6 @@
 
 library(tidyverse)
 library(heatwaveR)
-
 library(lme4)
 library(lmerTest)
 library(MuMIn)
@@ -751,8 +750,8 @@ heatwaves_by_year.L <- L.climatology %>%
   filter(above_thresh) %>%  # Keep only threshold-exceeding days
   group_by(year, group) %>%
   summarise(
-    start_date = min(t),
-    end_date = max(t),
+    date_start = min(t),
+    date_end = max(t),
     duration = n(),
     .groups = "drop"
   ) %>%
@@ -769,8 +768,8 @@ heatwaves_by_year.R <- R.climatology %>%
   filter(above_thresh) %>%  # Keep only threshold-exceeding days
   group_by(year, group) %>%
   summarise(
-    start_date = min(t),
-    end_date = max(t),
+    date_start = min(t),
+    date_end = max(t),
     duration = n(),
     .groups = "drop"
   ) %>%
@@ -785,8 +784,8 @@ heatwaves_by_year.T <- T.climatology %>%
   filter(above_thresh) %>%  # Keep only threshold-exceeding days
   group_by(year, group) %>%
   summarise(
-    start_date = min(t),
-    end_date = max(t),
+    date_start = min(t),
+    date_end = max(t),
     duration = n(),
     .groups = "drop"
   ) %>%
@@ -798,10 +797,10 @@ heatwaves_by_year.T <- T.climatology %>%
 hw.3to5 = rbind(heatwaves_by_year.L, heatwaves_by_year.R, heatwaves_by_year.T)
 
 
+hw.3to5 = hw.3to5 %>% mutate(lake_year = paste(lake, year, sep = "_"))
 
 
-
-
+write.csv(hw.3to5, "./results/heatwave modeled outputs/heatwave events LRT 3 to 5 days 3 to 5 degrees.csv")
 
 
 
@@ -823,6 +822,176 @@ prism = prism %>% mutate(date = as.Date(date, format="%m/%d/%Y")) %>%
 ggplot(prism %>% filter(month >= 5 & month <= 9 & year == 2013), aes(x = doy, y = tmean))+
   geom_point()+
   geom_line()
+
+
+
+###### make separate models by lake and see how it changes the heatwaves which are identified #####
+
+test = lmer(mean_temp~SP.temp.1+ woodruff.temp +doy + (1|lake), data = sonde.SP.woodruff.training)
+
+# split the initial dataframe up by lake
+sonde.SP.woodruff.L = sonde.SP.woodruff %>% filter(lake == "L")
+sonde.SP.woodruff.R = sonde.SP.woodruff %>% filter(lake == "R")
+sonde.SP.woodruff.T = sonde.SP.woodruff %>% filter(lake == "T")
+
+# split the training dataframe up by lake
+sonde.SP.woodruff.training.L = sonde.SP.woodruff.training %>% filter(lake == "L")
+sonde.SP.woodruff.training.R = sonde.SP.woodruff.training %>% filter(lake == "R")
+sonde.SP.woodruff.training.T = sonde.SP.woodruff.training %>% filter(lake == "T")
+
+# split the testing dataframe up by lake
+sonde.SP.woodruff.testing.L = sonde.SP.woodruff.testing %>% filter(lake == "L")
+sonde.SP.woodruff.testing.R = sonde.SP.woodruff.testing %>% filter(lake == "R")
+sonde.SP.woodruff.testing.T = sonde.SP.woodruff.testing %>% filter(lake == "T")
+
+
+test.L = lm(mean_temp~SP.temp.1+ woodruff.temp +doy , data = sonde.SP.woodruff.training.L)
+test.R = lm(mean_temp~SP.temp.1+ woodruff.temp +doy, data = sonde.SP.woodruff.training.R)
+test.T = lm(mean_temp~SP.temp.1+ woodruff.temp +doy, data = sonde.SP.woodruff.training.T)
+
+summary(test.L) # R2 = 0.945
+summary(test.R) # R2 = 0.957
+summary(test.T) # R2 = 0.931
+
+
+sonde.SP.woodruff.testing.L$modeled = predict(test.L, sonde.SP.woodruff.testing.L)
+sonde.SP.woodruff.testing.R$modeled = predict(test.R, sonde.SP.woodruff.testing.R)
+sonde.SP.woodruff.testing.T$modeled = predict(test.T, sonde.SP.woodruff.testing.T)
+
+
+
+all.tested.separated = rbind(sonde.SP.woodruff.testing.L, sonde.SP.woodruff.testing.R, sonde.SP.woodruff.testing.T)
+
+r2_values <- all.tested.separated %>%
+  group_by(lake) %>%
+  summarize(R2 = summary(lm(modeled ~ mean_temp))$r.squared) %>%
+  mutate(R2_label = paste0("R² = ", round(R2, 2)))  # Format the R² label
+
+# Create the plot
+ggplot(data = all.tested.separated, aes(x = mean_temp, y = modeled, fill = lake)) +
+  geom_point(size = 3, pch = 21) +
+  labs(x = "Measured temperature (°C)", y = "Modeled temperature (°C)") +
+  theme_classic() +
+  scale_fill_manual(values = c("L" = "#ADDAE3", "R" = "#4AB5C4", "T" = "#BAAD8D")) +
+  theme(legend.position = "none") +
+  geom_abline(slope = 1, linetype = "dashed") +
+  facet_wrap(~lake) +
+  geom_text(data = r2_values, aes(x = Inf, y = Inf, label = R2_label), 
+            hjust = 1.5, vjust = 1.2, inherit.aes = FALSE)
+
+
+SP.woodruff = SP.temp.1 %>% left_join(woodruff, by = c("date", "doy", "year"))
+
+# make columns of lake that can be input to the model
+SP.woodruffL = SP.woodruff %>% mutate(lake = "L") 
+SP.woodruffL$modeled.temp = predict(test.L, SP.woodruffL)
+  
+SP.woodruffR = SP.woodruff %>% mutate(lake = "R")
+SP.woodruffR$modeled.temp = predict(test.R, SP.woodruffR)
+
+SP.woodruffT = SP.woodruff %>% mutate(lake = "T")
+SP.woodruffT$modeled.temp = predict(test.T, SP.woodruffT)
+
+
+# combine into one for predicting temp
+SP.woodruff = rbind(SP.woodruffL, SP.woodruffR, SP.woodruffT)
+
+SP.woodruff.subset = SP.woodruff %>% filter(year %in% c(1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+                                                        2002, 2003, 2009, 2010, 2011, 2012, 2014,
+                                                        2016, 2019, 2020, 2021, 2022)) %>% 
+  filter(doy > 120 & doy < 275)
+
+# format for heatwaveR
+modeled.heatwaveR.L = SP.woodruff.subset %>% filter(lake == "L") %>% mutate(t = date, temp = modeled.temp) %>% 
+  select(t, temp)
+
+modeled.heatwaveR.R = SP.woodruff.subset %>% filter(lake == "R") %>% mutate(t = date, temp = modeled.temp) %>% 
+  select(t, temp)
+
+modeled.heatwaveR.T = SP.woodruff.subset %>% filter(lake == "T") %>% mutate(t = date, temp = modeled.temp) %>% 
+  select(t, temp)
+
+# calculate climatology and thresholds
+modeled.climOutputL = ts2clm(modeled.heatwaveR.L, climatologyPeriod = c(min(modeled.heatwaveR.L$t), max(modeled.heatwaveR.L$t)))
+paulHW = detect_event(modeled.climOutputL)
+
+modeled.climOutputR = ts2clm(modeled.heatwaveR.R, climatologyPeriod = c(min(modeled.heatwaveR.R$t), max(modeled.heatwaveR.R$t)))
+peterHW = detect_event(modeled.climOutputR)
+
+modeled.climOutputT = ts2clm(modeled.heatwaveR.T, climatologyPeriod = c(min(modeled.heatwaveR.T$t), max(modeled.heatwaveR.T$t)))
+tuesdayHW = detect_event(modeled.climOutputT)
+
+
+# apply the new climatology and thresholds to the old data
+# Paul
+L.temp.sonde = temp.sonde %>% filter(lake == "L") %>% 
+  rename(temp = mean_temp, t = date) %>% 
+  select(doy, t, temp)
+
+# gets the long-term climatology for one year because it is the same across years
+climatology = modeled.climOutputL %>% filter(year(t) == 1990) %>%  select(doy, seas, thresh)
+
+L.climatology = left_join(L.temp.sonde, climatology, by = c("doy"), relationship = "many-to-many")
+
+paulHW = detect_event(L.climatology)
+paulHW.categories = detect_event(L.climatology, categories = TRUE)
+
+
+# Peter
+R.temp.sonde = temp.sonde %>% filter(lake == "R") %>% 
+  rename(temp = mean_temp, t = date) %>% 
+  select(doy, t, temp)
+
+climatology = modeled.climOutputR %>% filter(year(t) == 1990) %>%  select(doy, seas, thresh)
+
+R.climatology = left_join(R.temp.sonde, climatology, by = c("doy"), relationship = "many-to-many")
+
+peterHW = detect_event(R.climatology)
+
+
+peterHW.categories = detect_event(R.climatology, categories = TRUE)
+
+
+# Tuesday
+T.temp.sonde = temp.sonde %>% filter(lake == "T") %>% 
+  rename(temp = mean_temp, t = date) %>% 
+  select(doy, t, temp)
+
+climatology = modeled.climOutputT %>% filter(year(t) == 1990) %>%  select(doy, seas, thresh)
+
+T.climatology = left_join(T.temp.sonde, climatology, by = c("doy"), relationship = "many-to-many")
+
+tuesdayHW = detect_event(T.climatology)
+tuesdayHW.categories = detect_event(T.climatology, categories = TRUE)
+
+
+peterHW = peterHW$event %>% mutate(lake = "R")
+paulHW = paulHW$event %>% mutate(lake = "L")
+tuesdayHW = tuesdayHW$event %>% mutate(lake = "T")
+
+hw.all = rbind(peterHW, paulHW, tuesdayHW)
+
+hw.all = hw.all %>% mutate(year = year(date_start), lake_year = paste(lake, year, sep = "_"))
+
+write.csv(hw.all, "./results/heatwave modeled outputs/heatwave events LRT separate models.csv", row.names = FALSE)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

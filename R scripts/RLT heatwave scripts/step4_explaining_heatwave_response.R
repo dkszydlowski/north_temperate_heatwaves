@@ -182,7 +182,7 @@ light = ggplot(heatwaves.exp, aes(x = (mean.par.during), y = (percentChange), fi
   guides(fill = guide_legend(override.aes = list(shape = 22), title = NULL)) 
 
 
-tp = ggplot(heatwaves.exp, aes(x = (tp_ugL.after), y = (percentChange), fill = lake))+
+tp = ggplot(heatwaves.exp, aes(x = (tp_ugL.during), y = (percentChange), fill = lake))+
   geom_point(size = 5, color = "black", shape = 21, stroke = 1, alpha = 0.95)+
   labs(x = expression("total P (mg/m"^2*")"), y = "")+
   theme_classic()+
@@ -224,6 +224,68 @@ ggarrange(top, bottom, nrow = 2, common.legend = TRUE)
 #png("./figures/manuscript draft 2024-11-11/explanatory plots.png", height = 6, width = 8, units = "in", res = 300)
 #dev.off()
 
+### make each of the panels for the figure individually
+
+png("./figures/revisions draft 2025-01-27/figure 4 panels/stratification.png", height = 2.48, width = 2.376, units = "in", res = 300)
+ggplot(heatwaves.exp, aes(x = (stability.during), y = (percentChange), fill = lake))+
+  geom_point(size = 4, color = "black", shape = 21, stroke = 1, alpha = 0.95)+
+  labs(x = expression("Schmidt stability (J/m"^2*")"), y = "% change in chl-a")+
+  theme_classic()+
+  scale_fill_manual(values = c("R" = "#60BFCC", "L" = "#D9EEF3", "T" = "#544C34"),
+                    labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday"))+
+  theme(
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 8)) + 
+  guides(fill = guide_legend(title = NULL), fill = guide_legend(title = NULL))+
+  guides(fill = guide_legend(override.aes = list(shape = 22), title = NULL)) +
+  theme(legend.position = "none")
+dev.off()
+
+
+
+png("./figures/revisions draft 2025-01-27/figure 4 panels/phosphorus.png", height = 2.48, width = 2.376, units = "in", res = 300)
+ggplot(heatwaves.exp, aes(x = (tp_ugL.during), y = (percentChange), fill = lake))+
+  geom_point(size = 4, color = "black", shape = 21, stroke = 1, alpha = 0.95)+
+  labs(x = expression("total P (μg/L)"), y = "")+
+  theme_classic()+
+  scale_fill_manual(values = c("R" = "#60BFCC", "L" = "#D9EEF3", "T" = "#544C34"),
+                    labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday"))+
+  theme(
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 8)) + 
+  guides(fill = guide_legend(title = NULL), fill = guide_legend(title = NULL))+
+  guides(fill = guide_legend(override.aes = list(shape = 22), title = NULL)) +
+  theme(legend.position = "none")
+dev.off()
+
+png("./figures/revisions draft 2025-01-27/figure 4 panels/daphnia.png", height = 2.48, width = 2.376, units = "in", res = 300)
+ggplot(heatwaves.exp, aes(x = log10(biomass), y = (percentChange), fill = lake))+
+  geom_point(size = 4, color = "black", shape = 21, stroke = 1, alpha = 0.95)+
+  labs(x = expression("log10(Daphnia biomass g/m"^2*")"), y = "% change in chl-a")+
+  theme_classic()+
+  scale_fill_manual(values = c("R" = "#60BFCC", "L" = "#D9EEF3", "T" = "#544C34"),
+                    labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday"))+
+  theme(
+    axis.title.y = element_text(size = 12),
+    axis.title.x = element_text(size = 10),
+    axis.text = element_text(size = 8)) + 
+  guides(fill = guide_legend(title = NULL), fill = guide_legend(title = NULL))+
+  guides(fill = guide_legend(override.aes = list(shape = 22), title = NULL)) +
+  theme(legend.position = "none")
+dev.off()
+
+dev.off()
+ggplot(heatwaves.exp, aes(x = log10(biomass), y = percentChange, fill = lake))+
+  geom_point(size = 5, color = "black", shape = 21, stroke = 1, alpha = 0.95)+
+  labs(x = expression("log10(Daphnia dry biomass g/m"^2*")"), y = "% change in chlorophyll-a")+
+  theme_classic()+
+  scale_fill_manual(values = c("R" = "#60BFCC", "L" = "#D9EEF3", "T" = "#544C34"),
+                    labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday"))+
+  theme(legend.text = element_text(size = 16),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12)) + 
+  guides(fill = guide_legend(title = NULL), fill = guide_legend(title = NULL))+
+  guides(fill = guide_legend(override.aes = list(shape = 22), title = NULL)) 
 
 
 growth_banner <- textGrob("Growth Processes", gp=gpar(fontsize=16, fontface="bold", col="white", fill="blue", alpha=0.5))
