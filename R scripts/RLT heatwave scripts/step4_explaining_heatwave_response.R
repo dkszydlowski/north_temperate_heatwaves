@@ -294,7 +294,7 @@ dev.off()
 
 
 png("./figures/revisions draft 2025-01-27/figure 4 panels/heatwave intensity.png", height = 2.48, width = 2.376, units = "in", res = 300)
-ggplot(heatwaves.exp, aes(x = intensity_mean, y = (percentChange), fill = lake))+
+ggplot(heatwaves.exp, aes(x = intensity_mean_relThresh, y = (percentChange), fill = lake))+
   geom_point(size = 4, color = "black", shape = 21, stroke = 1, alpha = 0.95)+
   labs(x =("heatwave intensity (°C)"), y = "% change in chl-a")+
   theme_classic()+
@@ -312,12 +312,109 @@ dev.off()
 
 
 
+#### top row ####
 
 
+### make new total P column so that it includes week before heatwave ###
+
+temp = ggplot(heatwaves.exp, aes(x = intensity_mean_relThresh, y = (percentChange), fill = lake))+
+  geom_point(size = 4, color = "black", shape = 21, stroke = 1, alpha = 0.95)+
+  labs(x =("heatwave intensity (°C)"), y = "% change in chl-a")+
+  theme_classic()+
+  scale_fill_manual(values = c("R" = "#60BFCC", "L" = "#D9EEF3", "T" = "#544C34"),
+                    labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday"))+
+  theme(
+    axis.title.y = element_text(size = 12),
+    axis.title.x = element_text(size = 12),
+    axis.text = element_text(size = 8)) + 
+  guides(fill = guide_legend(title = NULL), fill = guide_legend(title = NULL))+
+  guides(fill = guide_legend(override.aes = list(shape = 22), title = NULL)) +
+  theme(legend.position = "none")
 
 
+heatwaves.exp = heatwaves.exp %>% 
+  mutate(total.P.during.or.before = coalesce(tp_ugL.during, tp_ugL.before))
+
+heatwaves.exp = heatwaves.exp %>% 
+  mutate(daphnia.during.or.before = coalesce(daphnia.biomass.during, daphnia.biomass.before))
+
+heatwaves.exp = heatwaves.exp %>% 
+  mutate(schmidt.during.or.before = coalesce(stability.during, stability.before))
 
 
+tp = ggplot(heatwaves.exp, aes(x = (total.P.during.or.before), y = (percentChange), fill = lake))+
+  geom_point(size = 4, color = "black", shape = 21, stroke = 1, alpha = 0.95)+
+  labs(x = expression("total P (μg/L)"), y = "")+
+  theme_classic()+
+  scale_fill_manual(values = c("R" = "#60BFCC", "L" = "#D9EEF3", "T" = "#544C34"),
+                    labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday"))+
+  theme(
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 8)) + 
+  guides(fill = guide_legend(title = NULL), fill = guide_legend(title = NULL))+
+  guides(fill = guide_legend(override.aes = list(shape = 22), title = NULL)) +
+  theme(legend.position = "none")
+
+zoop = ggplot(heatwaves.exp, aes(x = log10(daphnia.during.or.before+0.001), y = (percentChange), fill = lake))+
+  geom_point(size = 4, color = "black", shape = 21, stroke = 1, alpha = 0.95)+
+  labs(x = expression("Daphnia dry biomass (g/m"^2*")"), y = "% change in chl-a")+
+  theme_classic()+
+  scale_fill_manual(values = c("R" = "#60BFCC", "L" = "#D9EEF3", "T" = "#544C34"),
+                    labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday"))+
+  theme(
+    axis.title.y = element_text(size = 12),
+    axis.title.x = element_text(size = 10),
+    axis.text = element_text(size = 8)) + 
+  guides(fill = guide_legend(title = NULL), fill = guide_legend(title = NULL))+
+  guides(fill = guide_legend(override.aes = list(shape = 22), title = NULL)) +
+  theme(legend.position = "none")+
+  scale_x_continuous(
+    breaks = c(-3, -2, -1, 0),
+    labels = c("0", "-0.01", "0.1", "1")
+  )
+
+
+color = ggplot(heatwaves.exp, aes(x = PML.g440, y = (percentChange), fill = lake))+
+  geom_point(size = 4, color = "black", shape = 21, stroke = 1, alpha = 0.95)+
+  labs(x = expression("water color - g440 (m"^-1*")"), y = "")+
+  theme_classic()+
+  scale_fill_manual(values = c("R" = "#60BFCC", "L" = "#D9EEF3", "T" = "#544C34"),
+                    labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday"))+
+  theme(
+    axis.title.y = element_text(size = 12),
+    axis.title.x = element_text(size = 12),
+    axis.text = element_text(size = 8)) + 
+  guides(fill = guide_legend(title = NULL), fill = guide_legend(title = NULL))+
+  guides(fill = guide_legend(override.aes = list(shape = 22), title = NULL)) +
+  theme(legend.position = "none")
+
+
+strat = ggplot(heatwaves.exp, aes(x = (stability.during), y = (percentChange), fill = lake))+
+  geom_point(size = 4, color = "black", shape = 21, stroke = 1, alpha = 0.95)+
+  labs(x = expression("Schmidt stability (J/m"^2*")"), y = "")+
+  theme_classic()+
+  scale_fill_manual(values = c("R" = "#60BFCC", "L" = "#D9EEF3", "T" = "#544C34"),
+                    labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday"))+
+  theme(
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 8)) + 
+  guides(fill = guide_legend(title = NULL), fill = guide_legend(title = NULL))+
+  guides(fill = guide_legend(override.aes = list(shape = 22), title = NULL)) +
+  theme(legend.position = "none")
+
+top = ggarrange(temp, color, tp, align = "hv", nrow = 1, ncol = 3)
+
+bottom = ggarrange(zoop, strat, align = "hv", nrow = 1, ncol = 2)
+
+
+png("./figures/revisions draft 2025-01-27/figure 4 panels/top panels.png", height = 2.48, width = 7.13, units = "in", res = 300)
+top
+dev.off()
+
+
+png("./figures/revisions draft 2025-01-27/figure 4 panels/bottom panels.png", height = 2.48, width = 4.78, units = "in", res = 300)
+bottom
+dev.off()
 
 
 

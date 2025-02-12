@@ -127,9 +127,9 @@ metadata_plot <- ggplot() +
 # read in the heatwaves data calculated in the previous step
 # heatwaves = read.csv("./formatted data/heatwavesdata.csv")
 heatwaves = read.csv("./results/heatwave modeled outputs/heatwave events LRT.csv")
-heatwaves90 = read.csv("./results/heatwave modeled outputs/heatwave events LRT 90 percent.csv")
+#heatwaves90 = read.csv("./results/heatwave modeled outputs/heatwave events LRT 90 percent.csv")
 
-heatwaves$date_start %in% heatwaves90$date_start
+#heatwaves$date_start %in% heatwaves90$date_start
 #heatwaves$date_start %in% hw.all.original$date_start
 
 

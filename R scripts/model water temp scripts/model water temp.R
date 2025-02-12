@@ -121,13 +121,14 @@ ggplot(data = sonde.SP.woodruff.testing, aes(x = mean_temp, y = modeled, fill = 
 
 #png("./figures/ASLO figures/modeled temp testing scatterplot.#png", res = 300, height = 3.5, width = 6, units = "in")
 
-ggplot(data = sonde.SP.woodruff.testing, aes(x = mean_temp, y = modeled, fill = lake))+
-  geom_point(size = 3, pch = 21)+
-  labs(x = "measured temperature (°C)", y = "modeled temperature (°C)")+
+ggplot(data = sonde.SP.woodruff.testing, aes(x = mean_temp, y = modeled))+
+  geom_point(size = 5, pch = 21, alpha = 0.8, aes(fill = lake))+
+  labs(x = "measured sonde epilimnetic temperature in our study lakes (°C)", y = "modeled epilimnetic temperature from \nSparkling Lake and Woodruff Airport (°C)")+
   theme_classic()+
-  scale_fill_manual(values = c("L" = "#ADDAE3", "R"=  "#4AB5C4", "T"=  "#BAAD8D"))  +
-  theme(legend.position = "none")+
-  geom_abline (slope=1, linetype = "dashed")
+  scale_fill_manual(values = c("L" = "#ADDAE3", "R"=  "#4AB5C4", "T"=  "#BAAD8D"),
+                    labels = c("L" = "Paul", "R" = "Peter", "T" = "Tuesday"))  +
+  geom_smooth(method = "lm", linetype = "dashed", se = FALSE, color = "black")+
+  theme(axis.title = element_text(size = 14), axis.text = element_text(size = 14))
 
 
 summary(lm(data = sonde.SP.woodruff.testing, modeled~mean_temp))
@@ -976,7 +977,7 @@ hw.all = hw.all %>% mutate(year = year(date_start), lake_year = paste(lake, year
 write.csv(hw.all, "./results/heatwave modeled outputs/heatwave events LRT separate models.csv", row.names = FALSE)
 
 
-
+hw.individual.models = hw.all
 
 
 

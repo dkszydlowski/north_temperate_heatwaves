@@ -1274,20 +1274,20 @@ Tdist <- allSlopes %>%
                       quantile_lines = TRUE,
                       quantile_fun = function(x, ...) mean(x), 
                       scale = 2, size = 0.7) +
-  # geom_text(data = mean_dfT %>% filter(daysAfter == 2),
-  #           aes(x = mean_percent_change,
-  #               y = factor(period, levels = desired_order),  # Use factor with desired order
-  #               label = paste0(round(mean_percent_change, digits = 0), "%")),
-  #           color = "black",
-  #           size = 4,
-  #           vjust = 1) +
-  # geom_text(data = mean_dfT %>% filter(daysAfter == 2),
-  #           aes(x = 400,
-  #               y = factor(period, levels = desired_order),  # Use factor with desired order
-  #               label = paste("n = ", number_percent_change, sep = "")),
-#           color = "black",
-#           size = 4,
-#           vjust = 2) +
+geom_text(data = mean_dfT %>% filter(daysAfter == 2),
+          aes(x = mean_percent_change,
+              y = factor(period, levels = desired_order),  # Use factor with desired order
+              label = paste0(round(mean_percent_change, digits = 0), "%")),
+          color = "black",
+          size = 4,
+          vjust = 1) +
+geom_text(data = mean_dfT %>% filter(daysAfter == 2),
+          aes(x = 400,
+              y = factor(period, levels = desired_order),  # Use factor with desired order
+              label = paste("n = ", number_percent_change, sep = "")),
+          color = "black",
+          size = 4,
+          vjust = 2) +
 ylab("") +
   xlab("\n\n")+
   labs(title = "Tuesday") +
@@ -1327,19 +1327,19 @@ Rdist <- allSlopes %>%
                       quantile_lines = TRUE,
                       quantile_fun = function(x, ...) mean(x), 
                       scale = 2, size = 0.7) +
-  # geom_text(data = mean_dfR %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
-  #           aes(x = mean_percent_change,
-  #               y = factor(period, levels = desired_order),  # Use factor with desired order
-  #               label = paste0(round(mean_percent_change, digits = 0), "%")),            color = "black",
-  #           size = 4,
-  #           vjust = 2) +
-  # geom_text(data = mean_dfR %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
-  #           aes(x = 400,
-  #               y = factor(period, levels = desired_order),  # Use factor with desired order
-  #               label = paste("n = ", number_percent_change, sep = "")),
-  #           color = "black",
-#           size = 4,
-#           vjust = 2) +
+geom_text(data = mean_dfR %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+          aes(x = mean_percent_change,
+              y = factor(period, levels = desired_order),  # Use factor with desired order
+              label = paste0(round(mean_percent_change, digits = 0), "%")),            color = "black",
+          size = 4,
+          vjust = 2) +
+geom_text(data = mean_dfR %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+          aes(x = 400,
+              y = factor(period, levels = desired_order),  # Use factor with desired order
+              label = paste("n = ", number_percent_change, sep = "")),
+          color = "black",
+          size = 4,
+          vjust = 2) +
 ylab("") +
   xlab("\n\n% change in chlorophyll a")+
   labs(title = "Peter") +
@@ -1372,21 +1372,21 @@ Ldist <- allSlopes %>%
                       quantile_lines = TRUE,
                       quantile_fun = function(x, ...) mean(x), 
                       scale = 2, size = 0.7) +
-  # geom_text(data = mean_dfL %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
-  #           aes(x = mean_percent_change,
-  #               y = factor(period, levels = desired_order),  # Use factor with desired order
-  #               label = paste0(round(mean_percent_change, digits = 0), "%")),
-  #           color = "black",
-  #           size = 4,
-  #           vjust = 2) +
-  # geom_text(data = mean_dfL %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
-  #           aes(x = 200,
-  #               y = factor(period, levels = desired_order),  # Use factor with desired order
-  #               label = paste("n = ", number_percent_change, sep = "")),
-#           color = "black",
-#           size = 4,
-#           vjust = 2) +
-#ylab("") +
+geom_text(data = mean_dfL %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+          aes(x = mean_percent_change,
+              y = factor(period, levels = desired_order),  # Use factor with desired order
+              label = paste0(round(mean_percent_change, digits = 0), "%")),
+          color = "black",
+          size = 4,
+          vjust = 2) +
+geom_text(data = mean_dfL %>% filter(daysAfter == get("daysAfter", envir=globalenv())),
+          aes(x = 200,
+              y = factor(period, levels = desired_order),  # Use factor with desired order
+              label = paste("n = ", number_percent_change, sep = "")),
+          color = "black",
+          size = 4,
+          vjust = 2) +
+ylab("") +
 xlab("\n\n")+
   labs(title = "Paul", y = "") +
   scale_fill_manual(values = c("after heatwave" = "#D9EEF3", "all other days" = "darkgrey")) +  # Specify fill colors for groups
