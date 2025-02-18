@@ -134,11 +134,11 @@ heatwaves = read.csv("./results/heatwave modeled outputs/heatwave events LRT.csv
 
 
 
-heatwaves$date_end %in% heatwaves90$date_end
+#heatwaves$date_end %in% heatwaves90$date_end
 ## 2 of the heatwaves have different end dates in heatwaves 90 than in heatwaves..... why?
 
 
-test = heatwaves == heatwaves90
+#test = heatwaves == heatwaves90
 
 #permanent.heatwaves = heatwaves
 # read in the manual chl data

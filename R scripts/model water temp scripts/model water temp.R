@@ -123,9 +123,9 @@ ggplot(data = sonde.SP.woodruff.testing, aes(x = mean_temp, y = modeled, fill = 
 
 ggplot(data = sonde.SP.woodruff.testing, aes(x = mean_temp, y = modeled))+
   geom_point(size = 5, pch = 21, alpha = 0.8, aes(fill = lake))+
-  labs(x = "measured sonde epilimnetic temperature in our study lakes (°C)", y = "modeled epilimnetic temperature from \nSparkling Lake and Woodruff Airport (°C)")+
+  labs(x = "measured sonde temperature in our study lakes (°C)", y = "modeled temperature from \nSparkling Lake and Woodruff Airport (°C)")+
   theme_classic()+
-  scale_fill_manual(values = c("L" = "#ADDAE3", "R"=  "#4AB5C4", "T"=  "#BAAD8D"),
+  scale_fill_manual(values = c("R"=  "#60BFCC", "L" = "#D9EEF3", "T"=  "#544C34"),
                     labels = c("L" = "Paul", "R" = "Peter", "T" = "Tuesday"))  +
   geom_smooth(method = "lm", linetype = "dashed", se = FALSE, color = "black")+
   theme(axis.title = element_text(size = 14), axis.text = element_text(size = 14))

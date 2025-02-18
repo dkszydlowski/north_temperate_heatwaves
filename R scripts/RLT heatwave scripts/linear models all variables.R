@@ -5,7 +5,7 @@ library(lme4)
 library(MuMIn)
 
 # read in the explanatory dataset
-hw.exp = read.csv("./formatted data/master explanatory dataset/heatwaves explained var4.csv")
+hw.exp = read.csv("./formatted data/master explanatory dataset/heatwaves explained var6.csv")
 
 hw.exp = hw.exp %>% mutate(lake = as.factor(lake))
 
@@ -18,7 +18,9 @@ exp.vars = c("duration", "intensity_mean", "intensity_max", "intensity_var", "in
   "manual.chl.before", "manual.chl.during", "zoop.days.before", 
  "daphnia.length.before", "daphnia.length.during", 
   "daphnia.length.after","pchange.total.zoop", "abschange.total.zoop", "pchange.total.zoop.during.to.after", 
-  "pchange.daphnia.length", "abschange.daphnia.zoop", "abschange.daphnia.zoop.during.to.after")
+  "pchange.daphnia.length", "abschange.daphnia.zoop", "abschange.daphnia.zoop.during.to.after", "tp_ugL.before", 
+ "tp_ugL.after", "tp_ugL.during","tn_ugL.before", 
+ "tn_ugL.after", "tn_ugL.during")
 
 
 
@@ -339,7 +341,21 @@ i = ggplot(hw.exp, aes(x = (cumulative.load), y = (percentChange), fill = lake))
   guides(fill = guide_legend(override.aes = list(shape = 22), title = NULL))
 
 
+
+j = ggplot(hw.exp, aes(x = (tp_ugL.after), y = (percentChange), fill = lake))+
+  geom_point(size = 4, color = "black", shape = 21, stroke = 1, alpha = 0.95)+
+  labs(x = expression("TP after heatwave (ug/m"^2*")"), y = "")+
+  theme_classic()+
+  scale_fill_manual(values = c("R" = "#60BFCC", "L" = "#D9EEF3", "T" = "#544C34"),
+                    labels = c("R" = "Peter", "L" = "Paul", "T" = "Tuesday"))+
+  theme(legend.text = element_text(size = 16),
+        axis.title = element_text(size = 10),
+        axis.text = element_text(size = 10)) + 
+  guides(fill = guide_legend(title = NULL), fill = guide_legend(title = NULL))+
+  guides(fill = guide_legend(override.aes = list(shape = 22), title = NULL))
+
+
 png("./figures/manuscript draft 2024-11-11/S4 plots.png", height = 8, width = 11, res = 300, units = "in")
-ggarrange(nrow = 3, ncol = 3, d, c, h, a, b, e, f, g, i, common.legend = TRUE)
+ggarrange(nrow = 4, ncol = 3, d, c, h, a, b, e, f, g, i, j, common.legend = TRUE)
 dev.off()
 
