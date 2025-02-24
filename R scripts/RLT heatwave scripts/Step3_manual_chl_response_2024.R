@@ -1830,7 +1830,7 @@ scale_x_continuous(trans = pseudolog10_trans)
 
   ggplot(results, aes(x = lake, y = percentChange, fill = lake)) +
     geom_bar(stat = "identity", position = position_dodge(width = 0.9), alpha = 0.5, color = "black", width = 0.9) +
-    #geom_errorbar( aes(x=lake, ymin= error.bottom, ymax=error.top), position = position_dodge(width = 0.1), alpha = 0.5, color = "black", width = 0) +
+    geom_errorbar( aes(x=lake, ymin= error.bottom, ymax=error.top), position = position_dodge(width = 0.1), alpha = 0.5, color = "black", width = 0) +
     theme_classic() +  
     ylab("% change in surface chlorophyll-a") +
     xlab("") +
