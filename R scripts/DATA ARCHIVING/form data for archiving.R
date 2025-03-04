@@ -52,6 +52,9 @@ hw.exp = hw.exp %>% rename(lakeid = lake) %>%
 
 hw.exp = hw.exp %>% select(year, lake, lakeid, doy, everything())
 
+ggplot(hw.exp, aes(x = biomass, y = daphnia.biomass.after))+
+  geom_point()
+
 write.csv(hw.exp, "./formatted data/FINAL DATA FOR PUBLICATION/heatwave results and covariates 2008-2019.csv", row.names = FALSE)
 
 

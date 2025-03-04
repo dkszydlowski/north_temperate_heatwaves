@@ -145,8 +145,7 @@ phyto.wide = phyto.wide %>% select(-"NA")
 
 
 # Install and load necessary packages
-install.packages("vegan")
-install.packages("tidyverse")
+
 library(vegan)
 library(tidyverse)
 
@@ -199,15 +198,38 @@ phyto = phyto %>% filter(year4 >= 2008 & lakeid %in% c("L", "R", "T"))
 phyto.total = phyto %>% group_by(division, lakeid, year4, daynum) %>% 
   summarize(total.volume = sum(total_vol, na.rm = TRUE))
 
+phyto.total = phyto.total %>% group_by(lakeid, year4, daynum) %>% 
+  mutate(day.total = sum(total.volume, na.rm = TRUE)) %>% 
+  mutate(percent = 100*total.volume/day.total) %>% 
+  mutate(lakeid = as.character(lakeid)) %>% 
+  mutate(lakeid = replace(lakeid, lakeid == "R", "Peter")) %>% 
+  mutate(lakeid = replace(lakeid, lakeid == "L", "Paul")) %>% 
+  mutate(lakeid = replace(lakeid, lakeid == "T", "Tuesday"))
+
+# add vertical lines for heatwaves in those years
+hw.exp.13.15 = hw.exp %>% filter(year %in% c(2013, 2014, 2015)) %>% 
+  mutate(daynum = yday(date_start),
+         daynum.end = yday(date_end)) %>% 
+  select(lake, year, daynum, daynum.end) %>% 
+  rename(lakeid = lake, year4 = year) %>% 
+  mutate(lakeid = as.character(lakeid)) %>% 
+  mutate(lakeid = replace(lakeid, lakeid == "R", "Peter")) %>% 
+  mutate(lakeid = replace(lakeid, lakeid == "L", "Paul")) %>% 
+  mutate(lakeid = replace(lakeid, lakeid == "T", "Tuesday"))
+  
+
 png("./figures/revisions draft 2025-01-27/phytoplankton community over time.png", height = 6, width = 7, res = 300, units = "in")
 ggplot(phyto.total %>% filter(division != "Miscellaneous"), aes(x = daynum, y = percent, fill = division)) +
   geom_bar(stat = "identity") +
-  labs(x = "Year", y = "Percent of total", fill = "Division") +
+  labs(x = "day of year", y = "Percent of total", fill = "Division") +
   facet_wrap(year4~lakeid)+
   scale_fill_manual(values = c("Bacillariophyta" = "black", "Chlorophyta" = "#009292", "Chrysophyta" = "#ffff6d", "Cryptophyta" = "#db6d00",
                                "Cyanophyta" = "#004949", "Euglenophyta" = "#b66dff", "Rhodophyta" = "#920000", "Pyrrhophyta" = "#924900",
                                "Xanthophyta" = "#ffb6db", "Haptophyta" = "#006ddb"))+
-  theme_bw()
+  theme_bw()+
+  geom_vline(data = hw.exp.13.15, aes(xintercept = daynum), linetype = "dashed", color = "red3", size = 1.2)
+#  geom_rect(data = hw.exp.13.15, aes(xmin = daynum, xmax = daynum.end, ymin = 0, ymax = 100), fill = "black")
+
 
 dev.off()
 # color-blind friendly colors
@@ -216,9 +238,7 @@ dev.off()
 # "#920000","#924900","#db6d00","#24ff24","#ffff6d"
 
 ## create a column that has the percent of total volume ##
-phyto.total = phyto.total %>% group_by(lakeid, year4, daynum) %>% 
-  mutate(day.total = sum(total.volume, na.rm = TRUE)) %>% 
-  mutate(percent = 100*total.volume/day.total)
+
 
 
 

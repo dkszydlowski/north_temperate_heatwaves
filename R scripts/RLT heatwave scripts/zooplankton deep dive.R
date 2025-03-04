@@ -322,9 +322,10 @@ for(i in 1:nrow(hw.exp)){
   cur.casc.exp.before = cur.casc.exp.before %>% filter(daynum == max(daynum))
   if(nrow(cur.casc.exp.before) > 0){ 
     
-  hw.exp$daphnia.biomass.before[i] = sum(cur.casc.exp.before %>% filter(taxon_name == "Daphnia" | 
+  hw.exp$daphnia.biomass.before[i] = sum(cur.casc.exp.before %>% filter(taxon_name == "Daphnia" 
                                                                         #taxon_name == "Holopedium gibberum" |
-                                                                        taxon_name == "Ceriodaphnia") %>% pull(biomass), na.rm = TRUE)
+                                                                        #taxon_name == "Ceriodaphnia"
+                                                                        ) %>% pull(biomass), na.rm = TRUE)
   
   hw.exp$daphnia.length.before[i] = mean(cur.casc.exp.before %>% filter(taxon_name == "Daphnia") %>% pull(mean_length), na.rm = TRUE)
   
@@ -333,9 +334,10 @@ for(i in 1:nrow(hw.exp)){
   cur.casc.exp.during = cur.casc.exp.during %>% filter(daynum == min(daynum))
   if(nrow(cur.casc.exp.during) > 0){
     
-    hw.exp$daphnia.biomass.during[i] = sum(cur.casc.exp.during %>% filter(taxon_name == "Daphnia" |
+    hw.exp$daphnia.biomass.during[i] = sum(cur.casc.exp.during %>% filter(taxon_name == "Daphnia" 
                                                                           #  taxon_name == "Holopedium gibberum" |
-                                                                        taxon_name == "Ceriodaphnia") %>% pull(biomass), na.rm = TRUE)
+                                                                        #taxon_name == "Ceriodaphnia"
+                                                                        ) %>% pull(biomass), na.rm = TRUE)
     
     
     hw.exp$daphnia.length.during[i] = mean(cur.casc.exp.during %>% filter(taxon_name == "Daphnia" 
@@ -346,9 +348,10 @@ for(i in 1:nrow(hw.exp)){
   cur.casc.exp.after = cur.casc.exp.after %>% filter(daynum == min(daynum))
   if(nrow(cur.casc.exp.after) > 0){ 
     
-    hw.exp$daphnia.biomass.after[i] = sum(cur.casc.exp.after %>% filter(taxon_name == "Daphnia" |
+    hw.exp$daphnia.biomass.after[i] = sum(cur.casc.exp.after %>% filter(taxon_name == "Daphnia" 
                                                                           #taxon_name == "Holopedium gibberum" |
-                                                                        taxon_name == "Ceriodaphnia" ) %>% pull(biomass), na.rm = TRUE)
+                                                                       # taxon_name == "Ceriodaphnia" 
+                                                                        ) %>% pull(biomass), na.rm = TRUE)
     
     
     hw.exp$daphnia.length.after[i] = mean(cur.casc.exp.after %>% filter(taxon_name == "Daphnia" ) %>% pull(mean_length), na.rm = TRUE)
@@ -382,7 +385,7 @@ write.csv(zoop.all.hw, "./formatted data/zooplankton/zooplankton community heatw
 hw.exp = hw.exp %>% mutate(pchange.total.zoop = 100*(total.biomass.during - total.biomass.before)/total.biomass.before,
                            abschange.total.zoop = total.biomass.during- total.biomass.before,
                            pchange.total.zoop.during.to.after = 100*(total.biomass.after - total.biomass.during)/total.biomass.during,
-                           pchange.daphnia.length = 100*(daphnia.length.before- daphnia.length.during)/daphnia.length.during)
+                           pchange.daphnia.length = 100*(daphnia.length.during - daphnia.length.before)/daphnia.length.during)
 
 
 #hw.exp.zoop = hw.exp %>% select(date_start, date_end, lake, year, percentChange, pchange.daphnia.zoop, pchange.daphnia.length, abschange.daphnia.zoop,
@@ -724,3 +727,8 @@ r.squaredGLMM(test)
 
 write.csv(hw.exp, "./formatted data/master explanatory dataset/heatwaves explained var4.csv", row.names = FALSE)
 
+
+
+
+ggplot(hw.exp, aes(x = biomass, y = daphnia.biomass.during))+
+  geom_point()

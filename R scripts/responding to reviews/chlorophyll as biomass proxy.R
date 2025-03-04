@@ -18,8 +18,6 @@ allData = read.csv("./formatted data/interpolated_manual_chl_for_slopes.csv")
 
 
 
-
-
 # Package ID: knb-lter-ntl.354.5 Cataloging System:https://pasta.edirepository.org.
 # Data set title: Cascade Project at North Temperate Lakes LTER Core Data Process Data 1984 - 2016.
 # Data set creator:  Stephen Carpenter - University of Wisconsin 
@@ -224,4 +222,11 @@ ggplot(mean.chl, aes(x = chl.mean, y = depth_id, color = lakeid))+
   theme_bw()+
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 14))
 
+
+
+### what depth is 10% of light? ###
+ten.perc.depth = routines.chl %>% group_by(lakeid) %>%
+  filter(daynum >= 141 & daynum <= 245) %>% 
+  filter(depth_id == 3) %>% 
+  summarize(mean.depth = median(depth, na.rm = TRUE))
 

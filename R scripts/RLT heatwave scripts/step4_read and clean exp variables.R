@@ -672,6 +672,8 @@ for(i in 1:nrow(heatwaves.exp)){
   cur.casc.exp.color = cur.casc.exp %>% filter(!is.na(PML.g440))
   cur.casc.exp.nut = cur.casc.exp %>% filter(!is.na(cumulative.load))
   
+  print(nrow(cur.casc.exp.zoop))
+  
   # either before or during heatwave
   j = which(abs(cur.casc.exp.zoop$doy - targ.doy) == min(abs(cur.casc.exp.zoop$doy - targ.doy)))
   if(nrow(cur.casc.exp.zoop) > 0){ heatwaves.exp$biomass[i] = cur.casc.exp.zoop$biomass[j]}
